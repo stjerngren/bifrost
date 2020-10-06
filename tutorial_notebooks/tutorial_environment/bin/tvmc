@@ -1,0 +1,12 @@
+#!"/Users/axelstjerngren/uni/Year 4/Project Level 4/level-4-project/tutorial_notebooks/tutorial_environment/bin/python3"
+# EASY-INSTALL-ENTRY-SCRIPT: 'tvm==0.8.dev0','console_scripts','tvmc'
+__requires__ = 'tvm==0.8.dev0'
+import re
+import sys
+from pkg_resources import load_entry_point
+
+if __name__ == '__main__':
+    sys.argv[0] = re.sub(r'(-script\.pyw?|\.exe)?$', '', sys.argv[0])
+    sys.exit(
+        load_entry_point('tvm==0.8.dev0', 'console_scripts', 'tvmc')()
+    )
