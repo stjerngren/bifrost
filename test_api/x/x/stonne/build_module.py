@@ -1,12 +1,17 @@
+from typing import Dict
 
 class Simulator(object):
-    pass
+    config : Dict[str,int]
 
-def config_simulator(config: dict) -> Simulator:
+    def __init__(self, config: Dict[str,int]):
+        self.config = config
+
+def config_simulator(config: Dict[str,int]) -> Simulator:
     """
     This function builds a STONNE config and returns a simulator object
     """
+    return Simulator(config)
 
-    return 3
 
-     
+
+print(config_simulator({"r":1}))
