@@ -3,4 +3,4 @@
 # class exposures
 
 # function exposures
-from .build_module import config_simulator
+from .environment import config_simulator
