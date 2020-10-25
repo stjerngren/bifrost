@@ -22,6 +22,8 @@ class Simulator(object):
     def target_host(self):
         return None
 
+    
+
 def config_simulator(config: Dict[str,int]) -> Simulator:
     """
     This function builds a STONNE config and returns a simulator object

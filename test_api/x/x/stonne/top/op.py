@@ -1,8 +1,7 @@
 """Namespace for supporting Relay operators on STONNE."""
 
 import tvm
-from tvm import te
-from tvm import topi
+from tvm import te, topi
 
 from tvm.relay.op import op as reg
 from tvm.relay.op import strategy as _strategy
