@@ -18,20 +18,65 @@ sparsity_ratio=0.0
 
 @autotvm.register_topi_compute("conv2d_stonne.x86")
 def conv2d_stonne(
-    cfg, data, kernel, strides, padding, dilation, groups=1, layout="NCHW", out_dtype="float32"
+    cfg, 
+    data,
+    kernel,
+    strides,
+    padding,
+    dilation,
+    groups=1,
+    layout="NCHW",
+    out_dtype="float32"
 ):
-    """Compute conv2d using stonne library"""
+    """Compute conv2d using stonne library
+
+    -R: Number of flter rows
+    -S: Number of filter columns
+    -C: Number of filter and input channels
+    -K: Number of filters and output channels
+    -G: Number of groups
+    -N: Number of inputs (Only 1 is supported so far)
+    -X: Number of input rows
+    -Y: Number of input columns
+    """
     N, C, H, W = get_const_tuple(data.shape)
-    tile_file_1 = getTileFileFromConvDimensions(tiles_path, 3, 3, 1, 1)
+
+    output_channels, _, kernel_height, kernel_width = kernel.shape
+    print(get_const_tuple(kernel.shape))
+    print("This is the padding", padding)
+    print("This is the strides", padding)
+    print("This is the dilation", dilation)
+    # Translate variables names to STONNE taxonomy
+    X = H 
+    Y = W 
+    R = kernel_height
+    S = kernel_width
+    K = output_channels
+    G = groups
+    N = 1 
+
+    # Calculate the output shape
+    H_out:int =((X + 2 * padding[0] - dilation[0] * (R - 1) - 1) / strides[0]) + 1
+    W_out:int = ((Y + 2 * padding[1] - dilation[1] * (S - 1) - 1) / strides[0]) + 1
 
 
-    print("This is the kernel", kernel)
+    tile_file_1 = getTileFileFromConvDimensions(
+        tiles_path, 
+        C, # Channels
+        K, # K
+        R, # Height
+        G
+    )
+
+
     return te.extern(
-            data.shape,
+            [H_out, W_out],
             [data,kernel],
             lambda ins, outs: tvm.tir.call_packed(
+                "tvm.contrib.stonne.conv2d.forward",              
             ),
             out_dtype,
+            name = "test"
     )
 
 # Override the conv2d x86 strategy to add stonne support in
