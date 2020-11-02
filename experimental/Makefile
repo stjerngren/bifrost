@@ -29,6 +29,6 @@ ifeq ($(UNAME_S), Darwin)
 	PKG_LDFLAGS += -undefined dynamic_lookup
 endif
 
-lib/libtvm_ext.so: src/tvm_ext.cc
+lib/libtvm_ext.so: src/conv_forward_stonne.cc
 	@mkdir -p $(@D)
 	$(CXX) $(PKG_CFLAGS) -shared -o $@ $^ $(PKG_LDFLAGS)

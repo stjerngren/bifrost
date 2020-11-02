@@ -43,24 +43,25 @@ def conv2d_stonne(
 
     output_channels, _, kernel_height, kernel_width = kernel.shape
     print(get_const_tuple(kernel.shape))
-    print("This is the padding", padding)
-    print("This is the strides", padding)
-    print("This is the dilation", dilation)
+    print("This is the grips", groups)
+    print("This is the strides", padding[0])
+    print("This is the dilation", dilation[0])
     # Translate variables names to STONNE taxonomy
     X = H 
     Y = W 
     R = kernel_height
     S = kernel_width
     K = output_channels
-    G = groups
+    G = 1
     N = 1 
-
+    pad_x = padding[0] 
+    pad_y = padding[1]
     # Calculate the output shape
-    H_out:int =((X + 2 * padding[0] - dilation[0] * (R - 1) - 1) / strides[0]) + 1
-    W_out:int = ((Y + 2 * padding[1] - dilation[1] * (S - 1) - 1) / strides[0]) + 1
+    H_out:int =((X + 2 * padding[0] - dilation[0] * (R - 1) - 1) // strides[0]) + 1
+    W_out:int = ((Y + 2 * padding[1] - dilation[1] * (S - 1) - 1) // strides[0]) + 1
 
 
-    tile_file_1 = getTileFileFromConvDimensions(
+    tile_file = getTileFileFromConvDimensions(
         tiles_path, 
         C, # Channels
         K, # K
@@ -73,9 +74,26 @@ def conv2d_stonne(
             [H_out, W_out],
             [data,kernel],
             lambda ins, outs: tvm.tir.call_packed(
-                "tvm.contrib.stonne.conv2d.forward",              
+                "tvm.contrib.stonne.conv2d.forward",  
+                simulation_file, # [0]
+                R,               # [1]
+                S,               # [2]
+                C,               # [3]
+                K,               # [4]
+                G,               # [5]
+                N,               # [6]
+                X,               # [7]
+                Y,               # [8]
+                H_out,           # [9]    
+                W_out,           # [10]    
+                strides,         # [11]      
+                pad_x,           # [12]    
+                pad_y,           # [13]    
+                tile_file,       # [14]         
+                data,            # [15]
+                kernel           # [16]
+
             ),
-            out_dtype,
             name = "test"
     )
 
