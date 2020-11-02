@@ -6,7 +6,8 @@ from StonneUtils import getTileFileFromConvDimensions
 
 from tvm.relay.op.strategy.generic import *
 import tvm.relay.op as _op
-
+import os
+import ctypes
 # Start by registering stonne conv2d 
 
 
@@ -14,8 +15,17 @@ simulation_file='test.cfg'
 tiles_path='tiles/accumulation_buffer/128_mses/'
 sparsity_ratio=0.0
 
-# Register the compute schedule for stonne conv2d
+def load_lib():
+    """Load library, the functions will be registered into TVM"""
 
+    # load in as global so the global extern symbol is visible to other dll.
+    lib = ctypes.CDLL("lib/conv_forward_stonne.so", ctypes.RTLD_GLOBAL)
+    return lib
+
+
+_LIB = load_lib()
+
+# Register the compute schedule for stonne conv2d
 @autotvm.register_topi_compute("conv2d_stonne.x86")
 def conv2d_stonne(
     cfg, 

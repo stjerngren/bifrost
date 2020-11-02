@@ -29,7 +29,7 @@ def load_lib():
     """Load library, the functions will be registered into TVM"""
     curr_path = os.path.dirname(os.path.abspath(os.path.expanduser(__file__)))
     # load in as global so the global extern symbol is visible to other dll.
-    lib = ctypes.CDLL(os.path.join(curr_path, "../../lib/libtvm_ext.so"), ctypes.RTLD_GLOBAL)
+    lib = ctypes.CDLL(os.path.join(curr_path, "lib/libtvm_ext.so"), ctypes.RTLD_GLOBAL)
     return lib
 
 

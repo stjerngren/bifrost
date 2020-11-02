@@ -1,6 +1,6 @@
-#include "../../../stonne_works/stonne/stonne/stonne_linker_src/stonne_linker.h"
-#include "../../../stonne_works/stonne/stonne/include/Config.h"
+#include "<stonne/stonne_linker_src/stonne_linker.h>"
 #include <tvm/runtime/registry.h>
+#include "<stonne/include/Config.h>"
 
 namespace tvm
 {
@@ -28,6 +28,7 @@ namespace tvm
                 std::string path_to_tile = args[14];
                 DLTensor* input = args[15];
                 DLTensor* weight = args[16];
+                
                 //Creating config  to find out if we are going to
                 // run a dense or sparse simulation
                 Config stonne_config;
@@ -35,7 +36,7 @@ namespace tvm
                 {
                     stonne_config.loadFile(path_to_arch_file);
                 }
-
+                
                 float* input_raw = (float*)input->data;
                 float* weight_raw = (float*)weight->data;
                 float* output_raw;

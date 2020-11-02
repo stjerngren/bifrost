@@ -16,19 +16,19 @@
 # under the License.
 
 # Minimum Makefile for the extension package
-PKG_CFLAGS = -std=c++14 -O2 -fPIC\
+PKG_CFLAGS = -std=c++14 -stdlib=libc++ -O2 -fPIC\
 	-I${TVM_ROOT}/include\
 	-I${TVM_ROOT}/3rdparty/dmlc-core/include\
 	-I${TVM_ROOT}/3rdparty/dlpack/include
 
 
-PKG_LDFLAGS =-L${TVM_ROOT}/build
+PKG_LDFLAGS =-L${TVM_ROOT}/build -L${STONNE_ROOT}/objs
 UNAME_S := $(shell uname -s)
 
 ifeq ($(UNAME_S), Darwin)
 	PKG_LDFLAGS += -undefined dynamic_lookup
 endif
 
-lib/libtvm_ext.so: src/conv_forward_stonne.cc
+lib/conv_forward_stonne.so: src/conv_forward_stonne.cc
 	@mkdir -p $(@D)
 	$(CXX) $(PKG_CFLAGS) -shared -o $@ $^ $(PKG_LDFLAGS)
