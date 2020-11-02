@@ -11,8 +11,8 @@ import ctypes
 # Start by registering stonne conv2d 
 
 
-simulation_file='test.cfg'
-tiles_path='tiles/accumulation_buffer/128_mses/'
+simulation_file='/Users/axelstjerngren/uni/Year4/ProjectLevel4/level-4-project/experimental/test.cfg'
+tiles_path='/Users/axelstjerngren/uni/Year4/ProjectLevel4/level-4-project/experimental/tile_configuration_conv1.txt'
 sparsity_ratio=0.0
 
 def load_lib():
@@ -52,10 +52,7 @@ def conv2d_stonne(
     N, C, H, W = get_const_tuple(data.shape)
 
     output_channels, _, kernel_height, kernel_width = kernel.shape
-    print(get_const_tuple(kernel.shape))
-    print("This is the grips", groups)
-    print("This is the strides", padding[0])
-    print("This is the dilation", dilation[0])
+    print(layout)
     # Translate variables names to STONNE taxonomy
     X = H 
     Y = W 
@@ -71,17 +68,17 @@ def conv2d_stonne(
     W_out:int = ((Y + 2 * padding[1] - dilation[1] * (S - 1) - 1) // strides[0]) + 1
 
 
-    tile_file = getTileFileFromConvDimensions(
-        tiles_path, 
-        C, # Channels
-        K, # K
-        R, # Height
-        G
-    )
+    #tile_file = getTileFileFromConvDimensions(
+    #    tiles_path, 
+    #    C, # Channels
+    #    K, # K
+    #    R, # Height
+    #    G
+    #)
 
 
     return te.extern(
-            [H_out, W_out],
+            (H_out, W_out),
             [data,kernel],
             lambda ins, outs: tvm.tir.call_packed(
                 "tvm.contrib.stonne.conv2d.forward",  
@@ -99,12 +96,14 @@ def conv2d_stonne(
                 strides,         # [11]      
                 pad_x,           # [12]    
                 pad_y,           # [13]    
-                tile_file,       # [14]         
-                data,            # [15]
-                kernel           # [16]
+                tiles_path,      # [14]         
+                ins[0],          # [15]
+                ins[1],          # [16]
+                outs[0]          # [17]
 
             ),
-            name = "test"
+            name = "k",
+            dtype = "float32"
     )
 
 # Override the conv2d x86 strategy to add stonne support in
