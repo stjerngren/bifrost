@@ -54,7 +54,6 @@ module.run()
 out_shape = (batch_size, out_channels, 224, 224)
 out = module.get_output(0, tvm.nd.empty(out_shape))
 out_llvm = out.asnumpy()
-
 # Build and run with llvm backend, but this time use the
 # stonne conv2d ops
  
@@ -68,5 +67,6 @@ module.run()
 out_shape = (batch_size, out_channels, 224, 224)
 out = module.get_output(0, tvm.nd.empty(out_shape))
 out_stonne = out.asnumpy()
+
 
 print(np.all(out_stonne == out_llvm))

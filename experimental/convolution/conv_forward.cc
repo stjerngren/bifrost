@@ -270,7 +270,8 @@ TVM_REGISTER_GLOBAL("tvm.contrib.cudnn.conv2d.forward")
       std::string conv_dtype = args[12];
       int groups = args[13];
 
-      ConvolutionForward(mode, format, algo, 2, groups, pad_v, stride_v, dilation_v, x, w, y, conv_dtype);
+      ConvolutionForward(mode, format, algo, 2, groups, pad_v, stride_v, dilation_v, x, w, y,
+                         conv_dtype);
     });
 
 TVM_REGISTER_GLOBAL("tvm.contrib.cudnn.conv3d.forward")

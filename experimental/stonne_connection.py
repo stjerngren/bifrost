@@ -66,19 +66,10 @@ def conv2d_stonne(
     # Calculate the output shape
     H_out:int =((X + 2 * padding[0] - dilation[0] * (R - 1) - 1) // strides[0]) + 1
     W_out:int = ((Y + 2 * padding[1] - dilation[1] * (S - 1) - 1) // strides[0]) + 1
-
-
-    #tile_file = getTileFileFromConvDimensions(
-    #    tiles_path, 
-    #    C, # Channels
-    #    K, # K
-    #    R, # Height
-    #    G
-    #)
-
+    print(K)
 
     return te.extern(
-            (H_out, W_out),
+            (N,K,H_out, W_out),
             [data,kernel],
             lambda ins, outs: tvm.tir.call_packed(
                 "tvm.contrib.stonne.conv2d.forward",  
@@ -93,7 +84,7 @@ def conv2d_stonne(
                 Y,               # [8]
                 H_out,           # [9]    
                 W_out,           # [10]    
-                strides,         # [11]      
+                strides[0],         # [11]      
                 pad_x,           # [12]    
                 pad_y,           # [13]    
                 tiles_path,      # [14]         
