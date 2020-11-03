@@ -70,3 +70,8 @@ out_stonne = out.asnumpy()
 
 
 print(np.all(out_stonne == out_llvm))
+
+print(out_stonne == out_llvm)
+
+print(out_stonne.shape)
+print(out_llvm.shape)

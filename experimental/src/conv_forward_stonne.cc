@@ -30,7 +30,7 @@ namespace tvm
                 std::string path_to_tile = args[14];
                 DLTensor* input = args[15];
                 DLTensor* weight = args[16];
-                DLTensor* ouput = args[16];
+                DLTensor* output = args[16];
 
                 //Creating config  to find out if we are going to
                 // run a dense or sparse simulation
@@ -42,6 +42,9 @@ namespace tvm
                 
                 float* input_raw = (float*)input->data;
                 float* weight_raw = (float*)weight->data;
+                float* output_raw = (float*)output->data;
+
+                output->data = output_raw;
 
         });
 
@@ -64,7 +67,7 @@ namespace tvm
                 std::string path_to_tile = args[14];
                 DLTensor* input = args[15];
                 DLTensor* weight = args[16];
-                DLTensor* ouput = args[16];
+                DLTensor* output = args[16];
 
                 //Creating config  to find out if we are going to
                 // run a dense or sparse simulation
@@ -76,7 +79,7 @@ namespace tvm
                 
                 float* input_raw = (float*)input->data;
                 float* weight_raw = (float*)weight->data;
-                float* output_raw = (float*)ouput->data;
+                float* output_raw = (float*)output->data;
 
                 std::string layer_name = "TestConv2dLayer";
                 simulateDenseConvForward(
