@@ -1,0 +1,4 @@
+
+[submodule "virl"]
+	path = stonne/
+	url = https://github.com/axelstjerngren/stonne_fork.git
