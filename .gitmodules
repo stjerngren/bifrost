@@ -1,4 +1,4 @@
 
-[submodule "virl"]
+[submodule "stonne"]
 	path = stonne/
 	url = https://github.com/axelstjerngren/stonne_fork.git
