@@ -134,7 +134,9 @@ void ConvolutionForward(int mode, int format, int algo, int dims, int groups, co
       entry_ptr->conv_entry.conv_desc, entry_ptr->conv_entry.fwd_algo,
       entry_ptr->conv_entry.workspace, workspace_size,
       CuDNNDataType::GetConst<0>(entry_ptr->conv_entry.data_type),
-      entry_ptr->conv_entry.output_desc, y->data));
+      entry_ptr->conv_entry.output_desc, 
+      y->data)
+      );
 }
 
 void OutputShape(int format, int dims, int groups, const int pad[], const int stride[],

@@ -32,16 +32,15 @@ bn_mvar = relay.var("bn_var")
 simple_net = relay.nn.conv2d(
     data=data, weight=weight, kernel_size=(3, 3), channels=out_channels, padding=(1, 1)
 )
-simple_net = relay.nn.batch_norm(simple_net, bn_gamma, bn_beta, bn_mmean, bn_mvar)[0]
-simple_net = relay.nn.relu(simple_net)
-simple_net = relay.Function(relay.analysis.free_vars(simple_net), simple_net)
+#simple_net = relay.nn.batch_norm(simple_net, bn_gamma, bn_beta, bn_mmean, bn_mvar)[0]
+#simple_net = relay.nn.relu(simple_net)
+#simple_net = relay.Function(relay.analysis.free_vars(simple_net), simple_net)
 
 data_shape = (batch_size, 2, 4, 4)
 net, params = testing.create_workload(simple_net)
 
 # Generate the data to resuse with both llvm and llvm stonne
 data = np.random.uniform(-1, 1, size=data_shape).astype("float32")
-
 # Build and run with llvm backend
 logging.basicConfig(level=logging.DEBUG)  # to dump TVM IR after fusion
 
@@ -76,6 +75,8 @@ print(out_stonne == out_llvm)
 
 print(out_llvm.shape)
 print(out_stonne.shape)
+print(data.shape)
 
 print(out_llvm)
+print(data)
 print(out_stonne)

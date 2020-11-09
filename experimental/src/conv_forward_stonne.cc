@@ -1,6 +1,5 @@
-#include "../../stonne_works/stonne/stonne/stonne_linker_src/stonne_linker.h"
-#include <tvm/runtime/registry.h>
-#include "../../stonne_works/stonne/stonne/include/Config.h"
+#include "../../../stonne_works/stonne/stonne/stonne_linker_src/stonne_linker.h"
+#include "../../../stonne_works/stonne/stonne/include/Config.h"
 
 #include <tvm/runtime/device_api.h>
 #include <tvm/runtime/registry.h>
@@ -30,21 +29,25 @@ namespace tvm
                 std::string path_to_tile = args[14];
                 DLTensor* input = args[15];
                 DLTensor* weight = args[16];
-                DLTensor* output = args[16];
+                DLTensor* output = args[17];
 
                 //Creating config  to find out if we are going to
                 // run a dense or sparse simulation
-                Config stonne_config;
-                if (path_to_arch_file != "")
-                {
-                    stonne_config.loadFile(path_to_arch_file);
-                }
-                
-                float* input_raw = (float*)input->data;
-                float* weight_raw = (float*)weight->data;
-                float* output_raw = (float*)output->data;
+                //Config stonne_config;
+                //if (path_to_arch_file != "")
+                //{
+                //    stonne_config.loadFile(path_to_arch_file);
+                //}
+                //std::cout << input;
+                std::cout << path_to_arch_file;    
 
-                output->data = output_raw;
+                output->data = input->data;
+                //std::cout << output;
+                //float* input_raw = (float*)input->data;
+                //float* weight_raw = (float*)weight->data;
+                //float* output_raw = (float*)output->data;
+
+                //output->data = output_raw;
 
         });
 
@@ -67,7 +70,7 @@ namespace tvm
                 std::string path_to_tile = args[14];
                 DLTensor* input = args[15];
                 DLTensor* weight = args[16];
-                DLTensor* output = args[16];
+                DLTensor* output = args[17];
 
                 //Creating config  to find out if we are going to
                 // run a dense or sparse simulation

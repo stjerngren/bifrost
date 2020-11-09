@@ -5,6 +5,7 @@ from tvm.topi.util import get_const_tuple
 from StonneUtils import getTileFileFromConvDimensions
 
 from tvm.relay.op.strategy.generic import *
+from tvm.topi import generic
 import tvm.relay.op as _op
 import os
 import ctypes
@@ -26,17 +27,11 @@ def load_lib():
 _LIB = load_lib()
 
 # Register the compute schedule for stonne conv2d
-@autotvm.register_topi_compute("conv2d_stonne.x86")
-def conv2d_stonne(
-    cfg, 
-    data,
-    kernel,
-    strides,
-    padding,
-    dilation,
-    groups=1,
-    layout="NCHW",
-    out_dtype="float32"
+@autotvm.register_topi_compute("conv2d_stonne_nchw.x86")
+def conv2d_stonne_nchw(
+    cfg, data, kernel, strides, padding, dilation, groups=1, layout="NCHW", out_dtype="float32"
+
+    
 ):
     """Compute conv2d using stonne library
 
@@ -51,8 +46,11 @@ def conv2d_stonne(
     """
     N, C, H, W = get_const_tuple(data.shape)
 
-    output_channels, _, kernel_height, kernel_width = kernel.shape
-    print(layout)
+    output_channels, _, kernel_height, kernel_width = get_const_tuple(kernel.shape)
+    print(get_const_tuple(kernel.shape))
+    print(kernel.shape)
+    print(out_dtype)
+    print(data.shape)
     # Translate variables names to STONNE taxonomy
     X = H 
     Y = W 
@@ -63,10 +61,12 @@ def conv2d_stonne(
     N = 1 
     pad_x = padding[0] 
     pad_y = padding[1]
+
+
     # Calculate the output shape
     H_out:int =((X + 2 * padding[0] - dilation[0] * (R - 1) - 1) // strides[0]) + 1
     W_out:int = ((Y + 2 * padding[1] - dilation[1] * (S - 1) - 1) // strides[0]) + 1
-    print(H_out, W_out)
+
 
     return te.extern(
             (N,K,H_out, W_out),
@@ -93,9 +93,14 @@ def conv2d_stonne(
                 outs[0]          # [17]
 
             ),
-            name = "k",
-            dtype = "float32"
+            name = "s",
     )
+
+@autotvm.register_topi_schedule("conv2d_stonne.x86")
+def schedule_conv2d_stonne(cfg, outs):
+    """Create the schedule for conv2d_cudnn"""
+    return generic.schedule_extern(outs)
+
 
 # Override the conv2d x86 strategy to add stonne support in
 # the libs
@@ -111,13 +116,14 @@ def conv2d_strategy_cpu(attrs, inputs, out_type, target):
     if dilation_h < 1 or dilation_w < 1:
         raise ValueError("dilation should be positive value")
     if "stonne" in target.libs:
-        strategy.add_implementation(
-                wrap_compute_conv2d(conv2d_stonne),
-                wrap_topi_schedule(topi.generic.schedule_conv2d_nchw),
+        if layout == "NCHW":
+            strategy.add_implementation(
+                    wrap_compute_conv2d(conv2d_stonne_nchw),
+                    wrap_topi_schedule(schedule_conv2d_stonne),
 
-                name="conv2d_stonne.x86",
-        )
-        print("Hi")
+                    name="conv2d_stonne.x86",
+            )
+            print("Hi")
     else:
         if groups == 1:
             if layout == "NCHW":
