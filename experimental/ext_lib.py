@@ -20,7 +20,10 @@ import stonne_connection
 out_channels = 2
 batch_size = 1
 
-data = relay.var("data", relay.TensorType((batch_size, 2, 4, 4), "float32"))
+# Let’s create a very simple network for demonstration.
+# It consists of convolution, batch normalization, and ReLU activation.
+
+data = relay.var("data", relay.TensorType((batch_size, 2, 10, 10), "float32"))
 weight = relay.var("weight")
 bn_gamma = relay.var("bn_gamma")
 bn_beta = relay.var("bn_beta")
@@ -34,7 +37,7 @@ simple_net = relay.nn.conv2d(
 #simple_net = relay.nn.relu(simple_net)
 #simple_net = relay.Function(relay.analysis.free_vars(simple_net), simple_net)
 
-data_shape = (batch_size, 2, 4, 4)
+data_shape = (batch_size, 2, 10, 10)
 net, params = testing.create_workload(simple_net)
 
 # Generate the data to resuse with both llvm and llvm stonne
@@ -51,7 +54,7 @@ ctx = tvm.context(target, 0)
 module = runtime.GraphModule(lib["default"](ctx))
 module.set_input("data", data)
 module.run()
-out_shape = (batch_size, out_channels, 4, 4)
+out_shape = (batch_size, out_channels, 10, 10)
 out = module.get_output(0, tvm.nd.empty(out_shape))
 out_llvm = out.asnumpy()
 # Build and run with llvm backend, but this time use the
@@ -64,7 +67,7 @@ ctx = tvm.context(target, 0)
 module = runtime.GraphModule(lib["default"](ctx))
 module.set_input("data", data)
 module.run()
-out_shape = (batch_size, out_channels, 4, 4)
+out_shape = (batch_size, out_channels, 10, 10)
 out = module.get_output(0, tvm.nd.empty(out_shape))
 out_stonne = out.asnumpy()
 
@@ -78,5 +81,4 @@ print(out_stonne.shape)
 print(data.shape)
 
 print(out_llvm)
-print(data)
 print(out_stonne)
