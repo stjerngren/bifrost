@@ -20,8 +20,6 @@ import stonne_connection
 out_channels = 2
 batch_size = 1
 
-# Let’s create a very simple network for demonstration. It consists of convolution, batch normalization, and ReLU activation.
-
 data = relay.var("data", relay.TensorType((batch_size, 2, 4, 4), "float32"))
 weight = relay.var("weight")
 bn_gamma = relay.var("bn_gamma")

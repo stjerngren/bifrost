@@ -69,7 +69,7 @@ def conv2d_stonne_nchw(
             (N,K,X_, Y_),
             [data,kernel],
             lambda ins, outs: tvm.tir.call_packed(
-                "tvm.contrib.stonne.conv2d.forward",  
+                "tvm.contrib.stonne.test",  
                 simulation_file, # [0]
                 R,               # [1]
                 S,               # [2]

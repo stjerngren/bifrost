@@ -1,4 +1,4 @@
-#include "../../../stonne_works/stonne/stonne/stonne_linker_src/stonne_linker_tvm.h"
+#include "../../../stonne_works/stonne/stonne/stonne_linker_src/stonne_linker.h"
 #include "../../../stonne_works/stonne/stonne/include/Config.h"
 
 #include <tvm/runtime/device_api.h>
@@ -31,15 +31,6 @@ namespace tvm
                 DLTensor *weight = args[16];
                 DLTensor *output = args[17];
 
-                //Creating config  to find out if we are going to
-                // run a dense or sparse simulation
-                //Config stonne_config;
-                //if (path_to_arch_file != "")
-                //{
-                //    stonne_config.loadFile(path_to_arch_file);
-                //}
-                //std::cout << input;
-
                 std::cout << input->strides;
                 std::cout << (input->shape)[0];
                 std::cout << (input->shape)[1];
@@ -56,49 +47,18 @@ namespace tvm
                     std::cout << *(data + i) << ", ";
 
                 std::cout << "\n converted \n";
-                float *data_converted = from_dltensor_data(
-                    data,
-                    C,
-                    X,
-                    Y,
-                    pad_x,
-                    pad_y);
+                output->ndim = input->ndim;
+                output->shape = input->shape;
+                output->data = data;
+                output->byte_offset = input->byte_offset;
+                for ( int i = 0; i < 34; i++)
+                    std::cout << *(static_cast<float*>(output->data) + i) << ", ";
+                std::cout << (output->shape)[1];
+                std::cout << (output->shape)[2];
+                std::cout << (output->shape)[3];
+                std::cout << (output->shape)[0];
 
-                for (int i = 0; i < 73; i++)
-                    std::cout << *(data_converted + i) << ", ";
-                //std::cout << "\n kernel \n";
-
-                ////std::cout << weight->ndim;
-                ////std::cout << "\n";
-                //
-                //std::cout << (weight->shape)[0];
-                //std::cout << (weight->shape)[1];
-                //std::cout << (weight->shape)[2];
-                //std::cout << (weight->shape)[3];
-                //std::cout << "\n";
-                //
-                //
-                //for ( int i = 0; i < 38; i++)
-                //    std::cout << *(static_cast<float*>(weight->data) + i) << ", ";
-                //
-                ////output->shape = input->shape;
-                //output->data = data;
-                //output->byte_offset = input->byte_offset;
-                //for ( int i = 0; i < 34; i++)
-                //    std::cout << *(static_cast<float*>(output->data) + i) << ", ";
-                //std::cout << (output->shape)[1];
-                //std::cout << (output->shape)[2];
-                //std::cout << (output->shape)[3];
-                //std::cout << (output->shape)[0];
-                //std::cout << sizeof(*data)/sizeof(*data[0]);
-
-                //std::cout <<(*output->shape);
-                //std::cout <<(*output->strides);
-                //float* input_raw = (float*)input->data;
-                //float* weight_raw = (float*)weight->data;
-                //float* output_raw = (float*)output->data;
-
-                //output->data = output_raw;
+  
             });
 
         TVM_REGISTER_GLOBAL("tvm.contrib.stonne.conv2d.forward")
@@ -132,29 +92,13 @@ namespace tvm
 
                 float *input_raw = static_cast<float *>(input->data);
                 float *weight_raw = static_cast<float *>(weight->data);
+
                 float output_array[32];
-                    for (int i = 0; i < 32; i++)
+                for (int i = 0; i < 32; i++)
                 {
                     output_array[i] = 0.0;
                 }
                 float *output_raw = output_array;
-
-                std::cout << "Input data \n";
-                for (int i = 0; i < 33; i++)
-                    std::cout << *(static_cast<float *>(input->data) + i) << ", ";
-
-                std::cout << "converted \n";
-                for (int i = 0; i < 73; i++)
-                    std::cout << *(
-                        from_dltensor_data(static_cast<float *>(input->data), C, X, Y, pad_x, pad_y)
-                        + i
-                        ) << ", ";
-
-                
-
-                std::cout << "weight \n";
-                for (int i = 0; i < 33; i++)
-                    std::cout << *(static_cast<float *>(weight->data) + i) << ", ";
 
                 std::string layer_name = "Conv2dLayer";
                 simulateDenseConvForward(
@@ -178,10 +122,11 @@ namespace tvm
                     path_to_tile,
                     stonne_config);
 
-                for (int i = 0; i < 33; i++)
-                    std::cout << *(output_raw + i) << ", ";
-
+                output->shape = input->shape;
+                output->byte_offset = input->byte_offset;
                 output->data = output_raw;
+                for (int i = 0; i < 34; i++)
+                    std::cout << *(static_cast<float *>(output->data) + i) << ", ";
             });
 
     } // namespace contrib
