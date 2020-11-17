@@ -41,6 +41,9 @@ net, params = testing.create_workload(simple_net)
 
 # Generate the data to resuse with both llvm and llvm stonne
 data = np.random.uniform(-1, 1, size=data_shape).astype("float32")
+
+
+
 # Build and run with llvm backend
 logging.basicConfig(level=logging.DEBUG)  # to dump TVM IR after fusion
 

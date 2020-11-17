@@ -43,14 +43,13 @@ def conv2d_stonne_nchw(
     -N: Number of inputs (Only 1 is supported so far)
     -X: Number of input rows
     -Y: Number of input columns
+    -X_: Number of output columns
+    -Y_: Number of output columns
     """
     N, C, H, W = get_const_tuple(data.shape)
 
     output_channels, _, kernel_height, kernel_width = get_const_tuple(kernel.shape)
-    print(get_const_tuple(kernel.shape))
-    print(kernel.shape)
-    print(out_dtype)
-    print(data.shape)
+
     # Translate variables names to STONNE taxonomy
     X = H 
     Y = W 
@@ -61,15 +60,13 @@ def conv2d_stonne_nchw(
     N = 1 
     pad_x = padding[0] 
     pad_y = padding[1]
-
-
+    print(strides, "stride")
     # Calculate the output shape
-    H_out:int =((X + 2 * padding[0] - dilation[0] * (R - 1) - 1) // strides[0]) + 1
-    W_out:int = ((Y + 2 * padding[1] - dilation[1] * (S - 1) - 1) // strides[0]) + 1
+    X_:int = ((X + 2 * pad_x - dilation[0] * (R - 1) - 1) // strides[0]) + 1
+    Y_:int = ((Y + 2 * pad_y - dilation[1] * (S - 1) - 1) // strides[0]) + 1
 
-
-    return te.extern(
-            (N,K,H_out, W_out),
+    test = te.extern(
+            (N,K,X_, Y_),
             [data,kernel],
             lambda ins, outs: tvm.tir.call_packed(
                 "tvm.contrib.stonne.test",  
@@ -82,8 +79,8 @@ def conv2d_stonne_nchw(
                 N,               # [6]
                 X,               # [7]
                 Y,               # [8]
-                H_out,           # [9]    
-                W_out,           # [10]    
+                X_,              # [9]    
+                Y_,              # [10]    
                 strides[0],      # [11]      
                 pad_x,           # [12]    
                 pad_y,           # [13]    
@@ -94,11 +91,13 @@ def conv2d_stonne_nchw(
 
             ),
             name = "s",
+            dtype = out_dtype
     )
+    return test
 
 @autotvm.register_topi_schedule("conv2d_stonne.x86")
 def schedule_conv2d_stonne(cfg, outs):
-    """Create the schedule for conv2d_cudnn"""
+    """Create schedule for conv2d_nhwc"""
     return generic.schedule_extern(outs)
 
 
@@ -123,7 +122,6 @@ def conv2d_strategy_cpu(attrs, inputs, out_type, target):
 
                     name="conv2d_stonne.x86",
             )
-            print("Hi")
     else:
         if groups == 1:
             if layout == "NCHW":
