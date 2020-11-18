@@ -1,40 +1,43 @@
-
+""" 
+Register everything to do with conv2d
+"""
 import tvm
 from tvm import te, relay, autotvm
-from tvm.topi.util import get_const_tuple
-from StonneUtils import getTileFileFromConvDimensions
-
-from tvm.relay.op.strategy.generic import *
 from tvm.topi import generic
 import tvm.relay.op as _op
-import os
-import ctypes
-# Start by registering stonne conv2d 
+from tvm.relay.op.strategy.generic import *
 
-
+# TODO: These have to be configurable somehow
 simulation_file='/Users/axelstjerngren/uni/Year4/ProjectLevel4/level-4-project/experimental/test.cfg'
 tiles_path='/Users/axelstjerngren/uni/Year4/ProjectLevel4/level-4-project/experimental/tile_configuration_conv1.txt'
 sparsity_ratio=0.0
 
-def load_lib():
-    """Load library, the functions will be registered into TVM"""
-
-    # load in as global so the global extern symbol is visible to other dll.
-    lib = ctypes.CDLL("lib/conv_forward_stonne.so", ctypes.RTLD_GLOBAL)
-    return lib
-
-
-_LIB = load_lib()
-
 # Register the compute schedule for stonne conv2d
 @autotvm.register_topi_compute("conv2d_stonne_nchw.x86")
 def conv2d_stonne_nchw(
-    cfg, data, kernel, strides, padding, dilation, groups=1, layout="NCHW", out_dtype="float32"
-
+    cfg,
+    data, 
+    kernel, 
+    strides, 
+    padding, 
+    dilation, 
+    groups=1, 
+    layout="NCHW", 
+    out_dtype="float32"
     
-):
-    """Compute conv2d using stonne library
+    ):    
+    """
+    Compute conv2d using STONNE
+    """
 
+    # Extract data from 
+    N, C, H, W = get_const_tuple(data.shape)
+    output_channels, _, kernel_height, kernel_width = get_const_tuple(kernel.shape)
+    
+    if N>1:
+        raise ValueError("STONNE does not support a batch size greater than one")
+    """
+    Translate variables names to STONNE taxonomy
     -R: Number of flter rows
     -S: Number of filter columns
     -C: Number of filter and input channels
@@ -46,11 +49,6 @@ def conv2d_stonne_nchw(
     -X_: Number of output columns
     -Y_: Number of output columns
     """
-    N, C, H, W = get_const_tuple(data.shape)
-
-    output_channels, _, kernel_height, kernel_width = get_const_tuple(kernel.shape)
-
-    # Translate variables names to STONNE taxonomy
     X = H 
     Y = W 
     R = kernel_height
@@ -95,14 +93,13 @@ def conv2d_stonne_nchw(
     )
     return test
 
+# Use the genric schedule
 @autotvm.register_topi_schedule("conv2d_stonne.x86")
 def schedule_conv2d_stonne(cfg, outs):
     """Create schedule for conv2d_nhwc"""
     return generic.schedule_extern(outs)
 
-
-# Override the conv2d x86 strategy to add stonne support in
-# the libs
+# Override the conv2d x86 strategy to add STONNE support in the libs
 @conv2d_strategy.register("cpu")
 def conv2d_strategy_cpu(attrs, inputs, out_type, target):
     """conv2d x86 strategy"""
@@ -114,6 +111,10 @@ def conv2d_strategy_cpu(attrs, inputs, out_type, target):
     kernel_layout = attrs.kernel_layout
     if dilation_h < 1 or dilation_w < 1:
         raise ValueError("dilation should be positive value")
+
+    """
+    This is the only part which changes
+    """
     if "stonne" in target.libs:
         if layout == "NCHW":
             strategy.add_implementation(

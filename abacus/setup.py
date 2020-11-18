@@ -4,7 +4,7 @@ with open("README.md", "r") as fh:
     long_description = fh.read()
 
 setuptools.setup(
-    name="x", 
+    name="abacus", 
     version="0.0.1",
     author="Axel Stjerngren",
     author_email="axelstjerngren@protonmail.com",

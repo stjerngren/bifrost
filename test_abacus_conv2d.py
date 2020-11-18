@@ -14,7 +14,16 @@ import logging
 import random
 
 # Import this add stonne as an x86 co-processor
-import abacus
+import abacus.abacus
+
+# TODO: Add a way to configure STONNE
+
+
+
+
+
+
+
 
 
 out_channels = 2
@@ -71,10 +80,9 @@ out_shape = (batch_size, out_channels, 10, 10)
 out = module.get_output(0, tvm.nd.empty(out_shape))
 out_stonne = out.asnumpy()
 
+print(np.all(np.round(out_stonne, 4) == np.round(out_llvm, 4)))
 
-print(np.all(out_stonne == out_llvm))
-
-print(out_stonne == out_llvm)
+print(np.round(out_stonne,4) == np.round(out_llvm, 4))
 
 print(out_llvm.shape)
 print(out_stonne.shape)
