@@ -17,15 +17,6 @@ import random
 import abacus.abacus
 
 # TODO: Add a way to configure STONNE
-
-
-
-
-
-
-
-
-
 out_channels = 2
 batch_size = 1
 
