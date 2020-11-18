@@ -8,8 +8,8 @@ import tvm.relay.op as _op
 from tvm.relay.op.strategy.generic import *
 
 # TODO: These have to be configurable somehow
-simulation_file='/Users/axelstjerngren/uni/Year4/ProjectLevel4/level-4-project/experimental/test.cfg'
-tiles_path='/Users/axelstjerngren/uni/Year4/ProjectLevel4/level-4-project/experimental/tile_configuration_conv1.txt'
+simulation_file:str   = "/Users/axelstjerngren/uni/Year4/ProjectLevel4/level-4-project/simulator_default/test.cfg"
+tiles_path:str        = "/Users/axelstjerngren/uni/Year4/ProjectLevel4/level-4-project/simulator_default/tile_configuration_conv1.txt"
 sparsity_ratio=0.0
 
 # Register the compute schedule for stonne conv2d
