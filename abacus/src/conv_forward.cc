@@ -4,6 +4,18 @@
 #include <tvm/runtime/device_api.h>
 #include <tvm/runtime/registry.h>
 
+// Stonne variable taxonomy
+// -R: Number of flter rows
+// -S: Number of filter columns
+// -C: Number of filter and input channels
+// -K: Number of filters and output channels
+// -G: Number of groups
+// -N: Number of inputs (Only 1 is supported so far)
+// -X: Number of input rows
+// -Y: Number of input columns
+// -X_: Number of output columns
+// -Y_: Number of output columns
+
 namespace tvm
 {
     namespace contrib
@@ -56,6 +68,8 @@ namespace tvm
                         H_out,
                         W_out,
                         input,
+                        strides,
+                        pad_x,
                         weight,
                         output,
                         stonne_config )
@@ -150,6 +164,8 @@ void sparseConvolution(
     int Y,
     int H_out,
     int W_out,
+    int strides,
+    int pad,
     DLTensor *input,
     DLTensor *weight,
     DLTensor *output,
@@ -166,31 +182,45 @@ void sparseConvolution(
     // In this case, we send the complete number of input channels, and the
     // callee will have to be aware of this and run C/G if  groups exist.
 
-    torch::Tensor input_im2col = F::unfold(
-        input,
-        F::UnfoldFuncOptions({R, S}).padding(padding).stride(stride).dilation(
-            dilation)); // This function returns a 3D tensor [N, R*S*C,
+    //torch::Tensor input_im2col = F::unfold(
+    //    input,
+    //    F::UnfoldFuncOptions({R, S}).padding(padding).stride(stride).dilation(
+    //        dilation)); // This function returns a 3D tensor [N, R*S*C,
                         // number_of_outputs]
     // Getting raw data
-    float *KN_input_raw = (float *)input_im2col.data_ptr();
+    //float *KN_input_raw = (float *)input_im2col.data_ptr();
 
-    float *MK_weight_raw = (float *)weight.data_ptr();
-    // Creating output tensor
+    float *input = static_cast<float *>(input->data);
+    float im2col_array[C*K*K];
+    float *input_im2col = im2col_array;
+    float *weight_raw = static_cast<float *>(weight->data);
+    float *output_raw = static_cast<float *>(output->data);
+    // Note that since STONNE only supports sparse GEMM operations, we have to
+    // turn the input to im2col format and
+    // run a GEMM operation instead a CONVOLUTION
 
-    torch::Tensor output = torch::rand({N, K, H_out, W_out});
-    float *output_raw = (float *)output.data_ptr();
-    // Note that since STONNE only supports sparse GEMM operation, we have to
-    // turn
-    // the input to im2col format and run a GEMM operation instead a CONVOLUTION
+    
+    im2col_cpu(
+        input_raw,
+        C,
+        X,
+        Y,
+        K,
+        strides,
+        pad,
+        input_im2col
+        );
+
     // Getting GEMM dimensions
-    // MK matrix are the weights
+    // MK matrix are the weight
+
     int gemm_M = K;                       // Number of filters (weight.sizes()[0];) (i.e., rows MK)
     int gemm_K = input_im2col.sizes()[1]; // window size (i.e., columns MK)
     int gemm_N = input_im2col.sizes()[2]; // 0 is batch dim, 1 is K
     simulateSparseGemmForward(
         layer_name,
-        KN_input_raw,
-        MK_weight_raw,
+        input_raw,
+        weight_raw,
         output_raw,
         N,
         G,
@@ -202,4 +232,66 @@ void sparseConvolution(
         MK_STA_KN_STR); // Keeping MK stationary as they are the weights
                         // Cast the input and output data into float pointer arrays
                         // which are compatible with stonne
+}
+
+
+//From Berkeley Vision's Caffe!
+//https://github.com/BVLC/caffe/blob/master/LICENSE
+void im2col_cpu(
+    float* data_im,
+    int channels, 
+    int height, 
+    int width,
+    int ksize,  
+    int stride, 
+    int pad, 
+    float* data_col
+    ) 
+{
+    int c,h,w;
+    int height_col = (height + 2*pad - ksize) / stride + 1;
+    int width_col = (width + 2*pad - ksize) / stride + 1;
+
+    int channels_col = channels * ksize * ksize;
+    for (c = 0; c < channels_col; ++c) {
+        int w_offset = c % ksize;
+        int h_offset = (c / ksize) % ksize;
+        int c_im = c / ksize / ksize;
+        for (h = 0; h < height_col; ++h) {
+            for (w = 0; w < width_col; ++w) {
+                int im_row = h_offset + h * stride;
+                int im_col = w_offset + w * stride;
+                int col_index = (c * height_col + h) * width_col + w;
+                data_col[col_index] = im2col_get_pixel(
+                        data_im, 
+                        height, 
+                        width, 
+                        channels,
+                        im_row, 
+                        im_col, 
+                        c_im, 
+                        pad
+                        );
+            }
+        }
+    }
+}
+
+float im2col_get_pixel(
+    float *im,
+    int height,
+    int width, 
+    int channels,
+    int row,
+    int col,
+    int channel, 
+    int pad
+    )
+{
+    row -= pad;
+    col -= pad;
+
+    if (row < 0 || col < 0 ||
+        row >= height || col >= width) return 0;
+    return im[col + width*(row + height*channel)];
 }

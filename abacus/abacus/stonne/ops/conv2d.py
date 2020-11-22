@@ -63,7 +63,7 @@ def conv2d_stonne_nchw(
     X_:int = ((X + 2 * pad_x - dilation[0] * (R - 1) - 1) // strides[0]) + 1
     Y_:int = ((Y + 2 * pad_y - dilation[1] * (S - 1) - 1) // strides[0]) + 1
 
-    test = te.extern(
+    return te.extern(
             (N,K,X_, Y_),
             [data,kernel],
             lambda ins, outs: tvm.tir.call_packed(
@@ -91,7 +91,6 @@ def conv2d_stonne_nchw(
             name = "s",
             dtype = out_dtype
     )
-    return test
 
 # Use the genric schedule
 @autotvm.register_topi_schedule("conv2d_stonne.x86")
