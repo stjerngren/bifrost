@@ -24,6 +24,7 @@ namespace tvm
         using namespace runtime;
 
         float im2col_get_pixel(
+
             float *im,
             int height,
             int width,
@@ -59,6 +60,7 @@ namespace tvm
             int width_col = (width + 2 * pad - ksize) / stride + 1;
 
             int channels_col = channels * ksize * ksize;
+
             for (c = 0; c < channels_col; ++c)
             {
                 int w_offset = c % ksize;
@@ -195,10 +197,14 @@ namespace tvm
 
             // Getting GEMM dimensions
             // MK matrix are the weight
+            std::cout << "test sparse gemm" << std::endl;
 
             int gemm_M = K;
             int gemm_K = C * K * K;
-            int gemm_N = 1;
+            int gemm_N = 0;
+
+            std::cout << "perform sparse gemm" << std::endl;
+
             simulateSparseGemmForward(
                 layer_name,
                 input_im2col,

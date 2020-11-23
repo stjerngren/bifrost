@@ -1,25 +1,73 @@
 """Congigure stonne"""
-
+import os
 
 class Simulator(object):
+    path:str = ""
+    ms_size:int
+    reduce_network_type:str
+    dn_bw:int
+    rn_bw:int
+    controller_type:str
+    sparsity_ratio:float 
 
-    # TODO: Create objects for these...
-    simulation_file:str  
-    tiles_path:str       
-    sparsity_ratio:float  
 
-    def __init__(
+    def edit_config(
         self,
-        simulation_file:str   = "/Users/axelstjerngren/uni/Year4/ProjectLevel4/level-4-project/simulator_default/test.cfg",
-        tiles_path:str        = "/Users/axelstjerngren/uni/Year4/ProjectLevel4/level-4-project/simulator_default/tile_configuration_conv1.txt",
-        sparsity_ratio:float  =  0.0 
+        ms_size:int,
+        reduce_network_type:str,
+        dn_bw:int,
+        rn_bw:int,
+        controller_type:str,
+        sparsity_ratio:float = 0.0, 
     ):
-        self.simulation_file = simulation_file
-        self.tiles_path = tiles_path
-        self.sparsity_ratio = sparsity_ratio
+        self.ms_size = ms_size
+        self.reduce_network_type = reduce_network_type
+        self.dn_bw = dn_bw
+        self.rn_bw = rn_bw
+        self.controller_type = controller_type 
+        self.sparsity_ratio =sparsity_ratio
 
-def config_simulator():
+    def create_config_file(self, path:str):
+        """
+        This will create a config file at a desired location
+        """
+
+        if path == "":
+            path = os.getcwd()
+
+        self.path = path
+
+        with open(path + "/stonne_config.cfg", "w") as f:
+            f.write("[MSNetwork]\n")
+            f.write(f"ms_size={self.ms_size}\n")
+            f.write("[ReduceNetwork]\n")
+            f.write(f"type={self.reduce_network_type}\n")
+            f.write("[SDMemory]\n")
+            f.write(f"dn_bw={self.dn_bw}\n")
+            f.write(f"rn_bw={self.rn_bw}\n")
+
+def config_simulator(
+    ms_size:int,
+    reduce_network_type:str,
+    dn_bw:int,
+    rn_bw:int,
+    controller_type:str,
+    sparsity_ratio:float = 0.0, 
+    path:str = "",
+    ):
+
     """
     This function builds a new STONNE config
     """
-    
+
+    architecture.edit_config(
+        ms_size,
+        reduce_network_type,
+        dn_bw,
+        rn_bw,
+        controller_type ,
+        sparsity_ratio,
+    )
+    architecture.create_config_file(path = path)
+
+architecture = Simulator()

@@ -6,9 +6,10 @@ from tvm import te, relay, autotvm
 from tvm.topi import generic
 import tvm.relay.op as _op
 from tvm.relay.op.strategy.generic import *
+from ..simulator import architecture
+
 
 # TODO: These have to be configurable somehow
-simulation_file:str   = "/Users/axelstjerngren/uni/Year4/ProjectLevel4/level-4-project/simulator_default/test.cfg"
 tiles_path:str        = "/Users/axelstjerngren/uni/Year4/ProjectLevel4/level-4-project/simulator_default/tile_configuration_conv1.txt"
 sparsity_ratio=0.0
 
@@ -29,6 +30,9 @@ def conv2d_stonne_nchw(
     """
     Compute conv2d using STONNE
     """
+
+    if architecture.path == "":
+        raise ValueError("STONNE has not been configured")
 
     # Extract data from 
     N, C, H, W = get_const_tuple(data.shape)
@@ -68,7 +72,7 @@ def conv2d_stonne_nchw(
             [data,kernel],
             lambda ins, outs: tvm.tir.call_packed(
                 "tvm.contrib.stonne.conv2d.forward",  
-                simulation_file, # [0]
+                architecture.path, # [0]
                 R,               # [1]
                 S,               # [2]
                 C,               # [3]

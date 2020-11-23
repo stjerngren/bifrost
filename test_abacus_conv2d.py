@@ -15,6 +15,16 @@ import random
 
 # Import this add stonne as an x86 co-processor
 import abacus.abacus
+from abacus.abacus.stonne.simulator import config_simulator
+
+config_simulator(
+    ms_size=16,
+    reduce_network_type="ASNETWORK",
+    dn_bw=8,
+    rn_bw=8,
+    controller_type="MAERI_DENSE_WORKLOAD"
+)
+
 
 # TODO: Add a way to configure STONNE
 out_channels = 2
