@@ -53,7 +53,7 @@ def conv2d_stonne_nchw(
     -X_: Number of output columns
     -Y_: Number of output columns
     """
-    X = H 
+    X = H  
     Y = W 
     R = kernel_height
     S = kernel_width
