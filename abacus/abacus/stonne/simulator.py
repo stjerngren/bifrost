@@ -10,7 +10,6 @@ class Simulator(object):
     controller_type:str
     sparsity_ratio:float 
 
-
     def edit_config(
         self,
         ms_size:int,
@@ -18,7 +17,7 @@ class Simulator(object):
         dn_bw:int,
         rn_bw:int,
         controller_type:str,
-        sparsity_ratio:float = 0.0, 
+        sparsity_ratio:int = 0, 
     ):
         self.ms_size = ms_size
         self.reduce_network_type = reduce_network_type
@@ -31,20 +30,20 @@ class Simulator(object):
         """
         This will create a config file at a desired location
         """
-
         if path == "":
             path = os.getcwd()
 
-        self.path = path
+        self.path = path + "/stonne_config.cfg"
 
-        with open(path + "/stonne_config.cfg", "w") as f:
+        with open(self.path, "w") as f:
             f.write("[MSNetwork]\n")
             f.write(f"ms_size={self.ms_size}\n")
             f.write("[ReduceNetwork]\n")
-            f.write(f"type={self.reduce_network_type}\n")
+            f.write(f'type="{self.reduce_network_type}"\n')
             f.write("[SDMemory]\n")
             f.write(f"dn_bw={self.dn_bw}\n")
             f.write(f"rn_bw={self.rn_bw}\n")
+            f.write(f'controller_type="{self.controller_type}"\n')
 
 def config_simulator(
     ms_size:int,
@@ -52,7 +51,7 @@ def config_simulator(
     dn_bw:int,
     rn_bw:int,
     controller_type:str,
-    sparsity_ratio:float = 0.0, 
+    sparsity_ratio:int = 0, 
     path:str = "",
     ):
 

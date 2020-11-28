@@ -7,11 +7,10 @@ from tvm.topi import generic
 import tvm.relay.op as _op
 from tvm.relay.op.strategy.generic import *
 from ..simulator import architecture
+from ..tiles import tiles
 
-
-# TODO: These have to be configurable somehow
+simulation_file:str   = "/Users/axelstjerngren/uni/Year4/ProjectLevel4/level-4-project/simulator_default/test.cfg"
 tiles_path:str        = "/Users/axelstjerngren/uni/Year4/ProjectLevel4/level-4-project/simulator_default/tile_configuration_conv1.txt"
-sparsity_ratio=0.0
 
 # Register the compute schedule for stonne conv2d
 @autotvm.register_topi_compute("conv2d_stonne_nchw.x86")
@@ -66,7 +65,7 @@ def conv2d_stonne_nchw(
     # Calculate the output shape
     X_:int = ((X + 2 * pad_x - dilation[0] * (R - 1) - 1) // strides[0]) + 1
     Y_:int = ((Y + 2 * pad_y - dilation[1] * (S - 1) - 1) // strides[0]) + 1
-
+    
     return te.extern(
             (N,K,X_, Y_),
             [data,kernel],
@@ -86,10 +85,11 @@ def conv2d_stonne_nchw(
                 strides[0],      # [11]      
                 pad_x,           # [12]    
                 pad_y,           # [13]    
-                tiles_path,      # [14]         
-                ins[0],          # [15]
-                ins[1],          # [16]
-                outs[0]          # [17]
+                tiles.path,      # [14]     
+                architecture.sparsity_ratio, # [15]    
+                ins[0],          # [16]
+                ins[1],          # [17]
+                outs[0]          # [18]
 
             ),
             name = "s",

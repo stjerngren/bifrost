@@ -239,9 +239,10 @@ namespace tvm
                 int pad_x = args[12];
                 int pad_y = args[13];
                 std::string path_to_tile = args[14];
-                DLTensor *input = args[15];
-                DLTensor *weight = args[16];
-                DLTensor *output = args[17];
+                int sparsity_ratio = args[15];
+                DLTensor *input = args[16];
+                DLTensor *weight = args[17];
+                DLTensor *output = args[18];
 
                 //Creating config  to find out if we are going to
                 // run a dense or sparse simulation
@@ -254,7 +255,10 @@ namespace tvm
                 // Run different types of convolutions depending
                 // on whether sparsity is suported
                 if (stonne_config.sparsitySupportEnabled())
-                {
+                {   
+                    // Convert sparsity ratio to %
+                    float sparsity_ratio_flaot = sparsity_ratio/100;
+                    
                     // Run a sparse forward convolution
                     sparseConvolution(
                         R,
