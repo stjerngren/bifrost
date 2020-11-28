@@ -8,9 +8,7 @@ import tvm.relay.op as _op
 from tvm.relay.op.strategy.generic import *
 from ..simulator import architecture
 from ..tiles import tiles
-
-simulation_file:str   = "/Users/axelstjerngren/uni/Year4/ProjectLevel4/level-4-project/simulator_default/test.cfg"
-tiles_path:str        = "/Users/axelstjerngren/uni/Year4/ProjectLevel4/level-4-project/simulator_default/tile_configuration_conv1.txt"
+#from tvm.topi.nn.utils import traverse_inline
 
 # Register the compute schedule for stonne conv2d
 @autotvm.register_topi_compute("conv2d_stonne_nchw.x86")
@@ -100,7 +98,21 @@ def conv2d_stonne_nchw(
 @autotvm.register_topi_schedule("conv2d_stonne.x86")
 def schedule_conv2d_stonne(cfg, outs):
     """Create schedule for conv2d_nhwc"""
+    
+    ##### space definition begin #####
+    cfg.define_knob("oc_nthread", [1, 2])
+
+    """Create the schedule for conv2d_nchw"""
+    outs = [outs] if isinstance(outs, te.tensor.Tensor) else outs
+    s = te.create_schedule([x.op for x in outs])
+
+    #def _callback(op):
+     #   if op.tag == "conv2d_nchw":
+     #       schedule_direct_cuda(cfg, s, op.output(0))
+
+    #traverse_inline(s, outs[0].op, _callback)
     return generic.schedule_extern(outs)
+
 
 # Override the conv2d x86 strategy to add STONNE support in the libs
 @conv2d_strategy.register("cpu")
