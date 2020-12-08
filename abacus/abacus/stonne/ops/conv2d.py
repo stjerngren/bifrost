@@ -28,6 +28,13 @@ def conv2d_stonne_nchw(
     Compute conv2d using STONNE
     """
 
+    ##### space definition begin #####
+    cfg.define_knob("oc_nthread", [1, 2])
+    cfg.define_knob("oc1_nthread", [1, 2])
+    cfg.define_knob("oc2_nthread", [1, 2])
+    #cfg.add_flop(4)
+    print("-"*30)
+    print(cfg['oc2_nthread'])
     if architecture.path == "":
         raise ValueError("STONNE has not been configured")
 
@@ -95,23 +102,21 @@ def conv2d_stonne_nchw(
     )
 
 # Use the genric schedule
-@autotvm.register_topi_schedule("conv2d_stonne.x86")
+@autotvm.register_topi_schedule("conv2d_stonne_nchw.x86")
 def schedule_conv2d_stonne(cfg, outs):
     """Create schedule for conv2d_nhwc"""
     
     ##### space definition begin #####
     cfg.define_knob("oc_nthread", [1, 2])
-
+    cfg.define_knob("oc1_nthread", [1, 2])
+    cfg.define_knob("oc2_nthread", [1, 2])
+    cfg.add_flop(4)
     """Create the schedule for conv2d_nchw"""
-    outs = [outs] if isinstance(outs, te.tensor.Tensor) else outs
     s = te.create_schedule([x.op for x in outs])
-
-    #def _callback(op):
-     #   if op.tag == "conv2d_nchw":
-     #       schedule_direct_cuda(cfg, s, op.output(0))
-
-    #traverse_inline(s, outs[0].op, _callback)
-    return generic.schedule_extern(outs)
+    print("-"*100)
+    print(cfg)
+    print(s)
+    return s
 
 
 # Override the conv2d x86 strategy to add STONNE support in the libs
@@ -135,7 +140,6 @@ def conv2d_strategy_cpu(attrs, inputs, out_type, target):
             strategy.add_implementation(
                     wrap_compute_conv2d(conv2d_stonne_nchw),
                     wrap_topi_schedule(schedule_conv2d_stonne),
-
                     name="conv2d_stonne.x86",
             )
     else:
