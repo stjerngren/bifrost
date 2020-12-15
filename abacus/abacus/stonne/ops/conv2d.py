@@ -28,13 +28,13 @@ def conv2d_stonne_nchw(
     Compute conv2d using STONNE
     """
 
-    ##### space definition begin #####
-    cfg.define_knob("oc_nthread", [1, 2])
-    cfg.define_knob("oc1_nthread", [1, 2])
-    cfg.define_knob("oc2_nthread", [1, 2])
-    #cfg.add_flop(4)
-    print("-"*30)
-    print(cfg['oc2_nthread'])
+
+    # Define tuning space
+    cfg.define_knob("ms_size", [8,16,256,1024])
+
+    if architecture.tune:
+        architecture.ms_size = cfg['ms_size']
+
     if architecture.path == "":
         raise ValueError("STONNE has not been configured")
 
@@ -105,18 +105,8 @@ def conv2d_stonne_nchw(
 @autotvm.register_topi_schedule("conv2d_stonne_nchw.x86")
 def schedule_conv2d_stonne(cfg, outs):
     """Create schedule for conv2d_nhwc"""
-    
-    ##### space definition begin #####
-    cfg.define_knob("oc_nthread", [1, 2])
-    cfg.define_knob("oc1_nthread", [1, 2])
-    cfg.define_knob("oc2_nthread", [1, 2])
-    cfg.add_flop(4)
-    """Create the schedule for conv2d_nchw"""
-    s = te.create_schedule([x.op for x in outs])
-    print("-"*100)
-    print(cfg)
-    print(s)
-    return s
+    cfg.add_flop(1)
+    return generic.schedule_extern(outs)
 
 
 # Override the conv2d x86 strategy to add STONNE support in the libs
@@ -131,6 +121,7 @@ def conv2d_strategy_cpu(attrs, inputs, out_type, target):
     kernel_layout = attrs.kernel_layout
     if dilation_h < 1 or dilation_w < 1:
         raise ValueError("dilation should be positive value")
+
 
     """
     This is the only part which changes

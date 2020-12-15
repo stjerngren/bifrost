@@ -19,7 +19,8 @@ config_simulator(
     reduce_network_type="ASNETWORK",
     dn_bw=8,
     rn_bw=8,
-    controller_type="MAERI_DENSE_WORKLOAD"
+    controller_type="MAERI_DENSE_WORKLOAD",
+    tune = True
 )
 
 
@@ -58,9 +59,10 @@ logging.basicConfig(level=logging.DEBUG)  # to dump TVM IR after fusion
 target = "llvm --libs=stonne"
 
 mod, params = testing.create_workload(simple_net)
+log_file = "test.log"
 
 tuning_options = {
-    "log_filename": "test.log",
+    "log_filename": log_file,
     "tuner": "random",
     "early_stopping": None,
     "measure_option": autotvm.measure_option(
@@ -107,6 +109,18 @@ def tune_kernels(
             ],
         )
 
+# Use graph tuner to achieve graph level optimal schedules
+# Set use_DP=False if it takes too long to finish.
+def tune_graph(graph, dshape, records, opt_sch_file, use_DP=True):
+    target_op = [
+        relay.op.get("nn.conv2d"),
+    ]
+    Tuner = DPTuner if use_DP else PBQPTuner
+    executor = Tuner(graph, {input_name: dshape}, records, target_op, target)
+    executor.benchmark_layout_transform(min_exec_num=2000)
+    executor.run()
+    executor.write_opt_sch2record_file(opt_sch_file)
+
 if __name__ == "__main__":
     tasks = autotvm.task.extract_from_program(
             mod, 
@@ -118,3 +132,25 @@ if __name__ == "__main__":
 
     tune_kernels(tasks, tuning_options["measure_option"])
 
+    #tune_graph(mod["main"], data_shape, log_file, graph_opt_sch_file)
+#
+    ## compile kernels with graph-level best records
+    #with autotvm.apply_graph_best(graph_opt_sch_file):
+    #    print("Compile...")
+    #    with tvm.transform.PassContext(opt_level=3):
+    #        lib = relay.build_module.build(mod, target=target, params=params)
+#
+    #    # upload parameters to device
+    #    ctx = tvm.cpu()
+    #    data_tvm = tvm.nd.array((np.random.uniform(size=data_shape)).astype(dtype))
+    #    module = runtime.GraphModule(lib["default"](ctx))
+    #    module.set_input(input_name, data_tvm)
+#
+    #    # evaluate
+    #    print("Evaluate inference time cost...")
+    #    ftimer = module.module.time_evaluator("run", ctx, number=100, repeat=3)
+    #    prof_res = np.array(ftimer().results) * 1000  # convert to millisecond
+    #    print(
+    #        "Mean inference time (std dev): %.2f ms (%.2f ms)"
+    #        % (np.mean(prof_res), np.std(prof_res))
+    #    )
