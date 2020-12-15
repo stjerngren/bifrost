@@ -106,7 +106,7 @@ def conv2d_stonne_nchw(
 def schedule_conv2d_stonne(cfg, outs):
     """Create schedule for conv2d_nhwc"""
     cfg.add_flop(1)
-    return generic.schedule_extern(outs)
+    return te.create_schedule([x.op for x in outs])
 
 
 # Override the conv2d x86 strategy to add STONNE support in the libs

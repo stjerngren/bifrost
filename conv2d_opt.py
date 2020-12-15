@@ -1,6 +1,6 @@
 
 import tvm
-from tvm import te, autotvm ,relay
+from tvm import te, autotvm ,relay, rpc
 import numpy as np
 from tvm.contrib import graph_runtime as runtime
 from tvm.relay import testing
@@ -68,7 +68,10 @@ tuning_options = {
     "measure_option": autotvm.measure_option(
         builder=autotvm.LocalBuilder(),
         runner=autotvm.LocalRunner(
-            number=1, repeat=10, min_repeat_ms=0, enable_cpu_cache_flush=True
+            number=1,
+            repeat=10,
+            min_repeat_ms=0,
+            enable_cpu_cache_flush=True
         ),
     ),
 }
@@ -122,6 +125,8 @@ def tune_graph(graph, dshape, records, opt_sch_file, use_DP=True):
     executor.write_opt_sch2record_file(opt_sch_file)
 
 if __name__ == "__main__":
+    remote = rpc.LocalSession()
+
     tasks = autotvm.task.extract_from_program(
             mod, 
             target=target, 
@@ -129,7 +134,8 @@ if __name__ == "__main__":
             ops=(relay.op.get("nn.conv2d"),)
     )
 
-
+    print(tvm.get_global_func('tvm.contrib.stonne.conv2d.forward'))
+    print(100*"yup")
     tune_kernels(tasks, tuning_options["measure_option"])
 
     #tune_graph(mod["main"], data_shape, log_file, graph_opt_sch_file)
