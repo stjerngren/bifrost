@@ -79,6 +79,13 @@ batch_size = 1
 
 
 
+######################################################################
+# Here we upload the lib to the remote device, then invoke a device local
+# compiler for shared lib and load it into device memory. now `f` is a
+# remote module object.
+remote.upload(path)
+
+
 # You can skip the implementation of this function for this tutorial.
 def tune_kernels(
     tasks, measure_option, tuner="gridsearch", early_stopping=None, log_filename="tuning.log"
