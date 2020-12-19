@@ -7,9 +7,11 @@ from tvm.relay import testing
 import logging
 import random
 
+
 # Import this add stonne as an x86 co-processor
 import abacus.abacus
 from abacus.abacus.stonne.simulator import config_simulator
+from abacus.abacus.tuner.stone_builder import StonneLocalBuilder
 
 from tvm.autotvm.tuner import XGBTuner, GATuner, RandomTuner, GridSearchTuner
 
@@ -66,7 +68,7 @@ tuning_options = {
     "tuner": "random",
     "early_stopping": None,
     "measure_option": autotvm.measure_option(
-        builder=autotvm.LocalBuilder(),
+        builder=StonneLocalBuilder(),
         runner=autotvm.LocalRunner(
             number=1,
             repeat=10,
@@ -76,15 +78,6 @@ tuning_options = {
     ),
 }
 batch_size = 1
-
-
-
-######################################################################
-# Here we upload the lib to the remote device, then invoke a device local
-# compiler for shared lib and load it into device memory. now `f` is a
-# remote module object.
-remote.upload(path)
-
 
 # You can skip the implementation of this function for this tutorial.
 def tune_kernels(
