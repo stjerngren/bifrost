@@ -32,7 +32,6 @@ def conv2d_stonne_nchw(
     # Define tuning space
     cfg.define_knob("ms_size", [8,16,256,1024])
 
-    print("tune"*100, cfg['ms_size'])
     if architecture.tune:
         architecture.ms_size = cfg['ms_size']
 

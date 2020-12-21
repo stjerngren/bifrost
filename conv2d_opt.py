@@ -74,7 +74,7 @@ tuning_options = {
         builder=StonneLocalBuilder(),
         runner=StonneLocalRunner(
             number=1,
-            repeat=10,
+            repeat=2,
             min_repeat_ms=0,
             enable_cpu_cache_flush=True
         ),
@@ -120,18 +120,6 @@ def tune_kernels(
                 autotvm.callback.log_to_file(log_filename),
             ],
         )
-
-# Use graph tuner to achieve graph level optimal schedules
-# Set use_DP=False if it takes too long to finish.
-def tune_graph(graph, dshape, records, opt_sch_file, use_DP=True):
-    target_op = [
-        relay.op.get("nn.conv2d"),
-    ]
-    Tuner = DPTuner if use_DP else PBQPTuner
-    executor = Tuner(graph, {input_name: dshape}, records, target_op, target)
-    executor.benchmark_layout_transform(min_exec_num=2000)
-    executor.run()
-    executor.write_opt_sch2record_file(opt_sch_file)
 
 if __name__ == "__main__":
     remote = rpc.LocalSession()
