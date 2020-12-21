@@ -14,6 +14,8 @@ from abacus.abacus.stonne.simulator import config_simulator
 from abacus.abacus.tuner.stone_builder import StonneLocalBuilder, StonneLocalRunner
 
 from tvm.autotvm.tuner import XGBTuner, GATuner, RandomTuner, GridSearchTuner
+from tvm.autotvm.graph_tuner import DPTuner, PBQPTuner
+
 
 
 config_simulator(
@@ -56,6 +58,7 @@ data = np.random.uniform(-1, 1, size=data_shape).astype("float32")
 logging.basicConfig(level=logging.DEBUG)  # to dump TVM IR after fusion
 
 
+
 # Build and run with llvm backend, and use the
 # stonne conv2d ops
 target = "llvm --libs=stonne"
@@ -78,10 +81,16 @@ tuning_options = {
     ),
 }
 batch_size = 1
+graph_opt_sch_file = "graph_opt.log" 
+input_name = "data"
 
 # You can skip the implementation of this function for this tutorial.
 def tune_kernels(
-    tasks, measure_option, tuner="gridsearch", early_stopping=None, log_filename="tuning.log"
+    tasks, 
+    measure_option, 
+    tuner="gridsearch", 
+    early_stopping=None, 
+    log_filename=log_file
 ):
 
     for i, task in enumerate(tasks):
@@ -135,26 +144,21 @@ if __name__ == "__main__":
     )
 
     tune_kernels(tasks, tuning_options["measure_option"])
+#
+    with autotvm.apply_history_best(log_file):
+        
 
-    #tune_graph(mod["main"], data_shape, log_file, graph_opt_sch_file)
-#
-    ## compile kernels with graph-level best records
-    #with autotvm.apply_graph_best(graph_opt_sch_file):
-    #    print("Compile...")
-    #    with tvm.transform.PassContext(opt_level=3):
-    #        lib = relay.build_module.build(mod, target=target, params=params)
-#
-    #    # upload parameters to device
-    #    ctx = tvm.cpu()
-    #    data_tvm = tvm.nd.array((np.random.uniform(size=data_shape)).astype(dtype))
-    #    module = runtime.GraphModule(lib["default"](ctx))
-    #    module.set_input(input_name, data_tvm)
-#
-    #    # evaluate
-    #    print("Evaluate inference time cost...")
-    #    ftimer = module.module.time_evaluator("run", ctx, number=100, repeat=3)
-    #    prof_res = np.array(ftimer().results) * 1000  # convert to millisecond
-    #    print(
-    #        "Mean inference time (std dev): %.2f ms (%.2f ms)"
-    #        % (np.mean(prof_res), np.std(prof_res))
-    #    )
+        # Generate the data to suse with both llvm and llvm stonne
+        data = np.random.uniform(-1, 1, size=data_shape).astype("float32")
+
+        target = "llvm -libs=stonne"
+        lib = relay.build_module.build(net, target, params=params)
+
+        ctx = tvm.context(target, 0)
+        module = runtime.GraphModule(lib["default"](ctx))
+        module.set_input("data", data)
+        module.run()
+        out_shape = (batch_size, out_channels, 10, 10)
+        out = module.get_output(0, tvm.nd.empty(out_shape))
+        out_stonne = out.asnumpy()
+        print(out_stonne)
