@@ -11,7 +11,7 @@ import random
 # Import this add stonne as an x86 co-processor
 import abacus.abacus
 from abacus.abacus.stonne.simulator import config_simulator
-from abacus.abacus.tuner.stone_builder import StonneLocalBuilder
+from abacus.abacus.tuner.stone_builder import StonneLocalBuilder, StonneLocalRunner
 
 from tvm.autotvm.tuner import XGBTuner, GATuner, RandomTuner, GridSearchTuner
 
@@ -69,7 +69,7 @@ tuning_options = {
     "early_stopping": None,
     "measure_option": autotvm.measure_option(
         builder=StonneLocalBuilder(),
-        runner=autotvm.LocalRunner(
+        runner=StonneLocalRunner(
             number=1,
             repeat=10,
             min_repeat_ms=0,
@@ -134,8 +134,6 @@ if __name__ == "__main__":
             ops=(relay.op.get("nn.conv2d"),)
     )
 
-    print(tvm.get_global_func('tvm.contrib.stonne.conv2d.forward'))
-    print(100*"yup")
     tune_kernels(tasks, tuning_options["measure_option"])
 
     #tune_graph(mod["main"], data_shape, log_file, graph_opt_sch_file)
