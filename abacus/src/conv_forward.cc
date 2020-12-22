@@ -105,7 +105,8 @@ namespace tvm
             DLTensor *weight,
             DLTensor *output,
             std::string path_to_tile,
-            Config stonne_config)
+            Config stonne_config
+            )
         {
             // Cast pointers so they can be fed into stonne
             float *input_raw = static_cast<float *>(input->data);
@@ -243,6 +244,7 @@ namespace tvm
                 DLTensor *input = args[16];
                 DLTensor *weight = args[17];
                 DLTensor *output = args[18];
+                bool cost = args[19];
 
                 //Creating config  to find out if we are going to
                 // run a dense or sparse simulation

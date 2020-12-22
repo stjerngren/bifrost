@@ -94,7 +94,7 @@ def conv2d_stonne_nchw(
                 architecture.sparsity_ratio, # [15]    
                 ins[0],          # [16]
                 ins[1],          # [17]
-                outs[0]          # [18]
+                outs[0],         # [18]
 
             ),
             name = "s",
