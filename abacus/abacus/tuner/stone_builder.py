@@ -268,7 +268,9 @@ def run_stonne_through_rpc(
                 random_fill(arg)
             ctx.sync()
 
-        costs = time_f(*args).results
+        # Run this to create the output files
+        time_costs = time_f(*args).results
+        costs = [1,2]
 
         # clean up remote files
         remote.remove(build_result.filename)
@@ -299,7 +301,7 @@ def run_stonne_through_rpc(
     return MeasureResult(costs, errno, tstamp - tic + build_result.time_cost, tstamp)
 
 
-class RPCRunner(Runner):
+class StonneRPCRunner(Runner):
     """Run generated code on remove devices.
     This function will ask a RPC Tracker to get device for measurement.
 
@@ -360,7 +362,7 @@ class RPCRunner(Runner):
         check_correctness=False,
         enable_cpu_cache_flush=False,
     ):
-        super(RPCRunner, self).__init__(timeout, n_parallel)
+        super(StonneRPCRunner, self).__init__(timeout, n_parallel)
 
         self.key = key
         self.host = host
@@ -470,7 +472,7 @@ class RPCRunner(Runner):
         return results
 
 
-class StonneLocalRunner(RPCRunner):
+class StonneLocalRunner(StonneRPCRunner):
     """Run generated code on local devices.
 
     Parameters
