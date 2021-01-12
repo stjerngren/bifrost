@@ -30,9 +30,10 @@ def conv2d_stonne_nchw(
 
 
     # Define tuning space
-    cfg.define_knob("ms_size", [8,16,256,1024])
+    cfg.define_knob("ms_size", [8])
 
     if architecture.tune:
+        print("knob"*1000, cfg['ms_size'])
         architecture.ms_size = cfg['ms_size']
 
     if architecture.path == "":
@@ -105,7 +106,8 @@ def conv2d_stonne_nchw(
 @autotvm.register_topi_schedule("conv2d_stonne_nchw.x86")
 def schedule_conv2d_stonne(cfg, outs):
     """Create schedule for conv2d_nhwc"""
-    cfg.add_flop(1)
+    cfg.add_flop(2)
+
     return te.create_schedule([x.op for x in outs])
 
 

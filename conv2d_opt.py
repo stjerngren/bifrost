@@ -74,7 +74,7 @@ tuning_options = {
         builder=StonneLocalBuilder(),
         runner=StonneLocalRunner(
             number=1,
-            repeat=2,
+            repeat=0,
             min_repeat_ms=0,
             enable_cpu_cache_flush=True
         ),
@@ -133,20 +133,20 @@ if __name__ == "__main__":
 
     tune_kernels(tasks, tuning_options["measure_option"])
 #
-    with autotvm.apply_history_best(log_file):
-        
-
-        # Generate the data to suse with both llvm and llvm stonne
-        data = np.random.uniform(-1, 1, size=data_shape).astype("float32")
-
-        target = "llvm -libs=stonne"
-        lib = relay.build_module.build(net, target, params=params)
-
-        ctx = tvm.context(target, 0)
-        module = runtime.GraphModule(lib["default"](ctx))
-        module.set_input("data", data)
-        module.run()
-        out_shape = (batch_size, out_channels, 10, 10)
-        out = module.get_output(0, tvm.nd.empty(out_shape))
-        out_stonne = out.asnumpy()
-        print(out_stonne)
+#    with autotvm.apply_history_best(log_file):
+#        
+#
+#        # Generate the data to suse with both llvm and llvm stonne
+#        data = np.random.uniform(-1, 1, size=data_shape).astype("float32")
+#
+#        target = "llvm -libs=stonne"
+#        lib = relay.build_module.build(net, target, params=params)
+#
+#        ctx = tvm.context(target, 0)
+#        module = runtime.GraphModule(lib["default"](ctx))
+#        module.set_input("data", data)
+#        module.run()
+#        out_shape = (batch_size, out_channels, 10, 10)
+#        out = module.get_output(0, tvm.nd.empty(out_shape))
+#        out_stonne = out.asnumpy()
+#        print(out_stonne)

@@ -19,7 +19,7 @@ class Simulator(object):
     @ms_size.setter
     def ms_size(self, size: int):
         self._ms_size = size
-        self.create_config_file(self.path)
+        self.create_config_file(self._path)
 
     def edit_config(
         self,
