@@ -2,7 +2,8 @@
 import os
 
 class Simulator(object):
-    path:str = ""
+    _path: str = "" # Internal path without filename
+    path:str = "" # Path with filename
     _ms_size:int
     reduce_network_type:str
     dn_bw:int
@@ -45,6 +46,7 @@ class Simulator(object):
         """
         if path == "" and self.path == "":
             path = os.getcwd()
+            self._path = path
             self.path = path + "/stonne_config.cfg"
 
         with open(self.path, "w") as f:

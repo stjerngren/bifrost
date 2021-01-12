@@ -244,7 +244,6 @@ namespace tvm
                 DLTensor *input = args[16];
                 DLTensor *weight = args[17];
                 DLTensor *output = args[18];
-                bool cost = args[19];
 
                 //Creating config  to find out if we are going to
                 // run a dense or sparse simulation

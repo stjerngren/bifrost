@@ -2,6 +2,7 @@ import shutil
 import time 
 import tempfile
 import os
+import csv
 from random import getrandbits
 from collections import namedtuple
 import numpy as np
@@ -16,6 +17,7 @@ from tvm.autotvm.task.space import InstantiationError
 from tvm.contrib import tar
 from tvm.target import Target
 
+from ..stonne.simulator import architecture
 
 class StonneLocalBuilder(Builder):
     """Run compilation on local machine
@@ -270,7 +272,16 @@ def run_stonne_through_rpc(
 
         # Run this to create the output files
         time_costs = time_f(*args).results
-        costs = [1,2]
+
+        # Use the same psth as the architecture to store the costs
+        csv_path = os.path.join(architecture._path, "costs.csv")
+        
+        # Read the custom costs here
+        with open(csv_path, 'r+') as f:
+            reader = csv.reader(f, delimiter=',')
+            # The first line of the file corresponds to the cost
+            costs = list(map(int,next(reader))) # Convert string values to int
+            f.truncate(0) # Remove all contents from the file
 
         # clean up remote files
         remote.remove(build_result.filename)
