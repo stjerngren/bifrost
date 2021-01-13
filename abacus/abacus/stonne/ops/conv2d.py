@@ -30,15 +30,16 @@ def conv2d_stonne_nchw(
 
 
     # Define tuning space
-    cfg.define_knob("ms_size", [8])
+    cfg.define_knob("ms_size", [8,16])
+    try:
+        if architecture.tune:
+            architecture.ms_size = cfg['ms_size']
 
-    if architecture.tune:
-        print("knob"*1000, cfg['ms_size'])
-        architecture.ms_size = cfg['ms_size']
-
-    if architecture.path == "":
-        raise ValueError("STONNE has not been configured")
-
+        path = architecture.path
+        sparsity_ratio = architecture.sparsity_ratio
+    except Exception as e:
+        path = "/Users/axelstjerngren/uni/Year4/ProjectLevel4/level-4-project/stonne_config.cfg"
+        sparsity_ratio = 1
     # Extract data from 
     N, C, H, W = get_const_tuple(data.shape)
     output_channels, _, kernel_height, kernel_width = get_const_tuple(kernel.shape)
@@ -77,7 +78,7 @@ def conv2d_stonne_nchw(
             [data,kernel],
             lambda ins, outs: tvm.tir.call_packed(
                 "tvm.contrib.stonne.conv2d.forward",  
-                architecture.path, # [0]
+                path,            # [0]
                 R,               # [1]
                 S,               # [2]
                 C,               # [3]
@@ -92,7 +93,7 @@ def conv2d_stonne_nchw(
                 pad_x,           # [12]    
                 pad_y,           # [13]    
                 tiles.path,      # [14]     
-                architecture.sparsity_ratio, # [15]    
+                sparsity_ratio,  # [15]    
                 ins[0],          # [16]
                 ins[1],          # [17]
                 outs[0],         # [18]
@@ -107,7 +108,6 @@ def conv2d_stonne_nchw(
 def schedule_conv2d_stonne(cfg, outs):
     """Create schedule for conv2d_nhwc"""
     cfg.add_flop(2)
-
     return te.create_schedule([x.op for x in outs])
 
 

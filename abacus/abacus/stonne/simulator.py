@@ -2,16 +2,17 @@
 import os
 
 class Simulator(object):
-    _path: str = "" # Internal path without filename
-    path:str = "" # Path with filename
-    _ms_size:int
-    reduce_network_type:str
-    dn_bw:int
-    rn_bw:int
-    controller_type:str
-    sparsity_ratio:float 
-    tune:bool = False # A variable which to set if you want to use config
-    
+    def __init__(self):
+        self._path: str = "" # Internal path without filename
+        self.path:str = "" # Path with filename
+        self._ms_size:int
+        self.reduce_network_type:str
+        self.dn_bw:int
+        self.rn_bw:int
+        self.controller_type:str
+        self.sparsity_ratio:float = 0
+        self.tune:bool = False # A variable which to set if you want to use config
+        
     @property
     def ms_size(self):
         return self._ms_size
@@ -58,6 +59,7 @@ class Simulator(object):
             f.write(f"dn_bw={self.dn_bw}\n")
             f.write(f"rn_bw={self.rn_bw}\n")
             f.write(f'controller_type="{self.controller_type}"\n')
+        print("New config created at ", path, self.ms_size)
 
 def config_simulator(
     ms_size:int,

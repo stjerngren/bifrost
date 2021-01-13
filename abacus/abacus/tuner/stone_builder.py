@@ -309,6 +309,8 @@ def run_stonne_through_rpc(
         errno = MeasureErrorNo.RUNTIME_DEVICE
     tstamp = time.time()
     time.sleep(cooldown_interval)
+    print("_"*100)
+    print(costs, errno, tstamp - tic + build_result.time_cost, tstamp)
     return MeasureResult(costs, errno, tstamp - tic + build_result.time_cost, tstamp)
 
 
