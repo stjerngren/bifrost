@@ -12,7 +12,7 @@ if __name__ == "__main__":
     # Import this add stonne as an x86 co-processor
     import abacus.abacus
 
-    from abacus.abacus.stonne.simulator import config_simulator
+    from abacus.abacus.stonne.simulator import config_simulator, architecture
     from abacus.abacus.tuner.stone_builder import StonneLocalBuilder, StonneLocalRunner
 
     from tvm.autotvm.tuner import XGBTuner, GATuner, RandomTuner, GridSearchTuner
@@ -28,7 +28,7 @@ if __name__ == "__main__":
     #)
 #
 #
-
+    architecture.tune = True
 
     # TODO: Add a way to configure STONNE
     out_channels = 2
@@ -75,8 +75,8 @@ if __name__ == "__main__":
         "measure_option": autotvm.measure_option(
             builder=StonneLocalBuilder(),
             runner=StonneLocalRunner(
-                number=2,
-                repeat=2,
+                number=1,
+                repeat=1,
                 min_repeat_ms=0,
                 enable_cpu_cache_flush=True
             ),
@@ -113,6 +113,9 @@ if __name__ == "__main__":
 
             # do tuning
             n_trial = len(task.config_space)
+
+            print(task.config_space)
+            print(n_trial, "test")
             tuner_obj.tune(
                 n_trial=n_trial,
                 early_stopping=early_stopping,
@@ -134,7 +137,7 @@ if __name__ == "__main__":
             params=params, 
             ops=(relay.op.get("nn.conv2d"),)
     )
-
+    print(tasks)
     tune_kernels(tasks, tuning_options["measure_option"])
 #
 #    with autotvm.apply_history_best(log_file):
