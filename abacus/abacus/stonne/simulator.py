@@ -56,7 +56,7 @@ class Simulator(object):
         name_config : str (optional)
             An optional name for the specific cofig
         """
-        if path == "" and self.path == "":
+        if path == "":
             path = os.getcwd()
             self._path = path
             if name_config:
@@ -75,7 +75,7 @@ class Simulator(object):
             f.write(f"dn_bw={self.dn_bw}\n")
             f.write(f"rn_bw={self.rn_bw}\n")
             f.write(f'controller_type="{self.controller_type}"\n')
-        print("New config created at ", path, self.ms_size)
+        print("New config created at ", self.path, self.ms_size)
 
 def config_simulator(
     ms_size:int,

@@ -22,7 +22,7 @@ config_simulator(
     reduce_network_type="ASNETWORK",
     dn_bw=8,
     rn_bw=8,
-    controller_type="MAERI_DENSE_WORKLOAD"
+    controller_type="MAERI_DENSE_WORKLOAD",
 )
 
 

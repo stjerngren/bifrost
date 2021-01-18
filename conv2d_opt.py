@@ -1,3 +1,14 @@
+from abacus.abacus.stonne.simulator import config_simulator, architecture
+
+config_simulator(
+    ms_size=16,
+    reduce_network_type="ASNETWORK",
+    dn_bw=8,
+    rn_bw=8,
+    controller_type="MAERI_DENSE_WORKLOAD",
+    tune = True
+)
+
 if __name__ == "__main__":
 
     import tvm
@@ -12,21 +23,12 @@ if __name__ == "__main__":
     # Import this add stonne as an x86 co-processor
     import abacus.abacus
 
-    from abacus.abacus.stonne.simulator import config_simulator, architecture
     from abacus.abacus.tuner.stone_builder import StonneLocalBuilder, StonneLocalRunner
 
     from tvm.autotvm.tuner import XGBTuner, GATuner, RandomTuner, GridSearchTuner
     from tvm.autotvm.graph_tuner import DPTuner, PBQPTuner
 
-    #config_simulator(
-    #    ms_size=16,
-    #    reduce_network_type="ASNETWORK",
-    #    dn_bw=8,
-    #    rn_bw=8,
-    #    controller_type="MAERI_DENSE_WORKLOAD",
-    #    tune = True
-    #)
-#
+
 #
     architecture.tune = True
 

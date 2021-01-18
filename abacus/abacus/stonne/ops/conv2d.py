@@ -30,17 +30,18 @@ def conv2d_stonne_nchw(
 
 
     # Define tuning space
-    cfg.define_knob("ms_size", [8,16])
+    cfg.define_knob("ms_size", [8,16,64])
+
     if architecture.tune:
         print((" tuning here " + str(cfg['ms_size'])) * 100)
         # Change the architecture to the new settings
         architecture.ms_size = cfg['ms_size']
         # Create a temporary file for tuning config
         architecture.create_config_file(name_config="ms_size_" + str(cfg['ms_size']))
-
+    
     path = architecture.path
     sparsity_ratio = architecture.sparsity_ratio
-    print(path, "path " * 100)
+
     # Extract data from 
     N, C, H, W = get_const_tuple(data.shape)
     output_channels, _, kernel_height, kernel_width = get_const_tuple(kernel.shape)
