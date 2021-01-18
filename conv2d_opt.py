@@ -77,8 +77,8 @@ if __name__ == "__main__":
         "measure_option": autotvm.measure_option(
             builder=StonneLocalBuilder(),
             runner=StonneLocalRunner(
-                number=1,
-                repeat=1,
+                number=2,
+                repeat=3,
                 min_repeat_ms=0,
                 enable_cpu_cache_flush=True
             ),
@@ -119,11 +119,11 @@ if __name__ == "__main__":
             print(task.config_space)
             print(n_trial, "test")
             tuner_obj.tune(
-                n_trial=n_trial,
+                n_trial=100,
                 early_stopping=early_stopping,
                 measure_option=measure_option,
                 callbacks=[
-                    autotvm.callback.progress_bar(n_trial, prefix=prefix),
+                    autotvm.callback.progress_bar(100, prefix=prefix),
                     autotvm.callback.log_to_file(log_filename),
                 ],
             )

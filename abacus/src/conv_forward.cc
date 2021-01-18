@@ -4,6 +4,12 @@
 #include <tvm/runtime/device_api.h>
 #include <tvm/runtime/registry.h>
 
+#include <fstream>
+#include <string>
+#include <iostream>
+
+
+
 // Stonne variable taxonomy
 // -R: Number of flter rows
 // -S: Number of filter columns
@@ -241,9 +247,11 @@ namespace tvm
                 int pad_y = args[13];
                 std::string path_to_tile = args[14];
                 int sparsity_ratio = args[15];
-                DLTensor *input = args[16];
-                DLTensor *weight = args[17];
-                DLTensor *output = args[18];
+                bool tune = args[16];
+                std::string tuning_name = args[17];
+                DLTensor *input = args[18];
+                DLTensor *weight = args[19];
+                DLTensor *output = args[20];
 
                 //Creating config  to find out if we are going to
                 // run a dense or sparse simulation
@@ -252,7 +260,11 @@ namespace tvm
                 {
                     stonne_config.loadFile(path_to_arch_file);
                 }
+                std::ofstream out;
+                out.open("test_run.txt", std::ios::app);
 
+                out << path_to_arch_file + "\n";
+                out.close();
                 // Run different types of convolutions depending
                 // on whether sparsity is suported
                 if (stonne_config.sparsitySupportEnabled())

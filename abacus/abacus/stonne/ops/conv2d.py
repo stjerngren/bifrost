@@ -32,6 +32,10 @@ def conv2d_stonne_nchw(
     # Define tuning space
     cfg.define_knob("ms_size", [8,16,64])
 
+    # If the architecture is being tuned, write to the file with the
+    # following name
+    tuning_name = "ms_size_" + str(cfg['ms_size'])
+
     if architecture.tune:
         print((" tuning here " + str(cfg['ms_size'])) * 100)
         # Change the architecture to the new settings
@@ -80,25 +84,28 @@ def conv2d_stonne_nchw(
             [data,kernel],
             lambda ins, outs: tvm.tir.call_packed(
                 "tvm.contrib.stonne.conv2d.forward",  
-                path,            # [0]
-                R,               # [1]
-                S,               # [2]
-                C,               # [3]
-                K,               # [4]
-                G,               # [5]
-                N,               # [6]
-                X,               # [7]
-                Y,               # [8]
-                X_,              # [9]    
-                Y_,              # [10]    
-                strides[0],      # [11]      
-                pad_x,           # [12]    
-                pad_y,           # [13]    
-                tiles.path,      # [14]     
-                sparsity_ratio,  # [15]    
-                ins[0],          # [16]
-                ins[1],          # [17]
-                outs[0],         # [18]
+                path,              # [0]
+                R,                 # [1]
+                S,                 # [2]
+                C,                 # [3]
+                K,                 # [4]
+                G,                 # [5]
+                N,                 # [6]
+                X,                 # [7]
+                Y,                 # [8]
+                X_,                # [9]    
+                Y_,                # [10]    
+                strides[0],        # [11]      
+                pad_x,             # [12]    
+                pad_y,             # [13]    
+                tiles.path,        # [14]     
+                sparsity_ratio,    # [15]    
+                architecture.tune, # [16]
+                tuning_name,       # [17]
+                ins[0],            # [18]
+                ins[1],            # [19]
+                outs[0],           # [120]
+
 
             ),
             name = "s",
