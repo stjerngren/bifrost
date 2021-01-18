@@ -56,7 +56,7 @@ class Simulator(object):
         name_config : str (optional)
             An optional name for the specific cofig
         """
-        if path == "":
+        if path == "": 
             path = os.getcwd()
             self._path = path
             if name_config:
