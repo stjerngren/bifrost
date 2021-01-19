@@ -1,8 +1,15 @@
+// STONNE
 #include "../../../stonne_works/stonne/stonne/stonne_linker_src/stonne_linker.h"
 #include "../../../stonne_works/stonne/stonne/include/Config.h"
+#include "../../../stonne_works/stonne/stonne/include/STONNEModel.h"
 
+// TVM
 #include <tvm/runtime/device_api.h>
 #include <tvm/runtime/registry.h>
+
+// JSONCPP
+
+#include "json/json.h"
 
 #include <fstream>
 #include <string>
@@ -28,6 +35,18 @@ namespace tvm
     {
 
         using namespace runtime;
+        
+        void reportCost(
+            std::string tuning_name, 
+            std::string filename, 
+            int cost)
+        {
+                std::ofstream out;
+                out.open("test_run.txt", std::ios::app);
+
+                out << std::to_string(cost) + "\n";
+                out.close();
+        }
 
         float im2col_get_pixel(
 
@@ -93,7 +112,7 @@ namespace tvm
             }
         }
 
-        void denseConvolution(
+        Stonne* denseConvolution(
             int R,
             int S,
             int C,
@@ -123,7 +142,7 @@ namespace tvm
             std::string layer_name = "Conv2dLayerDense";
 
             // Run the simulated forward convolution
-            simulateDenseConvForward(
+            Stonne* stonne_instance = simulateDenseConvForward(
                 layer_name,
                 input_raw,
                 weight_raw,
@@ -144,9 +163,10 @@ namespace tvm
                 path_to_tile,
                 stonne_config
                 );
+            return stonne_instance;
         }
 
-        void sparseConvolution(
+        Stonne* sparseConvolution(
             int R,
             int S,
             int C,
@@ -212,7 +232,7 @@ namespace tvm
 
             std::cout << "perform sparse gemm" << std::endl;
 
-            simulateSparseGemmForward(
+            Stonne* stonne_instance = simulateSparseGemmForward(
                 layer_name,
                 input_im2col,
                 weight_raw,
@@ -227,6 +247,7 @@ namespace tvm
                 MK_STA_KN_STR); // Keeping MK stationary as they are the weights
                                 // Cast the input and output data into float pointer arrays
                                 // which are compatible with stonne
+            return stonne_instance;
         }
 
         TVM_REGISTER_GLOBAL("tvm.contrib.stonne.conv2d.forward")
@@ -260,20 +281,22 @@ namespace tvm
                 {
                     stonne_config.loadFile(path_to_arch_file);
                 }
-                std::ofstream out;
-                out.open("test_run.txt", std::ios::app);
 
-                out << path_to_arch_file + "\n";
-                out.close();
+                // TODO: Make stats printing optional by choosing a variable
+                // Turn of stats printing
+                stonne_config.print_stats_enabled = false;
+
                 // Run different types of convolutions depending
                 // on whether sparsity is suported
+
+                Stonne* stonne_instance; 
                 if (stonne_config.sparsitySupportEnabled())
                 {   
                     // Convert sparsity ratio to %
                     float sparsity_ratio_flaot = sparsity_ratio/100;
                     
                     // Run a sparse forward convolution
-                    sparseConvolution(
+                    stonne_instance = sparseConvolution(
                         R,
                         S,
                         C,
@@ -294,7 +317,7 @@ namespace tvm
                 else
                 {
                     // Run a dense forward convolution
-                    denseConvolution(
+                    stonne_instance = denseConvolution(
                         R,
                         S,
                         C,
@@ -314,6 +337,20 @@ namespace tvm
                         path_to_tile,
                         stonne_config);
                 }
+
+                // If the hardware is being tuned, report the cost
+                if (tune) 
+                {
+                    reportCost(
+                        tuning_name,
+                        "test_cost.csv",
+                        stonne_instance->n_cycles
+
+                    );
+                }
+                delete stonne_instance;
+
+                
             });
 
     } // namespace contrib

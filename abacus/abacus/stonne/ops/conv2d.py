@@ -42,6 +42,9 @@ def conv2d_stonne_nchw(
         architecture.ms_size = cfg['ms_size']
         # Create a temporary file for tuning config
         architecture.create_config_file(name_config="ms_size_" + str(cfg['ms_size']))
+
+        #TODO Add tuning file to architecture
+        # tuning_file = archtecture
     
     path = architecture.path
     sparsity_ratio = architecture.sparsity_ratio
