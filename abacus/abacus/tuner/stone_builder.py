@@ -274,15 +274,6 @@ def run_stonne_through_rpc(
         costs = time_f(*args).results
         with open('test_cost.json') as f:
             costs = json.load(f)["value"]
-        ## Use the same psth as the architecture to store the costs
-        #csv_path = os.path.join(architecture._path, "costs.csv")
-        #
-        ## Read the custom costs here
-        #with open(csv_path, 'r+') as f:
-        #    reader = csv.reader(f, delimiter=',')
-        #    # The first line of the file corresponds to the cost
-        #    costs = list(map(int,next(reader))) # Convert string values to int
-        #    f.truncate(0) # Remove all contents from the file
 
         # clean up remote files
         remote.remove(build_result.filename)
