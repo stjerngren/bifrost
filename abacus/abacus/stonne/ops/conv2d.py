@@ -37,7 +37,6 @@ def conv2d_stonne_nchw(
     tuning_name = "ms_size_" + str(cfg['ms_size'])
 
     if architecture.tune:
-        print((" tuning here " + str(cfg['ms_size'])) * 100)
         # Change the architecture to the new settings
         architecture.ms_size = cfg['ms_size']
         # Create a temporary file for tuning config

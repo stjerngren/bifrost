@@ -2,7 +2,7 @@ import shutil
 import time 
 import tempfile
 import os
-import csv
+import json
 from random import getrandbits
 from collections import namedtuple
 import numpy as np
@@ -272,7 +272,8 @@ def run_stonne_through_rpc(
 
         # Run this to create the output files
         costs = time_f(*args).results
-
+        with open('test_cost.json') as f:
+            costs = json.load(f)["value"]
         ## Use the same psth as the architecture to store the costs
         #csv_path = os.path.join(architecture._path, "costs.csv")
         #

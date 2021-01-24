@@ -41,14 +41,40 @@ namespace tvm
             std::string filename, 
             int cost)
         {
-            std::cout << filename + ".json" << std::endl;
-            std::ifstream config_doc(filename + ".json", std::ifstream::binary);
-
+            // Intialise the JSONCPP variables
             Json::Value root;   
-            config_doc >> root;
-            //root["test"] = 2;
-            //config_doc.close();
-            std::cout << root << std::endl;
+            Json::Reader reader;
+            Json::StyledStreamWriter writer;
+
+            // Read the file
+            std::ifstream f(filename + ".json");
+
+            // Parse the file
+            bool parsingSuccessful = reader.parse( f, root );
+            if ( !parsingSuccessful )
+            {
+                // report to the user the failure and their locations in the document.
+                std::cout  << "Failed to parse configuration\n"
+                        << reader.getFormattedErrorMessages();
+                return;
+            }
+            f.close();
+            // Add in the recorded cost
+            if (root["tuning_name"] == tuning_name) {
+                root["value"].append(cost);
+            } else {
+                // Create new member and insert array with one value
+                Json::Value content(Json::arrayValue);
+                content.append(cost);
+                root["value"] = content;
+
+                // Change tuning name variable
+                root["tuning_name"] = tuning_name;
+
+            }
+            // Write output
+            std::ofstream fout(filename + ".json");
+            writer.write(fout,root);
 
         }
 
