@@ -8,8 +8,8 @@
 #include <tvm/runtime/registry.h>
 
 // JSONCPP
-
 #include "json/json.h"
+#include "json/json-forwards.h"
 
 #include <fstream>
 #include <string>
@@ -41,11 +41,15 @@ namespace tvm
             std::string filename, 
             int cost)
         {
-                std::ofstream out;
-                out.open("test_run.txt", std::ios::app);
+            std::cout << filename + ".json" << std::endl;
+            std::ifstream config_doc(filename + ".json", std::ifstream::binary);
 
-                out << std::to_string(cost) + "\n";
-                out.close();
+            Json::Value root;   
+            config_doc >> root;
+            //root["test"] = 2;
+            //config_doc.close();
+            //std::cout << root << std::endl;
+
         }
 
         float im2col_get_pixel(
@@ -343,7 +347,7 @@ namespace tvm
                 {
                     reportCost(
                         tuning_name,
-                        "test_cost.csv",
+                        "test_cost",
                         stonne_instance->n_cycles
 
                     );
