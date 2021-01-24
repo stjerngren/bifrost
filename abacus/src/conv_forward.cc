@@ -48,7 +48,7 @@ namespace tvm
             config_doc >> root;
             //root["test"] = 2;
             //config_doc.close();
-            //std::cout << root << std::endl;
+            std::cout << root << std::endl;
 
         }
 

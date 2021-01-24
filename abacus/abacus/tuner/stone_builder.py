@@ -456,7 +456,6 @@ class StonneRPCRunner(Runner):
             for measure_inp, build_res in zip(
                 measure_inputs[i : i + self.n_parallel], build_results[i : i + self.n_parallel]
             ):
-                print(measure_inp, "measure_inp"*100)
                 ret = self.executor.submit(
                     run_stonne_through_rpc,
                     measure_inp,
