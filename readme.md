@@ -13,9 +13,9 @@ This project relies on [Apache TVM](https://tvm.apache.org) and .
 
 ## Quickstart
 You can install and run this project with one command:
-"""
+```
 pip install git+https://github.com/axelstjerngren/level-4-project#"egg=bifrost&subdirectory=bifrost"
-"""
+```
 This will enable to you to use the latest version of Bifröst
 
 ## Build from source
