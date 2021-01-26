@@ -16,7 +16,8 @@ You can install and run this project with one command:
 ```
 pip install git+https://github.com/axelstjerngren/level-4-project#"egg=bifrost&subdirectory=bifrost"
 ```
-This will enable to you to use the latest version of Bifröst
+This will enable to you to use the latest version of Bifröst. 
+**N.B** You need to have Apache TVM installed. You can find installation instructions [here](https://tvm.apache.org/docs/install/index.html).
 
 ## Build from source
 When cloning, run 
