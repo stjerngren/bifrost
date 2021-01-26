@@ -13,7 +13,7 @@ This project relies on [Apache TVM](https://tvm.apache.org) and .
 ## Getting Started
 When cloning, run 
 ```
-git clone --recurse-submodules -j8 https://github.com/mlsgrnt/aiae
+git clone --recurse-submodules -j8 https://github.com/axelstjerngren/level-4-project
 ```
 This is essential as otherwise the ViRL will not be included (and everything will break).
 
