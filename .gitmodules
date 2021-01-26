@@ -1,11 +1,1 @@
 
-[submodule "stonne"]
-	path = thirdparty/stonne/
-	url = https://github.com/axelstjerngren/stonne_fork.git
-
-
-[submodule "tvm"]
-	path = thirdparty/incubator-tvm/
-	url = https://github.com/apache/incubator-tvm.git
-
-
