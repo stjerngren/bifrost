@@ -10,7 +10,11 @@ Bifröst (/ˈbɪvrɒst/) is
 This project relies on [Apache TVM](https://tvm.apache.org) and .
 
 
-## Getting Started
+
+## Quickstart
+
+
+## Build from source
 When cloning, run 
 ```
 git clone --recurse-submodules -j8 https://github.com/axelstjerngren/level-4-project
@@ -25,9 +29,6 @@ Maybe back up your files before doing this on windows...
 
 
 Make sure you have Python installed as well, this project has ONLY been tested by Python 3.7.9. We recommended Anaconda to manage virtual environmeents.
-
-
-## Build instructions
 
 
 
