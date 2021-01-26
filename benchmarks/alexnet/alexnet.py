@@ -4,6 +4,7 @@ from tvm import relay
 import numpy as np
 
 from tvm.contrib.download import download_testdata
+from tvm.contrib import graph_runtime as runtime
 
 # PyTorch imports
 import torch
@@ -79,6 +80,7 @@ def alexnet_model(pretrained=False, progress=True, **kwargs):
     return model
 
 alex_model = alexnet_model(pretrained=True)
+alex_model.eval()
 
 # Download an example image from the pytorch website
 import urllib
@@ -87,7 +89,7 @@ from torchvision import transforms
 import torch
 
 
-url, filename = ("https://github.com/pytorch/hub/raw/master/dog.jpg", "dog.jpg")
+url, filename = ("https://raw.githubusercontent.com/pytorch/hub/master/images/dog.jpg", "dog.jpg")
 try: urllib.URLopener().retrieve(url, filename)
 except: urllib.request.urlretrieve(url, filename)
 
@@ -103,5 +105,32 @@ input_batch = input_tensor.unsqueeze(0) # create a mini-batch as expected by the
 
 
 
+test = torch.jit.trace(alex_model, input_batch).eval()
+print(input_batch)
+print(input_tensor)
+mod, params = relay.frontend.from_pytorch(test, [("test", input_batch.shape)])
 
-mod, params = relay.frontend.from_pytorch(alex_model, shape_list)
+
+# Import this add stonne as an x86 co-processor
+from ...abacus import abacus
+from ...abacus.abacus.stonne.simulator import config_simulator
+
+config_simulator(
+    ms_size=16,
+    reduce_network_type="ASNETWORK",
+    dn_bw=8,
+    rn_bw=8,
+    controller_type="MAERI_DENSE_WORKLOAD",
+)
+
+target = "llvm -libs=stonne"
+lib = relay.build(mod, target=target, params=params)
+
+ctx = tvm.context(target, 0)
+module = runtime.GraphModule(lib["default"](ctx))
+module.set_input("test", input_batch)
+module.run()
+
+
+out = module.get_output(0)
+print(out)

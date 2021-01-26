@@ -14,8 +14,8 @@ import logging
 import random
 
 # Import this add stonne as an x86 co-processor
-import abacus.abacus
-from abacus.abacus.stonne.simulator import config_simulator
+import bifrost
+from bifrost.stonne.simulator import config_simulator
 
 config_simulator(
     ms_size=16,

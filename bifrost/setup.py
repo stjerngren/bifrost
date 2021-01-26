@@ -4,8 +4,8 @@ with open("README.md", "r") as fh:
     long_description = fh.read()
 
 setuptools.setup(
-    name="abacus", 
-    version="0.0.1",
+    name="bifrost", 
+    version="0.0.2",
     author="Axel Stjerngren",
     author_email="axelstjerngren@protonmail.com",
     description="A package for TVM and STONNE",

@@ -11,7 +11,7 @@ def load_lib():
 
     # Find library based on relative paths
     dirname = os.path.dirname(__file__)
-    stonne_conv2d = os.path.join(dirname, "../../lib/conv_forward.so")
+    stonne_conv2d = os.path.join(dirname, "../lib/conv_forward.so")
 
     print(dirname)
     print(stonne_conv2d)
