@@ -1,14 +1,13 @@
 # Bifröst
 
-Bifröst (/ˈbɪvrɒst/) is 
+Bifröst (/ˈbɪvrɒst/) is a bridge between [Apache TVM](https://tvm.apache.org) and [STONNE]().
+
+The name is taken from Norse mythology, where Bifröst is the bridge between Midgard and Asgard
 
 ## Dissertation formalities
 * [Overleaf Dissertation](https://www.overleaf.com/project/5f756faefef3ec00014e888a)
 * [Timelog](https://github.com/axelstjerngren/level-4-project/wiki/Timelog)
 * [Meeting Notes](https://github.com/axelstjerngren/level-4-project/wiki/Meeting-Notes)
-
-This project relies on [Apache TVM](https://tvm.apache.org) and .
-
 
 
 ## Quickstart
@@ -20,53 +19,35 @@ This will enable to you to use the latest version of Bifröst.
 **N.B** You need to have Apache TVM installed. You can find installation instructions [here](https://tvm.apache.org/docs/install/index.html).
 
 ## Build from source
-When cloning, run 
+
+Install Apache TVM using the installation instructions [here](https://tvm.apache.org/docs/install/index.html).
+
+Clone the project and cd into bifrost
 ```
-git clone --recurse-submodules -j8 https://github.com/axelstjerngren/level-4-project
+git clone https://github.com/axelstjerngren/level-4-project
+cd level-4-project/bifrost
 ```
-This is essential as otherwise the ViRL will not be included (and everything will break).
-
-**N.B. if you're running Windows you should switch to a unix based operating system. If you still insist on windows you might have to run this command:**
+You can now install it by running setup.py:
 ```
-git config core.protectNTFS false
+python setup.py install 
 ```
-Maybe back up your files before doing this on windows...
 
 
-Make sure you have Python installed as well, this project has ONLY been tested by Python 3.7.9. We recommended Anaconda to manage virtual environmeents.
-
-
+## Modifying the C code 
+To change the C code you need to clone the STONNE and TVM repositories:
+```
+git clone https://github.com/axelstjerngren/stonne
+git clone https://github.com/apache/tvm
+```
+Keeping these three in the same folder will be useful.
 
 ## Requirements
 
-
-
-Python 3.7
-Packages: listed in requirements.txt
+Python >=3.8
 Tested on macOS Big Sur (11.1) 
 
-
-## Build steps
-
-List the steps required to build software.
-
-Hopefully something simple like pip install -e . or make or cd build; cmake ... In some cases you may have much more involved setup required.
-
 ## Test steps
-
-List steps needed to show your software works. This might be running a test suite, or just starting the program; but something that could be used to verify your code is working correctly.
-
-
-
-
-
-
-
-
-
-
-
-
+TODO: Make a test suite
 
 
 
