@@ -1,6 +1,6 @@
 # Bifröst
 
-Bifröst (/ˈbɪvrɒst/) is a bridge between [Apache TVM](https://tvm.apache.org) and [STONNE]().
+Bifrost (/ˈbɪvrɒst/) is a bridge between [Apache TVM](https://tvm.apache.org) and [STONNE]().
 
 The name is taken from Norse mythology, where Bifröst is the bridge between Midgard and Asgard
 
@@ -31,6 +31,7 @@ You can now install it by running setup.py:
 ```
 python setup.py install 
 ```
+You can now use Bifrost.
 
 
 ## Modifying the C code 
@@ -40,6 +41,19 @@ git clone https://github.com/axelstjerngren/stonne
 git clone https://github.com/apache/tvm
 ```
 Keeping these three in the same folder will be useful.
+
+All of the C files can be found in under:
+```
+level-4-project
+|___bifrost
+|    |__src
+|    |   |__conv_forward.cc
+|    |   |__cost.cc
+|    |   |__json.pp
+|    |__Makefile
+```
+TODO: Finish
+
 
 ## Requirements
 
