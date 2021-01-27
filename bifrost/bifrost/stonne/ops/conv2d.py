@@ -31,6 +31,14 @@ def conv2d_stonne_nchw(
 
     # Define tuning space
     cfg.define_knob("ms_size", [8,16,64])
+    if True:
+        knobs = [
+            ("a",[12,3,45,6,7]),
+            ("b",[6,7]),
+            ("c",[12,6,7])
+            ]
+        for knob in knobs:
+            cfg.define_knob(*knob)
 
     # If the architecture is being tuned, write to the file with the
     # following name

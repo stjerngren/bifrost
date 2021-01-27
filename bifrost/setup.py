@@ -6,7 +6,7 @@ with open("../readme.md", "r") as fh:
 
 setup(
     name="bifrost", 
-    version="0.0.16",
+    version="0.0.17",
     author="Axel Stjerngren",
     author_email="axelstjerngren@protonmail.com",
     description="A package for TVM and STONNE",
@@ -23,6 +23,7 @@ setup(
     python_requires='>=3.8',
     install_requires = [
         "torch",
+        "torchvision",
         "pytest",
         "pillow"
     ]

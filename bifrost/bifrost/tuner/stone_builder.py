@@ -11,7 +11,7 @@ from tvm import nd
 from tvm.error import TVMError
 from tvm.autotvm.measure.measure import MeasureResult, MeasureErrorNo, Builder
 from tvm.autotvm.measure.measure_methods import _build_func_common, request_remote, logger, Runner, check_remote
-from tvm.autotvm.util import get_const_tuple
+from tvm.autotvm.utils import get_const_tuple
 from tvm.autotvm.measure.local_executor import LocalExecutor
 from tvm.autotvm.task.space import InstantiationError
 from tvm.contrib import tar

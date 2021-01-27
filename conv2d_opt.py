@@ -1,4 +1,4 @@
-from abacus.abacus.stonne.simulator import config_simulator, architecture
+from bifrost.tuner.stone_builder import StonneLocalBuilder, StonneLocalRunner
 
 config_simulator(
     ms_size=16,
@@ -21,9 +21,8 @@ if __name__ == "__main__":
 
 
     # Import this add stonne as an x86 co-processor
-    import abacus.abacus
-
-    from abacus.abacus.tuner.stone_builder import StonneLocalBuilder, StonneLocalRunner
+    import bifrost
+    from bifrost.tuner.stone_builder import StonneLocalBuilder, StonneLocalRunner
 
     from tvm.autotvm.tuner import XGBTuner, GATuner, RandomTuner, GridSearchTuner
     from tvm.autotvm.graph_tuner import DPTuner, PBQPTuner
