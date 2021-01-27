@@ -1,4 +1,4 @@
-from bifrost.tuner.stone_builder import StonneLocalBuilder, StonneLocalRunner
+from bifrost.stonne.simulator import config_simulator, architecture
 
 config_simulator(
     ms_size=16,

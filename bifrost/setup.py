@@ -6,7 +6,7 @@ with open("../readme.md", "r") as fh:
 
 setup(
     name="bifrost", 
-    version="0.0.17",
+    version="0.0.19",
     author="Axel Stjerngren",
     author_email="axelstjerngren@protonmail.com",
     description="A package for TVM and STONNE",

@@ -31,7 +31,7 @@ def conv2d_stonne_nchw(
 
     # Define tuning space
     cfg.define_knob("ms_size", [8,16,64])
-    if True:
+    if False:
         knobs = [
             ("a",[12,3,45,6,7]),
             ("b",[6,7]),
