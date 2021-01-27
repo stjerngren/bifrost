@@ -15,6 +15,11 @@ try:
 except ImportError:
     from torch.utils.model_zoo import load_url as load_state_dict_from_url
 
+# Import this add stonne as an x86 co-processor
+import bifrost
+from bifrost.stonne.simulator import config_simulator
+
+
 
 __all__ = ['AlexNet', 'alexnet']
 
@@ -111,9 +116,6 @@ print(input_tensor)
 mod, params = relay.frontend.from_pytorch(test, [("test", input_batch.shape)])
 
 
-# Import this add stonne as an x86 co-processor
-from ...abacus import abacus
-from ...abacus.abacus.stonne.simulator import config_simulator
 
 config_simulator(
     ms_size=16,
