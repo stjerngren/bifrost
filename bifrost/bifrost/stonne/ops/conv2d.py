@@ -32,12 +32,8 @@ def conv2d_stonne_nchw(
 
     # Define tuning space
     cfg.define_knob("ms_size", [8,16,64])
-    if False:
-        knobs = [
-            ("a",[12,3,45,6,7]),
-            ("b",[6,7]),
-            ("c",[12,6,7])
-            ]
+    if architecture.tune:
+        knobs = architecture.knobs
         for knob in knobs:
             cfg.define_knob(*knob)
 
@@ -51,9 +47,6 @@ def conv2d_stonne_nchw(
         # Create a temporary file for tuning config
         architecture.create_config_file(name_config="ms_size_" + str(cfg['ms_size']))
 
-        #TODO Add tuning file to architecture
-        # tuning_file = archtecture
-    
     path = architecture.path
     sparsity_ratio = architecture.sparsity_ratio
     dirname = os.path.dirname(__file__)

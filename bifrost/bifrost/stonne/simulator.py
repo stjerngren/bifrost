@@ -12,7 +12,7 @@ class Simulator(object):
         self.controller_type:str = "MAERI_DENSE_WORKLOAD"
         self.sparsity_ratio:float = 0
         self.tune:bool = False # A variable which to set if you want to use config
-        
+        self.knobs:tuple = () # An empty tuple for now
     @property
     def ms_size(self):
         return self._ms_size
