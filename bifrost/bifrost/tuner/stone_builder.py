@@ -272,8 +272,21 @@ def run_stonne_through_rpc(
 
         # Run this to create the output files
         costs = time_f(*args).results
-        with open('test_cost.json') as f:
-            costs = json.load(f)["value"]
+        
+        # Get the costs from stonne
+        dirname = os.path.dirname(__file__)
+        cost_file = os.path.join(dirname, "../stonne/data/costs.json")
+        with open(cost_file, "r+") as f:
+            json_dict = json.load(f)
+            costs = json_dict["value"]
+
+            # Reset JSON file
+            f.seek(0)
+            f.truncate()
+            json_dict["value"] = []
+            json_dict["tuning_name"] = "null"
+            json.dump(json_dict, f)
+
 
         # clean up remote files
         remote.remove(build_result.filename)

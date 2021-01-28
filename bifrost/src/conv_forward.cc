@@ -47,7 +47,7 @@ namespace tvm
             Json::StyledStreamWriter writer;
 
             // Read the file
-            std::ifstream f(filename + ".json");
+            std::ifstream f(filename);
 
             // Parse the file
             bool parsingSuccessful = reader.parse( f, root );
@@ -73,7 +73,7 @@ namespace tvm
 
             }
             // Write output
-            std::ofstream fout(filename + ".json");
+            std::ofstream fout(filename);
             writer.write(fout,root);
 
         }
@@ -300,9 +300,10 @@ namespace tvm
                 int sparsity_ratio = args[15];
                 bool tune = args[16];
                 std::string tuning_name = args[17];
-                DLTensor *input = args[18];
-                DLTensor *weight = args[19];
-                DLTensor *output = args[20];
+                std::string costs_path = args[18];
+                DLTensor *input = args[19];
+                DLTensor *weight = args[20];
+                DLTensor *output = args[21];
 
                 //Creating config  to find out if we are going to
                 // run a dense or sparse simulation
@@ -373,7 +374,7 @@ namespace tvm
                 {
                     reportCost(
                         tuning_name,
-                        "test_cost",
+                        costs_path,
                         stonne_instance->n_cycles
 
                     );

@@ -6,7 +6,7 @@ with open("../readme.md", "r") as fh:
 
 setup(
     name="bifrost", 
-    version="0.0.19",
+    version="0.0.21",
     author="Axel Stjerngren",
     author_email="axelstjerngren@protonmail.com",
     description="A package for TVM and STONNE",
@@ -14,7 +14,9 @@ setup(
     long_description_content_type="text/markdown",
     url="https://github.com/axelstjerngren/level-4-project",
     packages=setuptools.find_packages(),
-    package_data={'': ['lib/*.so']},
+    package_data = {
+    '': ['lib/*.so', 'data/*.json'],
+    },
     classifiers=[
         "Programming Language :: Python :: 3",
         "License :: OSI Approved :: MIT License",

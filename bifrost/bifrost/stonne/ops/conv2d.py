@@ -6,6 +6,7 @@ from tvm import te, relay, autotvm
 from tvm.topi import generic
 import tvm.relay.op as _op
 from tvm.relay.op.strategy.generic import *
+import os
 from ..simulator import architecture
 from ..tiles import tiles
 #from tvm.topi.nn.utils import traverse_inline
@@ -55,7 +56,8 @@ def conv2d_stonne_nchw(
     
     path = architecture.path
     sparsity_ratio = architecture.sparsity_ratio
-
+    dirname = os.path.dirname(__file__)
+    costs_path = os.path.join(dirname, "../data/costs.json")
     # Extract data from 
     N, C, H, W = get_const_tuple(data.shape)
     output_channels, _, kernel_height, kernel_width = get_const_tuple(kernel.shape)
@@ -112,9 +114,10 @@ def conv2d_stonne_nchw(
                 sparsity_ratio,    # [15]    
                 architecture.tune, # [16]
                 tuning_name,       # [17]
-                ins[0],            # [18]
-                ins[1],            # [19]
-                outs[0],           # [120]
+                costs_path,        # [18]
+                ins[0],            # [19]
+                ins[1],            # [20]
+                outs[0],           # [21]
 
 
             ),
