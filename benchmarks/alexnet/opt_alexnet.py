@@ -1,10 +1,12 @@
 import tvm
-from tvm import relay, runtime
-alex_model = None
+from tvm import relay
+from tvm.contrib import graph_runtime as runtime
 
+from alexnet import alex_model 
 # Import this add stonne as an x86 co-processor
 import bifrost
 from bifrost.stonne.simulator import config_simulator
+from bifrost.runner.run import run_torch_stonne
 
 # Download an example image from the pytorch website
 import urllib
@@ -28,25 +30,4 @@ input_tensor = preprocess(input_image)
 input_batch = input_tensor.unsqueeze(0) # create a mini-batch as expected by the model
 
 
-
-test = torch.jit.trace(alex_model, input_batch).eval()
-mod, params = relay.frontend.from_pytorch(test, [("test", input_batch.shape)])
-
-config_simulator(
-    ms_size=16,
-    reduce_network_type="ASNETWORK",
-    dn_bw=8,
-    rn_bw=8,
-    controller_type="MAERI_DENSE_WORKLOAD",
-)
-
-target = "llvm -libs=stonne"
-lib = relay.build(mod, target=target, params=params)
-
-ctx = tvm.context(target, 0)
-module = runtime.GraphModule(lib["default"](ctx))
-module.set_input("test", input_batch)
-module.run()
-
-out = module.get_output(0)
-print(out)
+out = run_torch_stonne(alex_model, input_batch)

@@ -82,4 +82,3 @@ def alexnet_model(pretrained=False, progress=True, **kwargs):
     return model
 
 alex_model = alexnet_model(pretrained=True)
-alex_model.eval()
