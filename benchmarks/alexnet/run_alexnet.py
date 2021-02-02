@@ -28,4 +28,13 @@ preprocess = transforms.Compose([
 input_tensor = preprocess(input_image)
 input_batch = input_tensor.unsqueeze(0) # create a mini-batch as expected by the model
 
-
+#from alexnet import alex_model
+#import time 
+#start = time.time()
+#
+##run_torch_stonne(alex_model, input_batch)
+#alex_model.eval()
+#output = alex_model(input_batch)
+#
+#end = time.time()
+#print(end - start)

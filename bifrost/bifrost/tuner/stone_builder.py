@@ -371,7 +371,7 @@ class StonneRPCRunner(Runner):
         host,
         port,
         priority=1,
-        timeout=10,
+        timeout=2**16,
         n_parallel=None,
         number=4,
         repeat=3,
@@ -532,7 +532,7 @@ class StonneLocalRunner(StonneRPCRunner):
 
     def __init__(
         self,
-        timeout=10,
+        timeout=2**16,
         number=4,
         repeat=3,
         min_repeat_ms=0,
