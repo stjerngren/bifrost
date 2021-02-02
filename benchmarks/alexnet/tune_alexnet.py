@@ -18,7 +18,7 @@ if __name__ == "__main__":
     from tvm.relay import testing
     import logging
     import random
-
+    import torch
 
     # Import this add stonne as an x86 co-processor
     import bifrost
@@ -26,46 +26,19 @@ if __name__ == "__main__":
 
     from tvm.autotvm.tuner import XGBTuner, GATuner, RandomTuner, GridSearchTuner
     from tvm.autotvm.graph_tuner import DPTuner, PBQPTuner
-
-
-#
+    from alexnet import alex_model as torch_model
     architecture.tune = True
+    from run_alexnet import input_batch
 
-    out_channels = 2
-    batch_size = 1
-
-    # Let’s create a very simple network for demonstration.
-    # It consists of convolution, batch normalization, and ReLU activation.
-
-    data = relay.var("data", relay.TensorType((batch_size, 2, 10, 10), "float32"))
-    weight = relay.var("weight")
-    bn_gamma = relay.var("bn_gamma")
-    bn_beta = relay.var("bn_beta")
-    bn_mmean = relay.var("bn_mean")
-    bn_mvar = relay.var("bn_var")
-
-    simple_net = relay.nn.conv2d(
-        data=data, weight=weight, kernel_size=(3, 3), channels=out_channels, padding=(1, 1)
-    )
-
-    #simple_net = relay.Function(relay.analysis.free_vars(simple_net), simple_net)
-
-    data_shape = (batch_size, 2, 10, 10)
-    net, params = testing.create_workload(simple_net)
-
-    # Generate the data to resuse with both llvm and llvm stonne
-    data = np.random.uniform(-1, 1, size=data_shape).astype("float32")
-
-    # Build and run with llvm backend
-    logging.basicConfig(level=logging.DEBUG)  # to dump TVM IR after fusion
-
-
+    torch_model.eval()
+    trace = torch.jit.trace(torch_model, input_batch).eval()
+    
+    mod, params = relay.frontend.from_pytorch(
+        trace, [("trace", input_batch.shape)])
 
     # Build and run with llvm backend, and use the
     # stonne conv2d ops
     target = "llvm --libs=stonne"
-
-    mod, params = testing.create_workload(simple_net)
     log_file = "test.log"
 
     tuning_options = {

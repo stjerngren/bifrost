@@ -2,7 +2,6 @@ import tvm
 from tvm import relay
 from tvm.contrib import graph_runtime as runtime
 
-from alexnet import alex_model 
 # Import this add stonne as an x86 co-processor
 import bifrost
 from bifrost.stonne.simulator import config_simulator
@@ -30,4 +29,3 @@ input_tensor = preprocess(input_image)
 input_batch = input_tensor.unsqueeze(0) # create a mini-batch as expected by the model
 
 
-out = run_torch_stonne(alex_model, input_batch)

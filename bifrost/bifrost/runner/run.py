@@ -21,3 +21,4 @@ def run_torch_stonne(torch_model, input):
     module.run()
 
     return module.get_output(0)
+
