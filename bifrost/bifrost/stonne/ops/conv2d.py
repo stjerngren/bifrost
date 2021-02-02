@@ -49,6 +49,7 @@ def conv2d_stonne_nchw(
 
     path = architecture.path
     sparsity_ratio = architecture.sparsity_ratio
+    stats = architecture.print_stats
     dirname = os.path.dirname(__file__)
     costs_path = os.path.join(dirname, "../data/costs.json")
     # Extract data from 
@@ -108,9 +109,10 @@ def conv2d_stonne_nchw(
                 architecture.tune, # [16]
                 tuning_name,       # [17]
                 costs_path,        # [18]
-                ins[0],            # [19]
-                ins[1],            # [20]
-                outs[0],           # [21]
+                stats,             # [19]
+                ins[0],            # [20]
+                ins[1],            # [21]
+                outs[0],           # [22]
 
 
             ),

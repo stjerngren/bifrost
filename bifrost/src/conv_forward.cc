@@ -301,9 +301,10 @@ namespace tvm
                 bool tune = args[16];
                 std::string tuning_name = args[17];
                 std::string costs_path = args[18];
-                DLTensor *input = args[19];
-                DLTensor *weight = args[20];
-                DLTensor *output = args[21];
+                bool stats = args[19];
+                DLTensor *input = args[20];
+                DLTensor *weight = args[21];
+                DLTensor *output = args[22];
 
                 //Creating config  to find out if we are going to
                 // run a dense or sparse simulation
@@ -315,7 +316,7 @@ namespace tvm
 
                 // TODO: Make stats printing optional by choosing a variable
                 // Turn of stats printing
-                stonne_config.print_stats_enabled = false;
+                stonne_config.print_stats_enabled = stats;
 
                 // Run different types of convolutions depending
                 // on whether sparsity is suported

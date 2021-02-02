@@ -12,7 +12,9 @@ class Simulator(object):
         self.controller_type:str = "MAERI_DENSE_WORKLOAD"
         self.sparsity_ratio:float = 0
         self.tune:bool = False # A variable which to set if you want to use config
+        self.print_stats:bool = False # Create output stats for stonne
         self.knobs:tuple = () # An empty tuple for now
+
     @property
     def ms_size(self):
         return self._ms_size
@@ -29,7 +31,8 @@ class Simulator(object):
         rn_bw:int,
         controller_type:str,
         sparsity_ratio:int = 0, 
-        tune:bool = False
+        tune:bool = False,
+        print_stats:bool = False,
     ):
         """
         Set a whole new architectuer config
@@ -41,6 +44,7 @@ class Simulator(object):
         self.controller_type = controller_type 
         self.sparsity_ratio =sparsity_ratio
         self.tune = tune
+        self.print_stats = print_stats
 
     def create_config_file(self, path:str = "", name_config:str = None):
         """
