@@ -17,6 +17,8 @@ setup(
     package_data = {
     '': ['lib/*.so', 'data/*.json'],
     },
+    test_suite='nose.collector',
+    tests_require=['nose'],
     classifiers=[
         "Programming Language :: Python :: 3",
         "License :: OSI Approved :: MIT License",
