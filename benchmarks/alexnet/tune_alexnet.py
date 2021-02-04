@@ -48,8 +48,8 @@ if __name__ == "__main__":
         "measure_option": autotvm.measure_option(
             builder=StonneLocalBuilder(),
             runner=StonneLocalRunner(
-                number=2,
-                repeat=3,
+                number=0,
+                repeat=0,
                 min_repeat_ms=0,
                 enable_cpu_cache_flush=True
             ),

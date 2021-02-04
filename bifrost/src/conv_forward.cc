@@ -1,7 +1,7 @@
 // STONNE
-#include "../../../stonne_works/stonne/stonne/stonne_linker_src/stonne_linker.h"
-#include "../../../stonne_works/stonne/stonne/include/Config.h"
-#include "../../../stonne_works/stonne/stonne/include/STONNEModel.h"
+#include "stonne_linker.h"
+#include "Config.h"
+#include "STONNEModel.h"
 
 // TVM
 #include <tvm/runtime/device_api.h>
@@ -14,8 +14,6 @@
 #include <fstream>
 #include <string>
 #include <iostream>
-
-
 
 // Stonne variable taxonomy
 // -R: Number of flter rows
@@ -35,14 +33,14 @@ namespace tvm
     {
 
         using namespace runtime;
-        
+
         void reportCost(
-            std::string tuning_name, 
-            std::string filename, 
+            std::string tuning_name,
+            std::string filename,
             int cost)
         {
             // Intialise the JSONCPP variables
-            Json::Value root;   
+            Json::Value root;
             Json::Reader reader;
             Json::StyledStreamWriter writer;
 
@@ -50,19 +48,22 @@ namespace tvm
             std::ifstream f(filename);
 
             // Parse the file
-            bool parsingSuccessful = reader.parse( f, root );
-            if ( !parsingSuccessful )
+            bool parsingSuccessful = reader.parse(f, root);
+            if (!parsingSuccessful)
             {
                 // report to the user the failure and their locations in the document.
-                std::cout  << "Failed to parse configuration\n"
-                        << reader.getFormattedErrorMessages();
+                std::cout << "Failed to parse configuration\n"
+                          << reader.getFormattedErrorMessages();
                 return;
             }
             f.close();
             // Add in the recorded cost
-            if (root["tuning_name"] == tuning_name) {
+            if (root["tuning_name"] == tuning_name)
+            {
                 root["value"].append(cost);
-            } else {
+            }
+            else
+            {
                 // Create new member and insert array with one value
                 Json::Value content(Json::arrayValue);
                 content.append(cost);
@@ -70,12 +71,10 @@ namespace tvm
 
                 // Change tuning name variable
                 root["tuning_name"] = tuning_name;
-
             }
             // Write output
             std::ofstream fout(filename);
-            writer.write(fout,root);
-
+            writer.write(fout, root);
         }
 
         float im2col_get_pixel(
@@ -142,7 +141,7 @@ namespace tvm
             }
         }
 
-        Stonne* denseConvolution(
+        Stonne *denseConvolution(
             int R,
             int S,
             int C,
@@ -160,8 +159,7 @@ namespace tvm
             DLTensor *weight,
             DLTensor *output,
             std::string path_to_tile,
-            Config stonne_config
-            )
+            Config stonne_config)
         {
             // Cast pointers so they can be fed into stonne
             float *input_raw = static_cast<float *>(input->data);
@@ -172,7 +170,7 @@ namespace tvm
             std::string layer_name = "Conv2dLayerDense";
 
             // Run the simulated forward convolution
-            Stonne* stonne_instance = simulateDenseConvForward(
+            Stonne *stonne_instance = simulateDenseConvForward(
                 layer_name,
                 input_raw,
                 weight_raw,
@@ -191,12 +189,11 @@ namespace tvm
                 pad_x,
                 pad_y,
                 path_to_tile,
-                stonne_config
-                );
+                stonne_config);
             return stonne_instance;
         }
 
-        Stonne* sparseConvolution(
+        void sparseConvolution(
             int R,
             int S,
             int C,
@@ -219,7 +216,7 @@ namespace tvm
 
             std::cout << "Sparsity support enabled with ratio" << sparsity_level << std::endl;
 
-            // All the channels. Note this could not be the
+            // All the channels. Note this could not be thes
             // same in weight.sizes[1] (i.e., filter channels)
             // as the groups could reduce these last ones.
             // In this case, we send the complete number of input channels, and the
@@ -262,7 +259,7 @@ namespace tvm
 
             std::cout << "perform sparse gemm" << std::endl;
 
-            Stonne* stonne_instance = simulateSparseGemmForward(
+            simulateSparseGemmForward(
                 layer_name,
                 input_im2col,
                 weight_raw,
@@ -277,7 +274,7 @@ namespace tvm
                 MK_STA_KN_STR); // Keeping MK stationary as they are the weights
                                 // Cast the input and output data into float pointer arrays
                                 // which are compatible with stonne
-            return stonne_instance;
+            return;
         }
 
         TVM_REGISTER_GLOBAL("tvm.contrib.stonne.conv2d.forward")
@@ -321,14 +318,14 @@ namespace tvm
                 // Run different types of convolutions depending
                 // on whether sparsity is suported
 
-                Stonne* stonne_instance; 
+                Stonne *stonne_instance;
                 if (stonne_config.sparsitySupportEnabled())
-                {   
+                {
                     // Convert sparsity ratio to %
-                    float sparsity_ratio_flaot = sparsity_ratio/100;
-                    
+                    float sparsity_ratio_flaot = sparsity_ratio / 100;
+
                     // Run a sparse forward convolution
-                    stonne_instance = sparseConvolution(
+                    sparseConvolution(
                         R,
                         S,
                         C,
@@ -344,7 +341,7 @@ namespace tvm
                         input,
                         weight,
                         output,
-                        stonne_config);           
+                        stonne_config);
                 }
                 else
                 {
@@ -368,21 +365,19 @@ namespace tvm
                         output,
                         path_to_tile,
                         stonne_config);
+
+                    // If the hardware is being tuned, report the cost
+                    if (tune)
+                    {
+                        reportCost(
+                            tuning_name,
+                            costs_path,
+                            stonne_instance->n_cycles
+
+                        );
+                    }
+                    delete stonne_instance;
                 }
-
-                // If the hardware is being tuned, report the cost
-                if (tune) 
-                {
-                    reportCost(
-                        tuning_name,
-                        costs_path,
-                        stonne_instance->n_cycles
-
-                    );
-                }
-                delete stonne_instance;
-
-                
             });
 
     } // namespace contrib
