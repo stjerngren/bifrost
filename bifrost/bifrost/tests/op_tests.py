@@ -67,3 +67,4 @@ class TestOps(TestCase):
         out_stonne = out.asnumpy()
 
         self.assertTrue(np.all(np.round(out_stonne, 4) == np.round(out_llvm, 4)))
+

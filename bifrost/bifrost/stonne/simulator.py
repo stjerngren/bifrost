@@ -17,9 +17,9 @@ class Simulator(object):
         self._dn_bw:int = 8
         self._rn_bw:int = 8
         self._controller_type:str = "MAERI_DENSE_WORKLOAD"
-        self._sparsity_ratio:float = 0
-        self._tune:bool = False # A variable which to set if you want to use config
-        self._print_stats:bool = False # Create output stats for stonne
+        self.sparsity_ratio:float = 0
+        self.tune:bool = False # A variable which to set if you want to use config
+        self.print_stats:bool = False # Create output stats for stonne
         self._knobs:tuple = () # An empty tuple for now
         self._accumulation_buffer_enabled = 1
 
@@ -181,12 +181,12 @@ class Simulator(object):
         # write arcitecture to file
         with open(self.path, "w") as f:
             f.write("[MSNetwork]\n")
+            f.write(f'type="{self.ms_network_type}"\n')
             if self.ms_network_type == "LINEAR":
-                f.write(f"type={self.ms_network_type}\n")
+                f.write(f"ms_size={self.ms_size}\n")
             else:
                 f.write(f"ms_rows={self.ms_rows}\n")
-                f.write(f"type={self.ms_cols}\n")
-            f.write(f"ms_size={self.ms_size}\n")
+                f.write(f"ms_cols={self.ms_cols}\n")
             f.write("[ReduceNetwork]\n")
             f.write(f'type="{self.reduce_network_type}"\n')
             f.write(f'accumulation_buffer_enabled="{self.accumulation_buffer_enabled}"\n')
