@@ -25,7 +25,7 @@ config_simulator(
     dn_bw=8,
     rn_bw=8,
     controller_type="SIGMA_SPARSE_GEMM",
-    sparsity_ratio = 20,
+    sparsity_ratio = 90,
 )
 
 

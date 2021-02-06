@@ -357,18 +357,24 @@ namespace tvm
                         output,
                         stonne_config);
                 }
-                else if (!stonne_config.convOperationSupported()) { //IF CONV itself is not supported, we run it as a GEMM (e.g., the TPU)
-                    //im2col to the inputs
+                else if (!stonne_config.convOperationSupported()) { 
+                    // If CONV itself is not supported, 
+                    // run it as a GEMM (e.g., the TPU)
 
+
+                    // Calculate im2col output as h0 * w0 * R * S * C
+                    int h0 = (X + 2 * pad_x -(dilation_x * (R - 1) + 1)) /strides_x +1;
+                    int w0 = (Y + 2 * pad_y -(dilation_y * (S - 1) + 1)) /strides_y +1;
+
+                    // Get input and convert to im2col
                     float *input_raw = static_cast<float *>(input->data);
-                    float im2col_array[C * K * K];
+                    float im2col_array[h0*w0*R*S*C];
                     float *input_im2col = im2col_array;
+
+                    // Convert weight and output files to be STONNE compatible
                     float *weight_raw = static_cast<float *>(weight->data);
                     float *output_raw = static_cast<float *>(output->data);
-
-                    // Note that since STONNE only supports sparse GEMM operations, we have to
-                    // turn the input to im2col format and
-                    // run a GEMM operation instead a CONVOLUTION
+                
                     im2col_cpu(
                         input_raw,
                         C,
