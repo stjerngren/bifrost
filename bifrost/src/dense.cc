@@ -24,13 +24,13 @@ namespace tvm
                 int K = args[2]; // Number of input neurons
                 int N = args[3]; // Number of output neurons
                 std::string path_to_tile = args[4];
-                int sparsity_ratio = args[15];
-                bool stats = args[19];
+                int sparsity_ratio = args[5];
+                bool stats = args[6];
+                DLTensor *input = args[7];
+                DLTensor *weight = args[8];
+                DLTensor *output = args[9];
 
-                DLTensor *input = args[20];
-                DLTensor *weight = args[21];
-                DLTensor *output = args[22];
-
+                // Add some way to specify layer names
                 std::string layer_name = "Test";
 
                 //Here starts the function

@@ -46,6 +46,28 @@ def dense_stonne(data, weight, units=None, out_dtype=""):
     M, K = get_const_tuple(data.shape)
     N, _ = get_const_tuple(weight.shape)
 
+    return te.extern(
+            (M,N),
+            [data,weight],
+            lambda ins, outs: tvm.tir.call_packed(
+                "tvm.contrib.stonne.dense",  
+                architecture.path, # [0] Architecture file
+                M,                 # [1] Batch size
+                K,                 # [2] Number of input neurons
+                N,                 # [3] Number of output neurons
+                tiles.path,        # [4] Tiles path
+                architecture.sparsity_ratio,  # [5]
+                architecture.print_stats,     # [6] Create stats output files
+                ins[0],            # [7] Data
+                ins[1],            # [8] Weight
+                outs[0],           # [9] Output
+ 
+            ),
+            name = "s",
+            dtype = out_dtype
+    )
+    
+
 @autotvm.register_topi_schedule("conv2d_stonne_nchw.x86")
 def schedule_dense_stonne(cfg, outs):
     """Create schedule for conv2d_nhwc"""
