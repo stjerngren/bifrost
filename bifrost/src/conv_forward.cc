@@ -77,6 +77,16 @@ namespace tvm
             writer.write(fout, root);
         }
 
+        void transpose(float *src, float *dst, const int N, const int M) {
+            // Tranpose a matrix
+            #pragma omp parallel for
+            for(int n = 0; n<N*M; n++) {
+                int i = n/N;
+                int j = n%N;
+                dst[n] = src[M*j + i];
+            }
+        }
+
         //Inspired from Berkeley Vision's Caffe, modified to suit STONNE
         //https://github.com/BVLC/caffe/blob/master/src/caffe/util/im2col.cpp
         // Function uses casting from int to unsigned to compare if value of
@@ -361,6 +371,9 @@ namespace tvm
                     // If CONV itself is not supported, 
                     // run it as a GEMM (e.g., the TPU)
 
+                    // Convert weight and output files to be STONNE compatible
+                    float *weight_raw = static_cast<float *>(weight->data);
+                    float *output_raw = static_cast<float *>(output->data);
 
                     // Calculate im2col output as h0 * w0 * R * S * C
                     int h0 = (X + 2 * pad_x -(dilation_x * (R - 1) + 1)) /strides_x +1;
@@ -370,11 +383,6 @@ namespace tvm
                     float *input_raw = static_cast<float *>(input->data);
                     float im2col_array[h0*w0*R*S*C];
                     float *input_im2col = im2col_array;
-
-                    // Convert weight and output files to be STONNE compatible
-                    float *weight_raw = static_cast<float *>(weight->data);
-                    float *output_raw = static_cast<float *>(output->data);
-                
                     im2col_cpu(
                         input_raw,
                         C,
@@ -390,11 +398,16 @@ namespace tvm
                         dilation_y,
                         input_im2col);
 
+                    // Tranpose the result for the TPU
+                    float im2col_array_tranposed[h0*w0*R*S*C];
+                    float *input_im2col_t = im2col_array_tranposed;
+                    transpose(input_im2col, input_im2col_t, R*S*C, h0*w0);
+
                     // Getting GEMM dimensions
                     int gemm_M = K;
                     int gemm_K = R*S*C;
                     int gemm_N = h0*w0;
-                    simulateDenseGemmForward("TPU", input_im2col, weight_raw, output_raw, N, G, gemm_M, gemm_K, gemm_N, path_to_tile, stonne_config);
+                    simulateDenseGemmForward("TPU", input_im2col_t, weight_raw, output_raw, N, G, gemm_M, gemm_K, gemm_N, path_to_tile, stonne_config);
                 }
                 else
 
