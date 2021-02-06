@@ -357,7 +357,41 @@ namespace tvm
                         output,
                         stonne_config);
                 }
+                else if (!stonne_config.convOperationSupported()) { //IF CONV itself is not supported, we run it as a GEMM (e.g., the TPU)
+                    //im2col to the inputs
+
+                    float *input_raw = static_cast<float *>(input->data);
+                    float im2col_array[C * K * K];
+                    float *input_im2col = im2col_array;
+                    float *weight_raw = static_cast<float *>(weight->data);
+                    float *output_raw = static_cast<float *>(output->data);
+
+                    // Note that since STONNE only supports sparse GEMM operations, we have to
+                    // turn the input to im2col format and
+                    // run a GEMM operation instead a CONVOLUTION
+                    int gemm_N = im2col_cpu(
+                        input_raw,
+                        C,
+                        X,
+                        Y,
+                        R,
+                        S,
+                        pad_x,
+                        pad_y,
+                        strides_x,
+                        strides_y,
+                        dilation_x,
+                        dilation_y,
+                        input_im2col);
+
+                    // Getting GEMM dimensions
+                    // MK matrix is the weight
+                    int gemm_M = K;
+                    int gemm_K = R*S*C;
+                    simulateDenseGemmForward("TPU", input_im2col, weight_raw, output_raw, N, G, gemm_M, gemm_K, gemm_N, path_to_tile, stonne_config);
+                }
                 else
+
                 {
                     // Run a dense forward convolution
                     stonne_instance = denseConvolution(
