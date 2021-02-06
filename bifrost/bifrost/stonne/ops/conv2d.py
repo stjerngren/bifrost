@@ -80,7 +80,8 @@ def conv2d_stonne_nchw(
     N = 1 
     pad_x = padding[0] 
     pad_y = padding[1]
-    
+    print("here"*100)
+    print(padding, dilation)
     # Calculate the output shape
     X_:int = ((X + 2 * pad_x - dilation[0] * (R - 1) - 1) // strides[0]) + 1
     Y_:int = ((Y + 2 * pad_y - dilation[1] * (S - 1) - 1) // strides[0]) + 1

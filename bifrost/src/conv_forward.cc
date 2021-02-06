@@ -90,7 +90,7 @@ namespace tvm
             return static_cast<unsigned>(a) < static_cast<unsigned>(b);
         }
 
-        int im2col_cpu(const float *data_im, const int channels,
+        void im2col_cpu(const float *data_im, const int channels,
                         const int height, const int width, const int kernel_h, const int kernel_w,
                         const int pad_h, const int pad_w,
                         const int stride_h, const int stride_w,
@@ -106,6 +106,7 @@ namespace tvm
                                      stride_w +
                                  1;
             const int channel_size = height * width;
+            int count = 0;
             for (int channel = channels; channel--; data_im += channel_size)
             {
                 for (int kernel_row = 0; kernel_row < kernel_h; kernel_row++)
@@ -120,6 +121,7 @@ namespace tvm
                                 for (int output_cols = output_w; output_cols; output_cols--)
                                 {
                                     *(data_col++) = 0;
+                                    count++;
                                 }
                             }
                             else
@@ -130,10 +132,12 @@ namespace tvm
                                     if (is_a_ge_zero_and_a_lt_b(input_col, width))
                                     {
                                         *(data_col++) = data_im[input_row * width + input_col];
+                                            count++;
                                     }
                                     else
                                     {
                                         *(data_col++) = 0;
+                                count++;
                                     }
                                     input_col += stride_w;
                                 }
@@ -143,7 +147,7 @@ namespace tvm
                     }
                 }
             }
-            return output_h*output_w;
+            std::cout << "Count " << count << std::endl;
         }
         
 
@@ -224,39 +228,24 @@ namespace tvm
         {
             std::string layer_name = "Conv2dLayerSparse";
 
-            // All the channels. Note this could not be thes
-            // same in weight.sizes[1] (i.e., filter channels)
-            // as the groups could reduce these last ones.
-            // In this case, we send the complete number of input channels, and the
-            // callee will have to be aware of this and run C/G if  groups exist.
+            // Calculate im2col output as h0 * w0 * R * S * C
+            int h0 = (X + 2 * pad_x -(dilation_x * (R - 1) + 1)) /strides_x +1;
+            int w0 = (Y + 2 * pad_y -(dilation_y * (S - 1) + 1)) /strides_y +1;
+
+            // Get input and convert to im2col
             float *input_raw = static_cast<float *>(input->data);
-            float im2col_array[C * K * K*100];
+            float im2col_array[h0*w0*R*S*C];
             float *input_im2col = im2col_array;
+
+            // Convert weight and output files to be STONNE compatible
             float *weight_raw = static_cast<float *>(weight->data);
             float *output_raw = static_cast<float *>(output->data);
-
+                
             // Note that since STONNE only supports sparse GEMM operations, we have to
             // turn the input to im2col format and
-            // run a GEMM operation instead a CONVOLUTION
-
-            for (int i = N*C*X*Y- 1; i >= 0; i--) {
-                std::cout << input_raw[i];
-                std::cout << ", ";
-            }       
-            
+            // run a GEMM operation instead a CONVOLUTION    
             std::cout << "Run im2col" << std::endl;
-            std::cout << C << std::endl;
-            std::cout << X << std::endl;
-            std::cout << Y << std::endl;
-            std::cout << R << std::endl;
-            std::cout << S << std::endl;
-            std::cout << pad_x << std::endl;
-            std::cout << pad_y << std::endl;
-            std::cout << strides_x << std::endl;
-            std::cout << strides_y << std::endl;
-            std::cout << dilation_x << std::endl;
-            std::cout << dilation_y << std::endl;
-            int gemm_N = im2col_cpu(
+            im2col_cpu(
                 input_raw,
                 C,
                 X,
@@ -271,20 +260,10 @@ namespace tvm
                 dilation_y,
                 input_im2col);
             
-            std::cout << "Finished im2col" << std::endl;
-
             // Getting GEMM dimensions
-            // MK matrix is the weight
             int gemm_M = K;
             int gemm_K = R*S*C;
-
-            for (int i = C*K*K - 1; i >= 0; i--) {
-                std::cout << input_im2col[i];
-            }
-            std::cout << "STATS" << std::endl;
-            std::cout << gemm_M << std::endl;
-            std::cout << gemm_K << std::endl;
-            std::cout << gemm_N << std::endl;
+            int gemm_N = h0*w0;
 
             simulateSparseGemmForward(
                 layer_name,
@@ -353,7 +332,7 @@ namespace tvm
                 {
                     // Convert sparsity ratio to %
                     float sparsity_ratio_float = sparsity_ratio / 100;
-
+                    std::cout << "K init :" << K << std::endl;
                     // Run a sparse forward convolution
                     sparseConvolution(
                         R,
@@ -390,7 +369,7 @@ namespace tvm
                     // Note that since STONNE only supports sparse GEMM operations, we have to
                     // turn the input to im2col format and
                     // run a GEMM operation instead a CONVOLUTION
-                    int gemm_N = im2col_cpu(
+                    im2col_cpu(
                         input_raw,
                         C,
                         X,
@@ -409,6 +388,7 @@ namespace tvm
                     // MK matrix is the weight
                     int gemm_M = K;
                     int gemm_K = R*S*C;
+                    int gemm_N = 1;
                     simulateDenseGemmForward("TPU", input_im2col, weight_raw, output_raw, N, G, gemm_M, gemm_K, gemm_N, path_to_tile, stonne_config);
                 }
                 else
