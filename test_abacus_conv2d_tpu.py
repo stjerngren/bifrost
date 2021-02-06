@@ -17,27 +17,18 @@ import random
 import bifrost
 from bifrost.stonne.simulator import config_simulator
 
-#config_simulator(
-#    ms_size=16,
-#    reduce_network_type="TEMPORALRN",
-#    ms_network_type= "OS_MESH",
-#    accumulation_buffer_enabled = True,
-#    dn_bw=8,
-#    rn_bw=8,
-#    controller_type="TPU_OS_DENSE",
-#    sparsity_ratio = 20,
-#)
-#
 config_simulator(
     ms_size=16,
-    reduce_network_type="ASNETWORK",
-    ms_network_type= "LINEAR",
+    reduce_network_type="TEMPORALRN",
+    ms_network_type= "OS_MESH",
     accumulation_buffer_enabled = True,
     dn_bw=8,
     rn_bw=8,
-    controller_type="SIGMA_SPARSE_GEMM",
+    controller_type="TPU_OS_DENSE",
     sparsity_ratio = 20,
 )
+
+
 
 
 

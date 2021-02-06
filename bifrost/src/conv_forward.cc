@@ -391,10 +391,9 @@ namespace tvm
                         input_im2col);
 
                     // Getting GEMM dimensions
-                    // MK matrix is the weight
                     int gemm_M = K;
                     int gemm_K = R*S*C;
-                    int gemm_N = 1;
+                    int gemm_N = h0*w0;
                     simulateDenseGemmForward("TPU", input_im2col, weight_raw, output_raw, N, G, gemm_M, gemm_K, gemm_N, path_to_tile, stonne_config);
                 }
                 else
