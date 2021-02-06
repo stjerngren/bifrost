@@ -12,7 +12,7 @@ from ..tiles import tiles
 from tvm.auto_scheduler import is_auto_scheduler_enabled
 from tvm.te import SpecializedCondition
 
-@autotvm.register_topi_compute("dense_stonne_forward.x86")
+@autotvm.register_topi_compute("dense_stonne.x86")
 def dense_stonne(cfg,data, weight, units=None, out_dtype=""):
     """Dense operator
     Applies a linear transformation

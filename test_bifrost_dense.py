@@ -32,7 +32,6 @@ out_channels = 2
 batch_size = 1
 
 # Let’s create a very simple network for demonstration.
-
 data = relay.var("data", shape=(1, 2))
 weight = relay.var("weight", shape=(6, 2))
 
