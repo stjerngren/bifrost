@@ -145,6 +145,7 @@ namespace tvm
             }
             return output_h*output_w;
         }
+        
 
         Stonne *denseConvolution(
             int R,
@@ -229,7 +230,7 @@ namespace tvm
             // In this case, we send the complete number of input channels, and the
             // callee will have to be aware of this and run C/G if  groups exist.
             float *input_raw = static_cast<float *>(input->data);
-            float im2col_array[C * K * K];
+            float im2col_array[C * K * K*100];
             float *input_im2col = im2col_array;
             float *weight_raw = static_cast<float *>(weight->data);
             float *output_raw = static_cast<float *>(output->data);
@@ -237,6 +238,24 @@ namespace tvm
             // Note that since STONNE only supports sparse GEMM operations, we have to
             // turn the input to im2col format and
             // run a GEMM operation instead a CONVOLUTION
+
+            for (int i = N*C*X*Y- 1; i >= 0; i--) {
+                std::cout << input_raw[i];
+                std::cout << ", ";
+            }       
+            
+            std::cout << "Run im2col" << std::endl;
+            std::cout << C << std::endl;
+            std::cout << X << std::endl;
+            std::cout << Y << std::endl;
+            std::cout << R << std::endl;
+            std::cout << S << std::endl;
+            std::cout << pad_x << std::endl;
+            std::cout << pad_y << std::endl;
+            std::cout << strides_x << std::endl;
+            std::cout << strides_y << std::endl;
+            std::cout << dilation_x << std::endl;
+            std::cout << dilation_y << std::endl;
             int gemm_N = im2col_cpu(
                 input_raw,
                 C,
@@ -251,6 +270,8 @@ namespace tvm
                 dilation_x,
                 dilation_y,
                 input_im2col);
+            
+            std::cout << "Finished im2col" << std::endl;
 
             // Getting GEMM dimensions
             // MK matrix is the weight
