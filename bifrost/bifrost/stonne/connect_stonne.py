@@ -12,7 +12,7 @@ def load_lib():
     # Find library based on relative paths
     stonne_conv2d = os.path.join(
         os.path.dirname(os.path.realpath(__file__)),
-        "lib/stonne_lib.so"
+        "stonne_lib/stonne_lib.so"
     )
 
     # load in as global so the global extern symbol is visible to other dll.

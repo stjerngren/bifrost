@@ -15,7 +15,7 @@ setup(
     url="https://github.com/axelstjerngren/level-4-project",
     packages=setuptools.find_packages(),
     package_data = {
-    '': ['lib/*.so', 'data/*.json'],
+    '': ['stonne_lib/*.so', 'data/*.json'],
     },
     test_suite='nose.collector',
     tests_require=['nose'],
