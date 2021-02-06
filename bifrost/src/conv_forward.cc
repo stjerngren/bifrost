@@ -213,86 +213,6 @@ namespace tvm
             return stonne_instance;
         }
 
-        void sparseConvolution(
-            int R,
-            int S,
-            int C,
-            int K,
-            int G,
-            int N,
-            int X,
-            int Y,
-            int H_out,
-            int W_out,
-            int strides_x,
-            int strides_y,
-            int pad_x,
-            int pad_y,
-            int dilation_x,
-            int dilation_y,
-            float sparsity_level,
-            DLTensor *input,
-            DLTensor *weight,
-            DLTensor *output,
-            Config stonne_config)
-        {
-            std::string layer_name = "Conv2dLayerSparse";
-
-            // Calculate im2col output as h0 * w0 * R * S * C
-            int h0 = (X + 2 * pad_x -(dilation_x * (R - 1) + 1)) /strides_x +1;
-            int w0 = (Y + 2 * pad_y -(dilation_y * (S - 1) + 1)) /strides_y +1;
-
-            // Get input and convert to im2col
-            float *input_raw = static_cast<float *>(input->data);
-            float im2col_array[h0*w0*R*S*C];
-            float *input_im2col = im2col_array;
-
-            // Convert weight and output files to be STONNE compatible
-            float *weight_raw = static_cast<float *>(weight->data);
-            float *output_raw = static_cast<float *>(output->data);
-                
-            // Note that since STONNE only supports sparse GEMM operations, we have to
-            // turn the input to im2col format and
-            // run a GEMM operation instead a CONVOLUTION    
-            std::cout << "Run im2col" << std::endl;
-            im2col_cpu(
-                input_raw,
-                C,
-                X,
-                Y,
-                R,
-                S,
-                pad_x,
-                pad_y,
-                strides_x,
-                strides_y,
-                dilation_x,
-                dilation_y,
-                input_im2col);
-            
-            // Getting GEMM dimensions
-            int gemm_M = K;
-            int gemm_K = R*S*C;
-            int gemm_N = h0*w0;
-
-            simulateSparseGemmForward(
-                layer_name,
-                input_im2col,
-                weight_raw,
-                output_raw,
-                N,
-                G,
-                gemm_M,
-                gemm_K,
-                gemm_N,
-                sparsity_level,
-                stonne_config,
-                MK_STA_KN_STR); // Keeping MK stationary as they are the weights
-                                // Cast the input and output data into float pointer arrays
-                                // which are compatible with stonne
-            return;
-        }
-
         TVM_REGISTER_GLOBAL("tvm.contrib.stonne.conv2d.forward")
             .set_body([](TVMArgs args, TVMRetValue *ret) {
                 std::string path_to_arch_file = args[0];
@@ -329,43 +249,70 @@ namespace tvm
                 {
                     stonne_config.loadFile(path_to_arch_file);
                 }
-
-                // TODO: Make stats printing optional by choosing a variable
-                // Turn of stats printing
+                // Set output files
                 stonne_config.print_stats_enabled = stats;
 
-                // Run different types of convolutions depending
-                // on whether sparsity is suported
+                // Run different types of convolutions depending architecture
+                int cycles;
 
-                Stonne *stonne_instance;
                 if (stonne_config.sparsitySupportEnabled())
                 {
                     // Convert sparsity ratio to %
                     float sparsity_ratio_float = sparsity_ratio / 100;
                     std::cout << "K init :" << K << std::endl;
-                    // Run a sparse forward convolution
-                    sparseConvolution(
-                        R,
-                        S,
+
+                    std::string layer_name = "Conv2dLayerSparse";
+
+                    // Calculate im2col output as h0 * w0 * R * S * C
+                    int h0 = (X + 2 * pad_x -(dilation_x * (R - 1) + 1)) /strides_x +1;
+                    int w0 = (Y + 2 * pad_y -(dilation_y * (S - 1) + 1)) /strides_y +1;
+
+                    // Get input and convert to im2col
+                    float *input_raw = static_cast<float *>(input->data);
+                    float im2col_array[h0*w0*R*S*C];
+                    float *input_im2col = im2col_array;
+
+                    // Convert weight and output files to be STONNE compatible
+                    float *weight_raw = static_cast<float *>(weight->data);
+                    float *output_raw = static_cast<float *>(output->data);
+                        
+                    // Note that since STONNE only supports sparse GEMM operations, we have to
+                    // turn the input to im2col format and
+                    // run a GEMM operation instead a CONVOLUTION    
+                    std::cout << "Run im2col" << std::endl;
+                    im2col_cpu(
+                        input_raw,
                         C,
-                        K,
-                        G,
-                        N,
                         X,
                         Y,
-                        H_out,
-                        W_out,
-                        strides_x,
-                        strides_y,
+                        R,
+                        S,
                         pad_x,
                         pad_y,
+                        strides_x,
+                        strides_y,
                         dilation_x,
                         dilation_y,
+                        input_im2col);
+                    
+                    // Getting GEMM dimensions
+                    int gemm_M = K;
+                    int gemm_K = R*S*C;
+                    int gemm_N = h0*w0;
+
+                    cycles = simulateSparseGemmForward(
+                        layer_name,
+                        input_im2col,
+                        weight_raw,
+                        output_raw,
+                        N,
+                        G,
+                        gemm_M,
+                        gemm_K,
+                        gemm_N,
                         sparsity_ratio_float,
-                        input,
-                        weight,
-                        output,
-                        stonne_config);
+                        stonne_config,
+                        MK_STA_KN_STR);
                 }
                 else if (!stonne_config.convOperationSupported()) { 
                     // If CONV itself is not supported, 
@@ -407,13 +354,13 @@ namespace tvm
                     int gemm_M = K;
                     int gemm_K = R*S*C;
                     int gemm_N = h0*w0;
-                    simulateDenseGemmForward("TPU", input_im2col_t, weight_raw, output_raw, N, G, gemm_M, gemm_K, gemm_N, path_to_tile, stonne_config);
+                    cycles = simulateDenseGemmForward("TPU", input_im2col_t, weight_raw, output_raw, N, G, gemm_M, gemm_K, gemm_N, path_to_tile, stonne_config);
                 }
                 else
 
                 {
                     // Run a dense forward convolution
-                    stonne_instance = denseConvolution(
+                    Stonne *stonne_instance = denseConvolution(
                         R,
                         S,
                         C,
@@ -433,17 +380,18 @@ namespace tvm
                         path_to_tile,
                         stonne_config);
 
-                    // If the hardware is being tuned, report the cost
-                    if (tune)
-                    {
-                        reportCost(
-                            tuning_name,
-                            costs_path,
-                            stonne_instance->n_cycles
-
-                        );
-                    }
+                    cycles = stonne_instance->n_cycles;
                     delete stonne_instance;
+                }
+                if (tune)
+                // If the hardware is being tuned, report the cost
+                {
+                    reportCost(
+                        tuning_name,
+                        costs_path,
+                        cycles
+
+                    );
                 }
             });
 
