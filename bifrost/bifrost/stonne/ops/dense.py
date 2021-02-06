@@ -9,10 +9,11 @@ from tvm.relay.op.strategy.generic import *
 import os
 from ..simulator import architecture
 from ..tiles import tiles
+from tvm.auto_scheduler import is_auto_scheduler_enabled
 from tvm.te import SpecializedCondition
 
-@autotvm.register_topi_compute("conv2d_stonne_nchw.x86")
-def dense_stonne(data, weight, units=None, out_dtype=""):
+@autotvm.register_topi_compute("dense_stonne_forward.x86")
+def dense_stonne(cfg,data, weight, units=None, out_dtype=""):
     """Dense operator
     Applies a linear transformation
 
@@ -45,7 +46,6 @@ def dense_stonne(data, weight, units=None, out_dtype=""):
 
     M, K = get_const_tuple(data.shape)
     N, _ = get_const_tuple(weight.shape)
-
     return te.extern(
             (M,N),
             [data,weight],
@@ -63,16 +63,15 @@ def dense_stonne(data, weight, units=None, out_dtype=""):
                 outs[0],           # [9] Output
  
             ),
-            name = "s",
+            name = "d",
             dtype = out_dtype
     )
     
 
-@autotvm.register_topi_schedule("conv2d_stonne_nchw.x86")
+@autotvm.register_topi_schedule("dense_stonne.x86")
 def schedule_dense_stonne(cfg, outs):
-    """Create schedule for conv2d_nhwc"""
-    cfg.add_flop(2)
     return te.create_schedule([x.op for x in outs])
+
 
 @dense_strategy.register("cpu")
 def dense_strategy_cpu(attrs, inputs, out_type, target):
@@ -89,19 +88,21 @@ def dense_strategy_cpu(attrs, inputs, out_type, target):
         plevel=10,
     )
 
+
+    if "stonne" in target.libs:
+        strategy.add_implementation(
+            wrap_compute_dense(dense_stonne),
+            wrap_topi_schedule(schedule_dense_stonne),
+            name="dense_stonne.x86",
+            plevel=12,
+        )
+
     if is_auto_scheduler_enabled():
         strategy.add_implementation(
             wrap_compute_dense(topi.nn.dense, need_auto_scheduler_layout=True),
             naive_schedule,
             name="dense.generic",
             plevel=11,
-        )
-
-    if "stonne" in target.libs:
-        strategy.add_implementation(
-            wrap_compute_conv2d(dense_stonne),
-            wrap_topi_schedule(schedule_dense_stonne),
-            name="dense_stonne.x86",
         )
 
     if "cblas" in target.libs:
