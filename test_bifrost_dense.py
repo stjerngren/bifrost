@@ -24,22 +24,24 @@ config_simulator(
     accumulation_buffer_enabled = True,
     dn_bw=8,
     rn_bw=8,
-    controller_type="MAERI_DENSE_WORKLOAD",
+    controller_type="SIGMA_SPARSE_GEMM",
+    sparsity_ratio = 1000,
 )
 
 
 out_channels = 2
 batch_size = 1
+data_shape = (100,200)
 
 # Let’s create a very simple network for demonstration.
-data = relay.var("data", shape=(1, 2))
-weight = relay.var("weight", shape=(6, 2))
+data = relay.var("data", shape=(100, 200))
+weight = relay.var("weight", shape=(50, 200))
 
 simple_net = relay.nn.dense(
     data=data, weight=weight
 )
 
-data_shape = (1,2)
+
 net, params = testing.create_workload(simple_net)
 
 # Generate the data to resuse with both llvm and llvm stonne
@@ -57,7 +59,7 @@ module = runtime.GraphModule(lib["default"](ctx))
 module.set_input("data", data)
 module.run()
 
-out_shape = (1,6)
+out_shape = (100,50)
 out = module.get_output(0, tvm.nd.empty(out_shape))
 out_llvm = out.asnumpy()
 print(out_llvm)
@@ -71,7 +73,7 @@ ctx = tvm.context(target, 0)
 module = runtime.GraphModule(lib["default"](ctx))
 module.set_input("data", data)
 module.run()
-out_shape = (1,6)
+out_shape = (100,50)
 out = module.get_output(0, tvm.nd.empty(out_shape))
 out_stonne = out.asnumpy()
 print(out_stonne)

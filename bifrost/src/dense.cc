@@ -52,7 +52,8 @@ namespace tvm
                     // Convert sparsity ratio to %
                     float sparsity_ratio_float = sparsity_ratio / 100;
                     simulateSparseGemmForward(
-                        layer_name, weight_raw, 
+                        layer_name, 
+                        weight_raw, 
                         input_raw, 
                         output_raw,
                         1, 1, M, K, N, 

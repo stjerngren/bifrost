@@ -24,7 +24,8 @@ config_simulator(
     accumulation_buffer_enabled = True,
     dn_bw=8,
     rn_bw=8,
-    controller_type="MAERI_DENSE_WORKLOAD",
+    controller_type="SIGMA_SPARSE_GEMM",
+    sparsity_ratio = 20,
 )
 
 
