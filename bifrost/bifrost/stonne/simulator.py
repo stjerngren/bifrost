@@ -20,7 +20,7 @@ class Simulator(object):
         self.sparsity_ratio:float = 0
         self.tune:bool = False # A variable which to set if you want to use config
         self.print_stats:bool = False # Create output stats for stonne
-        self._knobs:tuple = () # An empty tuple for now
+        self.knobs:tuple = () # An empty tuple for now
         self._accumulation_buffer_enabled = 1
 
     @property

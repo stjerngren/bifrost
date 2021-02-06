@@ -16,6 +16,6 @@ ifeq ($(UNAME_S), Darwin)
 	PKG_LDFLAGS += -undefined dynamic_lookup
 endif
 
-bifrost/stonne/lib/conv_forward.so: src/jsoncpp.cpp src/conv_forward.cc ${STONNE_ROOT}/stonne_linker_src/stonne_linker.cpp $(wildcard ${STONNE_ROOT}/src/*cpp)
+bifrost/stonne/lib/stonne_lib.so: src/jsoncpp.cpp src/conv_forward.cc src/dense.cc ${STONNE_ROOT}/stonne_linker_src/stonne_linker.cpp $(wildcard ${STONNE_ROOT}/src/*cpp)
 	@mkdir -p $(@D)
 	$(CXX) $(PKG_CFLAGS) -shared -o $@ $^ $(PKG_LDFLAGS)
