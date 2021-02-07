@@ -7,10 +7,6 @@
 #include <tvm/runtime/device_api.h>
 #include <tvm/runtime/registry.h>
 
-// JSONCPP
-#include "json/json.h"
-#include "json/json-forwards.h"
-
 namespace tvm
 {
     namespace contrib

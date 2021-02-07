@@ -44,6 +44,28 @@ def dense_stonne(cfg,data, weight, units=None, out_dtype=""):
         The computed result.
     """
 
+    # If the architecture is being tuned, write to the file with the
+    # following name
+
+
+    # Define tuning space
+    cfg.define_knob("ms_size", [8,16,64])
+    if architecture.tune:
+        knobs = architecture.knobs
+        for knob in knobs:
+            cfg.define_knob(*knob)
+            
+    tuning_name = "ms_size_" + str(cfg['ms_size'])
+
+    if architecture.tune:
+        # Change the architecture to the new settings
+        architecture.ms_size = cfg['ms_size']
+        # Create a temporary file for tuning config
+        architecture.create_config_file(name_config="ms_size_" + str(cfg['ms_size']))
+
+    dirname = os.path.dirname(__file__)
+    costs_path = os.path.join(dirname, "../data/costs.json")
+
     M, K = get_const_tuple(data.shape)
     N, _ = get_const_tuple(weight.shape)
     return te.extern(
@@ -58,9 +80,12 @@ def dense_stonne(cfg,data, weight, units=None, out_dtype=""):
                 tiles.path,        # [4] Tiles path
                 architecture.sparsity_ratio,  # [5]
                 architecture.print_stats,     # [6] Create stats output files
-                ins[0],            # [7] Data
-                ins[1],            # [8] Weight
-                outs[0],           # [9] Output
+                architecture.tune, # [7] Enable if tuning
+                tuning_name,       # [8]
+                costs_path,        # [9]
+                ins[0],            # [10] Data
+                ins[1],            # [11] Weight
+                outs[0],           # [12] Output
  
             ),
             name = "d",

@@ -7,9 +7,8 @@
 #include <tvm/runtime/device_api.h>
 #include <tvm/runtime/registry.h>
 
-// JSONCPP
-#include "json/json.h"
-#include "json/json-forwards.h"
+// Cost function
+#include "include/cost.h"
 
 namespace tvm
 {
@@ -26,12 +25,18 @@ namespace tvm
                 std::string path_to_tile = args[4];
                 int sparsity_ratio = args[5];
                 bool stats = args[6];
-                DLTensor *input = args[7];
-                DLTensor *weight = args[8];
-                DLTensor *output = args[9];
+                bool tune = args[7];
+                std::string tuning_name = args[8];
+                std::string costs_path = args[9];                
+                DLTensor *input = args[10];
+                DLTensor *weight = args[11];
+                DLTensor *output = args[12];
 
                 // Add some way to specify layer names
                 std::string layer_name = "Test";
+
+                // Init tuning cycle variable
+                int cycles;
 
                 //Here starts the function
                 //Creating config file to find out if we are going to run a dense or sparse simulation
@@ -51,7 +56,7 @@ namespace tvm
                 {
                     // Convert sparsity ratio to %
                     float sparsity_ratio_float = sparsity_ratio / 100;
-                    simulateSparseGemmForward(
+                    cycles = simulateSparseGemmForward(
                         layer_name, 
                         weight_raw, 
                         input_raw, 
@@ -63,7 +68,7 @@ namespace tvm
                 }
                 else
                 {
-                    simulateDenseGemmForward(
+                    cycles = simulateDenseGemmForward(
                         layer_name,
                         weight_raw,
                         input_raw,
@@ -72,6 +77,17 @@ namespace tvm
                         path_to_tile,
                         stonne_config);
                 }
+                if (tune)
+                // If the hardware is being tuned, report the cost
+                {
+                    reportCost(
+                        tuning_name,
+                        costs_path,
+                        cycles
+
+                    );
+                }
+
             });
 
     } // namespace contrib

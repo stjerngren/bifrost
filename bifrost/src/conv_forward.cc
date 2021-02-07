@@ -7,13 +7,9 @@
 #include <tvm/runtime/device_api.h>
 #include <tvm/runtime/registry.h>
 
-// JSONCPP
-#include "json/json.h"
-#include "json/json-forwards.h"
+// Cost function
+#include "include/cost.h"
 
-#include <fstream>
-#include <string>
-#include <iostream>
 
 // Stonne variable taxonomy
 // -R: Number of flter rows
@@ -34,49 +30,7 @@ namespace tvm
 
         using namespace runtime;
 
-        void reportCost(
-            std::string tuning_name,
-            std::string filename,
-            int cost)
-        {
-            // Intialise the JSONCPP variables
-            Json::Value root;
-            Json::Reader reader;
-            Json::StyledStreamWriter writer;
-
-            // Read the file
-            std::ifstream f(filename);
-
-            // Parse the file
-            bool parsingSuccessful = reader.parse(f, root);
-            if (!parsingSuccessful)
-            {
-                // report to the user the failure and their locations in the document.
-                std::cout << "Failed to parse configuration\n"
-                          << reader.getFormattedErrorMessages();
-                return;
-            }
-            f.close();
-            // Add in the recorded cost
-            if (root["tuning_name"] == tuning_name)
-            {
-                root["value"].append(cost);
-            }
-            else
-            {
-                // Create new member and insert array with one value
-                Json::Value content(Json::arrayValue);
-                content.append(cost);
-                root["value"] = content;
-
-                // Change tuning name variable
-                root["tuning_name"] = tuning_name;
-            }
-            // Write output
-            std::ofstream fout(filename);
-            writer.write(fout, root);
-        }
-
+        
         void transpose(float *src, float *dst, const int N, const int M) {
             // Tranpose a matrix
             #pragma omp parallel for
