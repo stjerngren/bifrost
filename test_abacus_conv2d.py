@@ -18,13 +18,13 @@ import bifrost
 from bifrost.stonne.simulator import config_simulator
 
 config_simulator(
-        ms_size=16,
+    ms_size=16,
     reduce_network_type="ASNETWORK",
     ms_network_type= "LINEAR",
     accumulation_buffer_enabled = False,
     dn_bw=8,
     rn_bw=8,
-    controller_type="SIGMA_SPARSE_GEMM",
+    controller_type="MAGMA_SPARSE_DENSE",
     sparsity_ratio = 20,
 )
 
