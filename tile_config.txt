@@ -1,4 +1,4 @@
-tile_type="CONV"
+tile_type="ddf"
 T_R=1
 T_S=1
 T_C=1

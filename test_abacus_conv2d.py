@@ -15,8 +15,10 @@ import random
 
 # Import this add stonne as an x86 co-processor
 import bifrost
-from bifrost.stonne.simulator import config_simulator
+from bifrost.stonne.simulator import config_simulator, architecture
 
+import os
+architecture.tile_paths = [os.getcwd()+ "/tile_config.txt"]
 config_simulator(
     ms_size=16,
     reduce_network_type="ASNETWORK",

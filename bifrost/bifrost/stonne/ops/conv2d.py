@@ -88,7 +88,7 @@ def conv2d_stonne_nchw(
     # Choose tiles
     if architecture.tile_paths and not architecture.tune:
         # TODO: Implement a way to specify tiles paths
-        pass
+        tile_path = architecture.tile_paths[0]
     else:     
         size = generate_basic_tile_config("CONV",R,S,C,K,G,X,Y,strides[0])
         ms_size = architecture.ms_size
@@ -98,7 +98,7 @@ def conv2d_stonne_nchw(
         architecture.create_config_file(name_config="ms_size_" + str(ms_size))
         path = architecture.path
         tiles.create_tile_file() # Create the file
-
+        tile_path =tiles.path
     return te.extern(
             (N,K,X_, Y_),
             [data,kernel],
@@ -121,7 +121,7 @@ def conv2d_stonne_nchw(
                 pad_y,             # [14]    
                 dilation[0],       # [15]
                 dilation[1],       # [16]
-                tiles.path,        # [17]     
+                tile_path,         # [17]     
                 sparsity_ratio,    # [18]    
                 architecture.tune, # [19]
                 tuning_name,       # [20]
