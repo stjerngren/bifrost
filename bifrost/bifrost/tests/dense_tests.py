@@ -1,18 +1,18 @@
 from unittest import TestCase
 
 import bifrost
+from bifrost.stonne.simulator import config_simulator
 
 import tvm
 from tvm import te, autotvm ,relay
 import numpy as np
 from tvm.contrib import graph_runtime as runtime
 from tvm.relay import testing
-import logging
-import random
+
 
 class TestDense(TestCase):
     
-    def test_dense(self):
+    def setUp(self):
         # Let’s create a very simple network for demonstration.
         data = relay.var("data", shape=(1, 2))
         weight = relay.var("weight", shape=(6, 2))
@@ -27,10 +27,6 @@ class TestDense(TestCase):
         # Generate the data to resuse with both llvm and llvm stonne
         data = np.random.uniform(-1, 1, size=data_shape).astype("float32")
     
-    
-        # Build and run with llvm backend
-        logging.basicConfig(level=logging.DEBUG)  # to dump TVM IR after fusion
-    
         target = "llvm"
         lib = relay.build_module.build(net, target, params=params)
     
@@ -39,10 +35,9 @@ class TestDense(TestCase):
         module.set_input("data", data)
         module.run()
     
-        out_shape = (1,6)
-        out = module.get_output(0, tvm.nd.empty(out_shape))
-        out_llvm = out.asnumpy()
-        print(out_llvm)
+        self.out_shape = (1,6)
+        out = module.get_output(0, tvm.nd.empty(self.out_shape))
+        self.out_llvm = out.asnumpy()
         # Build and run with llvm backend, but this time use the
         #stonne conv2d ops
         
@@ -50,13 +45,101 @@ class TestDense(TestCase):
         lib = relay.build_module.build(net, target, params=params)
     
         ctx = tvm.context(target, 0)
-        module = runtime.GraphModule(lib["default"](ctx))
-        module.set_input("data", data)
-        module.run()
-        out_shape = (1,6)
-        out = module.get_output(0, tvm.nd.empty(out_shape))
-        out_stonne = out.asnumpy()
-        print(out_stonne)
-    
-        self.assertTrue(np.all(np.round(out_stonne, 4) == np.round(out_llvm, 4)))
-    
+        self.module = runtime.GraphModule(lib["default"](ctx))
+        self.module.set_input("data", data)
+        
+
+
+
+
+    def test_maeri(self):
+        """
+        Test running on MAERI
+        """
+        
+        config_simulator(
+            ms_size=16,
+            reduce_network_type="ASNETWORK",
+            ms_network_type= "LINEAR",
+            accumulation_buffer_enabled = False,
+            dn_bw=8,
+            rn_bw=8,
+            controller_type="MAERI_DENSE_WORKLOAD",
+
+        )
+
+        self.module.run()
+        out_stonne = self.module.get_output(
+            0,
+            tvm.nd.empty(self.out_shape)
+            ).asnumpy()
+        
+        # Check if output is equivalent to running the convolution on CPU 
+        self.assertTrue(np.all(np.round(out_stonne, 4) == np.round(self.out_llvm, 4)))
+
+    def test_conv2d_tpu(self):
+
+        config_simulator(
+            ms_size=16,
+            reduce_network_type="TEMPORALRN",
+            ms_network_type= "OS_MESH",
+            accumulation_buffer_enabled = True,
+            dn_bw=8,
+            rn_bw=8,
+            controller_type="TPU_OS_DENSE",
+            sparsity_ratio = 20,
+        )
+        self.module.run()
+        out_stonne = self.module.get_output(
+            0,
+            tvm.nd.empty(self.out_shape)
+            ).asnumpy()
+        
+        # Check if output is equivalent to running the convolution on CPU 
+        self.assertTrue(np.all(np.round(out_stonne, 4) == np.round(self.out_llvm, 4)))
+#
+#
+    #def test_conv2d_magma_sparse_dense(self):
+#
+    #    config_simulator(
+    #        ms_size=16,
+    #        reduce_network_type="ASNETWORK",
+    #        ms_network_type= "LINEAR",
+    #        accumulation_buffer_enabled = False,
+    #        dn_bw=8,
+    #        rn_bw=8,
+    #        controller_type="MAGMA_SPARSE_DENSE",
+    #        sparsity_ratio = 20,
+    #    )
+#
+    #    self.module.run()
+    #    out_stonne = self.module.get_output(
+    #        0,
+    #        tvm.nd.empty(self.out_shape)
+    #        ).asnumpy()
+    #    
+    #    # Check if output is equivalent to running the convolution on CPU 
+    #    self.assertTrue(np.all(np.round(out_stonne, 4) == np.round(self.out_llvm, 4)))
+ #
+#    def test_conv2d_sigma_sparse(self):
+#
+#        config_simulator(
+#            ms_size=16,
+#            reduce_network_type="ASNETWORK",
+#            ms_network_type= "LINEAR",
+#            accumulation_buffer_enabled = False,
+#            dn_bw=8,
+#            rn_bw=8,
+#            controller_type="SIGMA_SPARSE_GEMM",
+#            sparsity_ratio = 20,
+#        )
+#
+#        self.module.run()
+#        out_stonne = self.module.get_output(
+#            0,
+#            tvm.nd.empty(self.out_shape)
+#            ).asnumpy()
+#        
+#        # Check if output is equivalent to running the convolution on CPU 
+#        self.assertTrue(np.all(np.round(out_stonne, 4) == np.round(self.out_llvm, 4)))
+ 
