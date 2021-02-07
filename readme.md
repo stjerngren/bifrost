@@ -34,31 +34,50 @@ python setup.py install
 You can now use Bifrost.
 
 
-## Modifying the C code 
+## Modifying the C++ code 
+All of the C++ files can be found in under:
+```
+level-4-project
+|___bifrost
+|    |__src
+|    |   |__include
+|    |   |     |__cost.h
+|    |   |
+|    |   |__conv_forward.cpp
+|    |   |__cost.cpp
+|    |   |__json.cpp
+|    |   |__etc...
+|    |__Makefile
+```
+
+Any new .cpp files will be automatically found by the Makefile as long as they are created within the /src folder. Before you compile the code you need STONNE and TVM as enviroment variables (see next section) You can the compile your new code with the following commands:
+```
+cd bifrost
+make -j
+```
+
+### C++ depdencies 
 To change the C code you need to clone the STONNE and TVM repositories:
 ```
 git clone https://github.com/axelstjerngren/stonne
 git clone https://github.com/apache/tvm
 ```
 Keeping these three in the same folder will be useful.
-
-All of the C files can be found in under:
+Before you can run **make** you need to export two environment variables:
 ```
-level-4-project
-|___bifrost
-|    |__src
-|    |   |__conv_forward.cc
-|    |   |__cost.cc
-|    |   |__json.pp
-|    |__Makefile
+export TVM_ROOT    = path_to_tvm/tvm
+export STONNE_ROOT = path_to_stonne/stonne
 ```
-TODO: Finish
+The C++ should now compile correctly when you run **make**.
 
 
-## Requirements
 
+## Dependecies
 Python >=3.8
-Tested on macOS Big Sur (11.1) and Manjaro 20.2.1 
+
+Remember to add proper credits to JSONCPP: https://github.com/open-source-parsers/jsoncpp
+
+
 
 ## Run the tests
 Bifrost includes a test suite. This will run all implemented layers (conv2d and dense) on STONNE and compare the output against the TVM x86 implementation for correctness. You can run the tests using the following commands:
@@ -66,6 +85,8 @@ Bifrost includes a test suite. This will run all implemented layers (conv2d and 
 cd bifrost
 python setup.py
 ```
+Tested on macOS Big Sur (11.1) and Manjaro 20.2.1 
+
 ### Architecture
 
 ### Where can I find stuff?
@@ -183,4 +204,4 @@ deep_q_agent.load_policy(path, "name")
 
 
 
-Remember to add proper credits to JSONCPP: https://github.com/open-source-parsers/jsoncpp
+
