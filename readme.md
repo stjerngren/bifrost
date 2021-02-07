@@ -58,18 +58,13 @@ TODO: Finish
 ## Requirements
 
 Python >=3.8
-Tested on macOS Big Sur (11.1) 
+Tested on macOS Big Sur (11.1) and Manjaro 20.2.1 
 
-## Test steps
-TODO: Make a test suite
-
-
-
-Make sure you have Python installed as well, this project has ONLY been tested by Python 3.7.9. We recommended Anaconda to manage virtual environmeents.
-
-Once you have a suitable version of Python, you will have to install all the dependencies required to run this.
+## Run the tests
+Bifrost includes a test suite. This will run all implemented layers (conv2d and dense) on STONNE and compare the output against the TVM x86 implementation for correctness. You can run the tests using the following commands:
 ```
-pip install -r req.txt
+cd bifrost
+python setup.py
 ```
 ### Architecture
 
