@@ -54,7 +54,7 @@ def dense_stonne(cfg,data, weight, units=None, out_dtype=""):
         knobs = architecture.knobs
         for knob in knobs:
             cfg.define_knob(*knob)
-            
+
     tuning_name = "ms_size_" + str(cfg['ms_size'])
 
     if architecture.tune:
@@ -68,6 +68,7 @@ def dense_stonne(cfg,data, weight, units=None, out_dtype=""):
 
     M, K = get_const_tuple(data.shape)
     N, _ = get_const_tuple(weight.shape)
+
     return te.extern(
             (M,N),
             [data,weight],

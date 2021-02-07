@@ -1,5 +1,6 @@
 """Congigure stonne"""
 import os
+from typing import List
 
 # Define a new error for improper configs
 class ConfigError(Exception):
@@ -10,10 +11,10 @@ class Simulator(object):
         self._path: str = "" # Internal path without filename
         self.path:str = "" # Path with filename
         self._ms_size:int = 16
-        self._ms_rows:int = 16
-        self._ms_cols:int = 16
+        self.ms_rows:int = 16
+        self.ms_cols:int = 16
         self._reduce_network_type:str = "ASNETWORK"
-        self._ms_network_type:str = "Linear"
+        self._ms_network_type:str = "LINEAR"
         self._dn_bw:int = 8
         self._rn_bw:int = 8
         self._controller_type:str = "MAERI_DENSE_WORKLOAD"
@@ -22,6 +23,7 @@ class Simulator(object):
         self.print_stats:bool = False # Create output stats for stonne
         self.knobs:tuple = () # An empty tuple for now
         self._accumulation_buffer_enabled = 1
+        self.tile_paths:List[str] = []
 
     @property
     def ms_size(self):

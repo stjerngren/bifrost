@@ -1,19 +1,18 @@
 import os
 
 class TileConfig(object):
-    path :str = os.getcwd() + "/tile_config.txt"
-    tile_type :str = "CONV"
-    T_R : int = 1
-    T_S : int = 1
-    T_C : int = 1
-    T_G : int = 1
-    T_K : int = 1
-    T_N : int = 1
-    T_X : int = 1
-    T_Y : int = 1
 
     def __init__(self):
-        self.create_tile_file()
+        self.path :str 
+        self.tile_type :str
+        self.T_R : int 
+        self.T_S : int 
+        self.T_C : int 
+        self.T_G : int 
+        self.T_K : int 
+        self.T_N : int 
+        self.T_X : int 
+        self.T_Y : int 
 
     def edit_tile_config(
         self,
@@ -28,7 +27,19 @@ class TileConfig(object):
         T_X : int,
         T_Y : int,
     ):
-        self.path = path + "/tile_config.txt"
+        self.path = (
+            path 
+            + "/tile_config_"
+            + str(T_R)
+            + str(T_S)
+            + str(T_C)
+            + str(T_G)
+            + str(T_K)
+            + str(T_N)
+            + str(T_X)
+            + str(T_Y)   
+            +".txt"
+        )
         self.tile_type = tile_type
         self.T_R = T_R
         self.T_S = T_S
@@ -38,7 +49,6 @@ class TileConfig(object):
         self.T_N = T_N
         self.T_X = T_X
         self.T_Y = T_Y   
-        self.create_tile_file()
 
     def create_tile_file(self):
 
@@ -84,4 +94,28 @@ def config_tile_file(
         T_Y,
     )
 
+def generate_basic_tile_config(
+    tile_type :str,
+    R: int,
+    S: int,
+    C:int,
+    K:int,
+    G:int,
+    X:int,
+    Y:int,
+    strides:int,
+    ):
 
+    config_tile_file(
+        tile_type,
+        R, 
+        S, 
+        C, 
+        G, 
+        K, 
+        1, 
+        (X - R + strides) // strides,
+        (Y - S + strides) // strides,
+    )
+
+    return R * S *C *G *K *1 * ((X - R + strides) // strides) *((Y - S + strides) // strides)

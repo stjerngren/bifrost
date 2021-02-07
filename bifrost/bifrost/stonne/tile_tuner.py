@@ -25,9 +25,6 @@ If the architecture to be run is flexible (MAERI or SIGMA):
 // -Y_: Number of output columns
 """
 
-from typing import List, Tuple
-
-
 def create_tile_tuning_space(
     R: int,
     S: int,
@@ -44,9 +41,10 @@ def create_tile_tuning_space(
     rn = range(1,range_max+1)
 
     # Constraints
-    X_ =(X - R + strides) / strides
-    Y_ = (Y - S + strides) / strides
+    X_ =(X - R + strides) // strides
+    Y_ = (Y - S + strides) // strides
 
+    # Generate tile configs
     return [
         ("T_R",  [x*R for x in rn]),
         ("T_S",  [x*S for x in rn]),
