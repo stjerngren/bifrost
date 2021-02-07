@@ -8,9 +8,9 @@ import tvm.relay.op as _op
 from tvm.relay.op.strategy.generic import *
 import os
 from ..simulator import architecture
-from ..tiles import tiles
 from tvm.auto_scheduler import is_auto_scheduler_enabled
 from tvm.te import SpecializedCondition
+from .. import fc_tiles
 
 @autotvm.register_topi_compute("dense_stonne.x86")
 def dense_stonne(cfg,data, weight, units=None, out_dtype=""):
@@ -69,6 +69,16 @@ def dense_stonne(cfg,data, weight, units=None, out_dtype=""):
     M, K = get_const_tuple(data.shape)
     N, _ = get_const_tuple(weight.shape)
 
+    # Choose tiles
+    if architecture.tile_paths and not architecture.tune:
+        # TODO: Implement a way to specify tiles paths
+        tile_path = architecture.tile_paths[0]
+    else:     
+        size = fc_tiles.generate_basic_tile_config()
+        ms_size = architecture.ms_size
+        fc_tiles.create_tile_file()
+
+
     return te.extern(
             (M,N),
             [data,weight],
@@ -78,7 +88,7 @@ def dense_stonne(cfg,data, weight, units=None, out_dtype=""):
                 M,                 # [1] Batch size
                 K,                 # [2] Number of input neurons
                 N,                 # [3] Number of output neurons
-                tiles.path,        # [4] Tiles path
+                fc_tiles.path,     # [4] Tiles path
                 architecture.sparsity_ratio,  # [5]
                 architecture.print_stats,     # [6] Create stats output files
                 architecture.tune, # [7] Enable if tuning

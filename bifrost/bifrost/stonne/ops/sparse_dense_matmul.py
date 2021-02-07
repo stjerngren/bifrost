@@ -8,7 +8,6 @@ import tvm.relay.op as _op
 from tvm.relay.op.strategy.generic import *
 import os
 from ..simulator import architecture
-from ..tiles import tiles
 from tvm.auto_scheduler import is_auto_scheduler_enabled
 from tvm.te import SpecializedCondition
 

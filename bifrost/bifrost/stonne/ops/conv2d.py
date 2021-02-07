@@ -8,7 +8,7 @@ import tvm.relay.op as _op
 from tvm.relay.op.strategy.generic import *
 import os
 from ..simulator import architecture
-from ..tiles import generate_basic_tile_config, tiles
+from .. import conv_tiles
 #from tvm.topi.nn.utils import traverse_inline
 
 # Register the compute schedule for stonne conv2d
@@ -90,15 +90,16 @@ def conv2d_stonne_nchw(
         # TODO: Implement a way to specify tiles paths
         tile_path = architecture.tile_paths[0]
     else:     
-        size = generate_basic_tile_config("CONV",R,S,C,K,G,X,Y,strides[0])
+        size = conv_tiles.generate_basic_tile_config(R,S,C,K,G,X,Y,strides[0])
         ms_size = architecture.ms_size
         while ms_size< size:
             ms_size = ms_size * 2
         architecture.ms_size = ms_size
         architecture.create_config_file(name_config="ms_size_" + str(ms_size))
         path = architecture.path
-        tiles.create_tile_file() # Create the file
-        tile_path =tiles.path
+        conv_tiles.create_tile_file() # Create the file
+        tile_path =conv_tiles.path
+
     return te.extern(
             (N,K,X_, Y_),
             [data,kernel],

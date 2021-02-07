@@ -25,7 +25,7 @@ If the architecture to be run is flexible (MAERI or SIGMA):
 // -Y_: Number of output columns
 """
 
-def create_tile_tuning_space(
+def create_conv_tile_tuning_space(
     R: int,
     S: int,
     C:int,
