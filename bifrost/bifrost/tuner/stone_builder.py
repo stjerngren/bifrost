@@ -148,7 +148,7 @@ class _StonneWrappedBuildFunc:
             # Find library based on relative paths
             # TODO: Modify this so that several fucntions can be uploaded
             dirname = os.path.dirname(__file__)
-            filename_module = os.path.join(dirname, "../stonne/lib/conv_forward.so")
+            filename_module = os.path.join(dirname, "../stonne/stonne_lib/stonne_lib.so")
 
             filename = os.path.join(
                 tmp_dir, "tmp_func_%0x.%s" % (getrandbits(64), self.build_func.output_format)

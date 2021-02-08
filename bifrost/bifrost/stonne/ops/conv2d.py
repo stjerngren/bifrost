@@ -43,7 +43,7 @@ def conv2d_stonne_nchw(
 
     if architecture.tune:
         # Change the architecture to the new settings
-        architecture.ms_size = cfg['ms_size']
+        architecture.ms_size = cfg['ms_size'].val
         # Create a temporary file for tuning config
         architecture.create_config_file(name_config="ms_size_" + str(cfg['ms_size']))
 
