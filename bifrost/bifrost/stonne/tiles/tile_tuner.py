@@ -34,7 +34,7 @@ def create_conv_tile_tuning_space(
     X:int,
     Y:int,
     strides:int,
-    range_max = 5 
+    range_max = 50
     ):
 
     # The amount of alternatives to generate
@@ -46,12 +46,12 @@ def create_conv_tile_tuning_space(
 
     # Generate tile configs
     return [
-        ("T_R",  [x*R for x in rn]),
-        ("T_S",  [x*S for x in rn]),
-        ("T_C",  [x*C for x in rn]),
-        ("T_K",  [x*K for x in rn]),
-        ("T_G",  [x*G for x in rn]),
+        ("T_R",  [x for x in rn if R%x==0 ]),
+        ("T_S",  [x for x in rn if S%x==0 ]),
+        ("T_C",  [x for x in rn if C%x==0 ]),
+        ("T_K",  [x for x in rn if K%x==0 ]),
+        ("T_G",  [x for x in rn if G%x==0 ]),
         ("T_N",  [1]), # Only supported so far
-        ("T_X_", [x*X_ for x in rn]),
-        ("T_Y_", [x*Y_ for x in rn]),
+        ("T_X_", [x for x in rn if X_%x==0]),
+        ("T_Y_", [x for x in rn if Y_%x==0]),
     ]

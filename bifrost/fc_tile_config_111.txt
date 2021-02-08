@@ -1,4 +1,0 @@
-tile_type="FC"
-T_N=1
-T_S=1
-T_K=1

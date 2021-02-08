@@ -52,7 +52,8 @@ def conv2d_stonne_nchw(
     stats = architecture.print_stats
     dirname = os.path.dirname(__file__)
     costs_path = os.path.join(dirname, "../data/costs.json")
-    # Extract data from 
+    
+    # Extract layer dimensions 
     N, C, H, W = get_const_tuple(data.shape)
     output_channels, _, kernel_height, kernel_width = get_const_tuple(kernel.shape)
     
@@ -90,13 +91,7 @@ def conv2d_stonne_nchw(
         # TODO: Implement a way to specify tiles paths
         tile_path = architecture.tile_paths[0]
     else:     
-        size = conv_tiles.generate_basic_tile_config(R,S,C,K,G,X,Y,strides[0])
-        ms_size = architecture.ms_size
-        while ms_size< size:
-            ms_size = ms_size * 2
-        architecture.ms_size = ms_size
-        architecture.create_config_file(name_config="ms_size_" + str(ms_size))
-        path = architecture.path
+        size = conv_tiles.generate_basic_tile_config()
         conv_tiles.create_tile_file() # Create the file
         tile_path =conv_tiles.path
 

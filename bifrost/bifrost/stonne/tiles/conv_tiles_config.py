@@ -59,30 +59,13 @@ class ConvTileConfig(object):
             f.write(f"T_X'={self.T_X}\n")
             f.write(f"T_Y'={self.T_Y}\n")   
 
-    def generate_basic_tile_config(
-        self,
-        R: int,
-        S: int,
-        C:int,
-        K:int,
-        G:int,
-        X:int,
-        Y:int,
-        strides:int,
-        ):
+    def generate_basic_tile_config(self):
 
         self.edit_tile_config(
-            R, 
-            S, 
-            C, 
-            G, 
-            K, 
-            1, 
-            (X - R + strides) // strides,
-            (Y - S + strides) // strides,
+            1,1,1,1,1,1,1,1
         )
 
-        return R * S *C *G *K *1 * ((X - R + strides) // strides) *((Y - S + strides) // strides)
+        
 
 conv_tiles = ConvTileConfig()
 
