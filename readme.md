@@ -33,6 +33,11 @@ python setup.py install
 ```
 You can now use Bifrost.
 
+Alternatively, if you are going to make modifications to Bifrost then export it to PYTHONPATH to tell python where to find the library. This way your changes will immeditaly be reflected and there is no need to call setup.py again.
+```
+export BIFROST=/path/to/level-4-project/bifrost/
+export PYTHONPATH=$BIFROST/python:${PYTHONPATH}
+```
 
 ## Modifying the C++ code 
 All of the C++ files can be found in under:
