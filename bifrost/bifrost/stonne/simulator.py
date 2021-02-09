@@ -2,7 +2,7 @@
 import os
 from typing import List
 from ..tuner import tune_parameters
-
+from .tiles import conv_tiles
 # Define a new error for improper configs
 class ConfigError(Exception):
     pass
@@ -27,7 +27,8 @@ class Simulator(object):
         self.tile_paths:List[str] = []
         
         self.tuner = tune_parameters
-
+        self.conv_tiles = conv_tiles
+        self.conv_tiles_path:str
     @property
     def ms_size(self):
         return self._ms_size
@@ -201,6 +202,28 @@ class Simulator(object):
             f.write(f"rn_bw={self.rn_bw}\n")
             f.write(f'controller_type="{self.controller_type}"\n')
         print("New config created at ", self.path, self.ms_size)
+
+    def config(self,cfg)->None:
+        """
+        This function generates an architecture and/or tile config depending
+        on which parameters are being tuned.
+
+        Parameters
+        ----------
+        cfg: tvm.autotvm.task.space.ConfigSpace
+            The configuration space 
+        """
+
+        # Get a list of call keys 
+        space_map = list(cfg.space_map.keys())
+
+        if self.tuner.tune_convolutions_tile:
+            # Create a new tile file
+            self.conv_tiles_path = conv_tiles.edit_tile_config(
+                cfg['T_R'].val, cfg['T_S'].val, cfg['T_C'].val, cfg['T_K'].val, 
+                cfg['T_G'].val, cfg['T_N'].val, cfg['T_X_'].val, cfg['T_Y_'].val
+            )
+            conv_tiles.create_tile_file()
 
 def config_simulator(
     ms_size:int,

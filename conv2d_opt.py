@@ -1,13 +1,8 @@
 from bifrost.stonne.simulator import config_simulator, architecture
 
-config_simulator(
-    ms_size=16,
-    reduce_network_type="ASNETWORK",
-    dn_bw=8,
-    rn_bw=8,
-    controller_type="MAERI_DENSE_WORKLOAD",
-    tune = True
-)
+architecture.tune = True
+architecture.tuner.tune_convolutions_tile = True
+architecture.tuner.conv_num = 10
 
 if __name__ == "__main__":
 
@@ -29,7 +24,7 @@ if __name__ == "__main__":
 
 
 #
-    architecture.tune = True
+
 
     out_channels = 2
     batch_size = 1
@@ -76,7 +71,7 @@ if __name__ == "__main__":
             builder=StonneLocalBuilder(),
             runner=StonneLocalRunner(
                 number=1,
-                repeat=1,
+                repeat=0,
                 min_repeat_ms=0,
                 enable_cpu_cache_flush=True
             ),

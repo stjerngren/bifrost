@@ -8,7 +8,6 @@ import tvm.relay.op as _op
 from tvm.relay.op.strategy.generic import *
 import os
 from ..simulator import architecture
-from .. import conv_tiles
 #from tvm.topi.nn.utils import traverse_inline
 
 # Register the compute schedule for stonne conv2d
@@ -31,18 +30,7 @@ def conv2d_stonne_nchw(
 
     # If the architecture is being tuned, write to the file with the
     # following name
-    tuning_name = "ms_size_" + str(cfg['ms_size'])
-
-    if architecture.tune:
-        
-        # Change the architecture to the new settings
-        architecture.ms_size = cfg['ms_size'].val
-        # Create a temporary file for tuning config
-        architecture.create_config_file(name_config="ms_size_" + str(cfg['ms_size']))
-
-    path = architecture.path
-    sparsity_ratio = architecture.sparsity_ratio
-    stats = architecture.print_stats
+    tuning_name = "none"
     dirname = os.path.dirname(__file__)
     costs_path = os.path.join(dirname, "../data/costs.json")
     
@@ -81,29 +69,36 @@ def conv2d_stonne_nchw(
 
     # Define tuning space
     if architecture.tune:
+        
+        # Generate the different conv tile options
         if architecture.tuner.tune_convolutions_tile:
             architecture.tuner.conv_tile(R,S,C,K,G,X,Y, strides[0])
+
+        # Get and register the tuning knobs
         knobs = architecture.tuner.create_knobs()
+        print(knobs)
         for knob in knobs:
             cfg.define_knob(*knob)
-        architecture.
+        # Create the architecture files
+        architecture.config(cfg)
 
+    ## Choose tiles
+    #if architecture.tile_paths and not architecture.tune:
+    #    # TODO: Implement a way to specify tiles paths
+    #    tile_path = architecture.tile_paths[0]
+    #else:     
+    #    size = architecture.conv_tiles.generate_basic_tile_config()
+    #    # Create the file
+    #    architecture.conv_tiles_path = architecture.conv_tiles.path
+    #    architecture.conv_tiles.create_tile_file() 
 
-    # Choose tiles
-    if architecture.tile_paths and not architecture.tune:
-        # TODO: Implement a way to specify tiles paths
-        tile_path = architecture.tile_paths[0]
-    else:     
-        size = conv_tiles.generate_basic_tile_config()
-        conv_tiles.create_tile_file() # Create the file
-        tile_path =conv_tiles.path
-
+    print(architecture.conv_tiles_path)
     return te.extern(
             (N,K,X_, Y_),
             [data,kernel],
             lambda ins, outs: tvm.tir.call_packed(
                 "tvm.contrib.stonne.conv2d.forward",  
-                path,              # [0]
+                architecture.path, # [0]
                 R,                 # [1]
                 S,                 # [2]
                 C,                 # [3]
@@ -120,12 +115,12 @@ def conv2d_stonne_nchw(
                 pad_y,             # [14]    
                 dilation[0],       # [15]
                 dilation[1],       # [16]
-                tile_path,         # [17]     
-                sparsity_ratio,    # [18]    
+                architecture.conv_tiles_path, # [17]     
+                architecture.sparsity_ratio, # [18]    
                 architecture.tune, # [19]
                 tuning_name,       # [20]
                 costs_path,        # [21]
-                stats,             # [22]
+                architecture.print_stats, # [22]
                 ins[0],            # [23]
                 ins[1],            # [24]
                 outs[0],           # [25]

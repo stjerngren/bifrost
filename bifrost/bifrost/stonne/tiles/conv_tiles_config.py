@@ -24,6 +24,7 @@ class ConvTileConfig(object):
         T_X : int,
         T_Y : int,
     ):
+        
         self.path = (
             os.getcwd() 
             + "/conv_tile_config_"
@@ -37,6 +38,7 @@ class ConvTileConfig(object):
             + str(T_Y)   
             +".txt"
         )
+        print("path ", self.path)
         self.T_R = T_R
         self.T_S = T_S
         self.T_C = T_C
@@ -45,6 +47,7 @@ class ConvTileConfig(object):
         self.T_N = T_N
         self.T_X = T_X
         self.T_Y = T_Y   
+        return self.path
 
     def create_tile_file(self):
 
