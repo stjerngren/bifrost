@@ -6,29 +6,18 @@ class TuningParameters(object):
         self
     ) -> None:
         self.tune_convolutions_tile:bool = False
-        self.tune_dense:bool = False
-        self.dense_num: int = 1
-        self.conv_num: int = 1
+        self.tune_fc_tile:bool = False
+        self.fc_num: int = 5
+        self.conv_num: int = 5
         self.conv_tile_knobs:List = []
-        self.dense_tile_knobs:List = []
+        self.fc_tile_knobs:List = []
+        self.tune_accumulation_buffer: bool = False
+        self.tune_sparsity_ratio: bool = False
+        self.sparsity_ratio_num:int = 1
+        self.tune_reduce_network_type:bool = False
+        self.tune_ms_network_type:bool = False   
+        self.tune_ms_size:bool = False
     
-    def parameters(self,
-        tune_convolutions_tile:bool = False,
-        tune_dense_tile:bool = False,
-        tune_architecture: bool = False,
-        dense_num: int = 1,
-        conv_num: int = 1,
-        tune_accumulation_buffer:bool = False,
-        tune_sparsity_ratio:bool = False,
-        sparsity_ratio_num: int = 1,
-        tune_ms_size:bool = True,
-        tune_rn_bw:bool = True,
-        tune_dn_bw:bool = True,
-        tune_reduce_network_type:bool = True,
-        tune_ms_network_type:bool = True,
-    ):
-        pass
-
     def create_knobs(self)->List:
         """
         Based on set tuning parameters, create all the knobs
@@ -41,11 +30,24 @@ class TuningParameters(object):
         """
         all_knobs = []
         all_knobs.extend(self.conv_tile_knobs)
-        all_knobs.extend(self.dense_tile_knobs)
+        all_knobs.extend(self.fc_tile_knobs)
+        if self.tune_accumulation_buffer:
+            all_knobs.append(("accumulation_buffer",[True,False]))
+        if self.tune_reduce_network_type:
+            all_knobs.append(("reduce_network_type",["ASNETWORK","FENETWORK"]))
+        if self.tune_ms_size:
+            all_knobs.append(("ms_size",[8,16,32,64,128]))
+        self.conv_tile_knobs = []
+        self.fc_tile_knobs = []
+
         return all_knobs
 
-    def tune_everything():
-        pass
+    def tune_maeri_all(self):
+        self.tune_accumulation_buffer = True
+        self.tune_reduce_network_type = True
+        self.tune_ms_size = True
+        self.tune_convolutions_tile = True
+        self.tune_fc_tile = True
 
     def conv_tile(self,
         R: int,

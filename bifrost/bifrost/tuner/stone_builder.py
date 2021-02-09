@@ -299,18 +299,21 @@ def run_stonne_through_rpc(
                 if not np.allclose(expected, real.asnumpy(), rtol=1e-4):
                     logger.warning("Wrong Answer!")
                     errno = MeasureErrorNo.WRONG_ANSWER
+        average = costs[0]
     except TVMError as exc:
         msg = str(exc)
         if "Stack trace returned" in msg:
             msg = msg[: msg.index("Stack trace returned")]
         if "CUDA Source" in msg:
             msg = msg[: msg.index("CUDA Source")]
+        average = 1000000000
         costs = (RuntimeError(msg[:1024]),)
+
         errno = MeasureErrorNo.RUNTIME_DEVICE
     tstamp = time.time()
     time.sleep(cooldown_interval)
 
-    return MeasureResult(costs, errno, tstamp - tic + build_result.time_cost, tstamp)
+    return MeasureResult(costs, errno, average, tstamp)
 
 
 class StonneRPCRunner(Runner):

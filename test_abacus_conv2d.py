@@ -21,7 +21,7 @@ import os
 
 config_simulator(
     ms_size=8,
-    reduce_network_type="ASNETWORK",
+    reduce_network_type="FENETWORK",
     ms_network_type= "LINEAR",
     accumulation_buffer_enabled = False,
     dn_bw=8,

@@ -29,6 +29,7 @@ class Simulator(object):
         self.tuner = tune_parameters
         self.conv_tiles = conv_tiles
         self.conv_tiles_path:str
+
     @property
     def ms_size(self):
         return self._ms_size
@@ -216,14 +217,25 @@ class Simulator(object):
         # Get a list of call keys 
         space_map = list(cfg.space_map.keys())
 
+        # Tiles
         if self.tuner.tune_convolutions_tile:
             # Create a new tile file
             self.conv_tiles_path = conv_tiles.edit_tile_config(
                 cfg['T_R'].val, cfg['T_S'].val, cfg['T_C'].val, cfg['T_K'].val, 
                 cfg['T_G'].val, cfg['T_N'].val, cfg['T_X_'].val, cfg['T_Y_'].val
             )
+        if self.tuner.tune_fc_tile:
+            # TODO: Implement FC tuning
+            pass
+        if "accumulation_buffer" in space_map:
+            self.accumulation_buffer = cfg["accumulation_buffer"].val
+        if "reduce_network_type" in space_map:
+            self.reduce_network_type = cfg["reduce_network_type"].val
+        if "ms_size" in space_map:
+            self.ms_size = cfg["ms_size"].val
 
-
+        # Create a new config file depending with new tuning options
+        self.create_config_file()
 def config_simulator(
     ms_size:int,
     reduce_network_type:str,

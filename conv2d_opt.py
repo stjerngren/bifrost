@@ -1,8 +1,8 @@
 from bifrost.stonne.simulator import config_simulator, architecture
 
 architecture.tune = True
-architecture.tuner.tune_convolutions_tile = True
-architecture.tuner.conv_num = 10
+architecture.tuner.tune_maeri_all()
+
 
 if __name__ == "__main__":
 
@@ -110,9 +110,9 @@ if __name__ == "__main__":
             n_trial = len(task.config_space)
 
             print(task.config_space)
-            print(n_trial, "test")
+            print(n_trial)
             tuner_obj.tune(
-                n_trial=100,
+                n_trial=n_trial,
                 early_stopping=early_stopping,
                 measure_option=measure_option,
                 callbacks=[
