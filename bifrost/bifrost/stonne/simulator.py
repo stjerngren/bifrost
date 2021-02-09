@@ -176,15 +176,13 @@ class Simulator(object):
         elif not os.path.exists("bifrost_temp/architecture"):
             os.mkdir("bifrost_temp/architecture")
 
-        path = os.path.join(
+        self._path = os.path.join(
             os.getcwd(),
             "bifrost_temp/architecture"
-                )
-
-        self._path = path
-
-        name = "stonne_config"+str(hash(self))+".cfg"
-        self.path = os.path.join(path,name)
+                ) 
+        # Create a unique name for the STONNE config
+        name = "stonne_config"+str(hash(self.__dict__.values()))+".cfg"
+        self.path = os.path.join(self._path,name)
 
         # write arcitecture to file
         with open(self.path, "w+") as f:
