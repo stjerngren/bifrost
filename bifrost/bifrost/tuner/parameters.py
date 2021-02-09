@@ -8,7 +8,7 @@ class TuningParameters(object):
         self.tune_convolutions_tile:bool = False
         self.tune_fc_tile:bool = False
         self.fc_num: int = 5
-        self.conv_num: int = 5
+        self.conv_num: int = 3
         self.conv_tile_knobs:List = []
         self.fc_tile_knobs:List = []
         self.tune_accumulation_buffer: bool = False
@@ -36,15 +36,14 @@ class TuningParameters(object):
         if self.tune_reduce_network_type:
             all_knobs.append(("reduce_network_type",["ASNETWORK","FENETWORK"]))
         if self.tune_ms_size:
-            all_knobs.append(("ms_size",[8,16,32,64,128]))
+            all_knobs.append(("ms_size",[32,64,128]))
         self.conv_tile_knobs = []
         self.fc_tile_knobs = []
-
         return all_knobs
 
     def tune_maeri_all(self):
-        self.tune_accumulation_buffer = True
-        self.tune_reduce_network_type = True
+        self.tune_accumulation_buffer = False
+        self.tune_reduce_network_type = False
         self.tune_ms_size = True
         self.tune_convolutions_tile = True
         self.tune_fc_tile = True

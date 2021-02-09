@@ -213,10 +213,6 @@ class Simulator(object):
         cfg: tvm.autotvm.task.space.ConfigSpace
             The configuration space 
         """
-
-        # Get a list of call keys 
-        space_map = list(cfg.space_map.keys())
-
         # Tiles
         if self.tuner.tune_convolutions_tile:
             # Create a new tile file
@@ -227,13 +223,12 @@ class Simulator(object):
         if self.tuner.tune_fc_tile:
             # TODO: Implement FC tuning
             pass
-        if "accumulation_buffer" in space_map:
+        if self.tuner.tune_accumulation_buffer:
             self.accumulation_buffer = cfg["accumulation_buffer"].val
-        if "reduce_network_type" in space_map:
+        if self.tuner.tune_reduce_network_type:
             self.reduce_network_type = cfg["reduce_network_type"].val
-        if "ms_size" in space_map:
+        if self.tuner.tune_ms_size:
             self.ms_size = cfg["ms_size"].val
-
         # Create a new config file depending with new tuning options
         self.create_config_file()
 def config_simulator(
