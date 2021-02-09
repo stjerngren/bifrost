@@ -61,7 +61,7 @@ if __name__ == "__main__":
     target = "llvm --libs=stonne"
 
     mod, params = testing.create_workload(simple_net)
-    log_file = "test.log"
+    log_file = "bifrost_temp/test.log"
 
     tuning_options = {
         "log_filename": log_file,
@@ -70,8 +70,8 @@ if __name__ == "__main__":
         "measure_option": autotvm.measure_option(
             builder=StonneLocalBuilder(),
             runner=StonneLocalRunner(
-                number=1,
-                repeat=0,
+                number=0,
+                repeat=1,
                 min_repeat_ms=0,
                 enable_cpu_cache_flush=True
             ),

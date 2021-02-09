@@ -177,16 +177,26 @@ class Simulator(object):
             An optional name for the specific cofig
         """
         if path == "": 
-            path = os.getcwd()
+            # Make tile paths if they don't exist
+            if not os.path.exists("bifrost_temp"):
+                os.mkdir("bifrost_temp")
+            elif not os.path.exists("bifrost_temp/architecture"):
+                os.mkdir("bifrost_temp/architecture")
+
+            path = os.path.join(
+                os.getcwd(),
+                "bifrost_temp/architecture"
+                )
+
             self._path = path
             if name_config:
-                name = "/stonne_config_" + name_config + ".cfg"
+                name = "stonne_config_" + name_config + ".cfg"
             else:
-                name = "/stonne_config.cfg"
-            self.path = path + name
+                name = "stonne_config.cfg"
+            self.path = os.path.join(path,name)
 
         # write arcitecture to file
-        with open(self.path, "w") as f:
+        with open(self.path, "w+") as f:
             f.write("[MSNetwork]\n")
             f.write(f'type="{self.ms_network_type}"\n')
             if self.ms_network_type == "LINEAR":
@@ -223,7 +233,6 @@ class Simulator(object):
                 cfg['T_R'].val, cfg['T_S'].val, cfg['T_C'].val, cfg['T_K'].val, 
                 cfg['T_G'].val, cfg['T_N'].val, cfg['T_X_'].val, cfg['T_Y_'].val
             )
-            conv_tiles.create_tile_file()
 
 def config_simulator(
     ms_size:int,

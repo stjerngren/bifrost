@@ -144,3 +144,4 @@ cython_debug/
 *.cfg
 *.txt
 *.log
+bifrost_temp/

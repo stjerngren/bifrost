@@ -76,23 +76,18 @@ def conv2d_stonne_nchw(
 
         # Get and register the tuning knobs
         knobs = architecture.tuner.create_knobs()
-        print(knobs)
         for knob in knobs:
             cfg.define_knob(*knob)
         # Create the architecture files
         architecture.config(cfg)
 
-    ## Choose tiles
-    #if architecture.tile_paths and not architecture.tune:
-    #    # TODO: Implement a way to specify tiles paths
-    #    tile_path = architecture.tile_paths[0]
-    #else:     
-    #    size = architecture.conv_tiles.generate_basic_tile_config()
-    #    # Create the file
-    #    architecture.conv_tiles_path = architecture.conv_tiles.path
-    #    architecture.conv_tiles.create_tile_file() 
+    # Choose tiles
+    if architecture.tile_paths and not architecture.tune:
+        # TODO: Implement a way to specify tiles paths
+        tile_path = architecture.tile_paths[0]
+    elif not architecture.tune:     
+        architecture.conv_tiles_path = architecture.conv_tiles.generate_basic_tile_config()
 
-    print(architecture.conv_tiles_path)
     return te.extern(
             (N,K,X_, Y_),
             [data,kernel],
