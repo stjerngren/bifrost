@@ -162,38 +162,29 @@ class Simulator(object):
         self.ms_network_type = ms_network_type
         self.accumulation_buffer_enabled = accumulation_buffer_enabled
 
-    def create_config_file(self, path:str = "", name_config:str = None):
+    def create_config_file(self):
         """
         This will create a config file at a desired location
 
         Parameters
         ----------
-        
-        path : str (optional)
-            The path for the config to be saved at. If none provided, the new 
-            config will be created in the new working directory
-        
-        name_config : str (optional)
-            An optional name for the specific cofig
         """
-        if path == "": 
-            # Make tile paths if they don't exist
-            if not os.path.exists("bifrost_temp"):
-                os.mkdir("bifrost_temp")
-            elif not os.path.exists("bifrost_temp/architecture"):
-                os.mkdir("bifrost_temp/architecture")
+   
+        # Make tile paths if they don't exist
+        if not os.path.exists("bifrost_temp"):
+            os.mkdir("bifrost_temp")
+        elif not os.path.exists("bifrost_temp/architecture"):
+            os.mkdir("bifrost_temp/architecture")
 
-            path = os.path.join(
-                os.getcwd(),
-                "bifrost_temp/architecture"
+        path = os.path.join(
+            os.getcwd(),
+            "bifrost_temp/architecture"
                 )
 
-            self._path = path
-            if name_config:
-                name = "stonne_config_" + name_config + ".cfg"
-            else:
-                name = "stonne_config.cfg"
-            self.path = os.path.join(path,name)
+        self._path = path
+
+        name = "stonne_config"+str(hash(self))+".cfg"
+        self.path = os.path.join(path,name)
 
         # write arcitecture to file
         with open(self.path, "w+") as f:
@@ -234,6 +225,7 @@ class Simulator(object):
                 cfg['T_G'].val, cfg['T_N'].val, cfg['T_X_'].val, cfg['T_Y_'].val
             )
 
+
 def config_simulator(
     ms_size:int,
     reduce_network_type:str,
@@ -243,7 +235,6 @@ def config_simulator(
     rn_bw:int,
     controller_type:str,
     sparsity_ratio:int = 0, 
-    path:str = "",
     tune:bool = False,
     ms_rows = 16,
     ms_cols = 16,
@@ -269,6 +260,6 @@ def config_simulator(
         accumulation_buffer_enabled,
 
     )
-    architecture.create_config_file(path = path)
+    architecture.create_config_file()
 
 architecture = Simulator()

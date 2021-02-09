@@ -65,7 +65,7 @@ if __name__ == "__main__":
 
     tuning_options = {
         "log_filename": log_file,
-        "tuner": "random",
+        "tuner": "ga",
         "early_stopping": None,
         "measure_option": autotvm.measure_option(
             builder=StonneLocalBuilder(),
