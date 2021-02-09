@@ -47,11 +47,11 @@ if __name__ == "__main__":
     bn_mvar = relay.var("bn_var")
 
     simple_net = relay.nn.conv2d(
-    data=data, weight=weight, kernel_size=(3, 3), channels=out_channels, padding=(1, 1)
+    data=data, weight=weight, kernel_size=(5,5), channels=out_channels, padding=(1, 1)
     )
 
     simple_net = relay.nn.relu(simple_net)
-    simple_net = relay.nn.conv2d(simple_net, weight=weight, kernel_size=(3, 3), channels=out_channels, padding=(1, 1)
+    simple_net = relay.nn.conv2d(simple_net, weight=weight, kernel_size=(5, 5), channels=out_channels, padding=(1, 1)
     )
     simple_net = relay.Function(relay.analysis.free_vars(simple_net), simple_net)
 
@@ -82,7 +82,7 @@ if __name__ == "__main__":
         "measure_option": autotvm.measure_option(
             builder=StonneLocalBuilder(),
             runner=StonneLocalRunner(
-                number=1,
+                number=0,
                 repeat=1,
                 min_repeat_ms=0,
                 enable_cpu_cache_flush=True
@@ -146,3 +146,19 @@ if __name__ == "__main__":
     )
     print(tasks)
     tune_kernels(tasks, tuning_options["measure_option"])
+
+    with autotvm.apply_history_best(log_file):
+        
+
+        # Generate the data to suse with both llvm and llvm stonne
+        target = "llvm -libs=stonne"
+        lib = relay.build_module.build(net, target, params=params)
+
+        ctx = tvm.context(target, 0)
+        module = runtime.GraphModule(lib["default"](ctx))
+        module.set_input("data", data)
+        module.run()
+        out_shape = (batch_size, out_channels, 6, 6)
+        out = module.get_output(0, tvm.nd.empty(out_shape))
+        out_stonne = out.asnumpy()
+        print(out_stonne)

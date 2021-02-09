@@ -271,7 +271,7 @@ def run_stonne_through_rpc(
             ctx.sync()
 
         # Run this to create the output files
-        costs = time_f(*args).results
+        time_f(*args).results
         
         # Get the costs from stonne
         dirname = os.path.dirname(__file__)
@@ -293,11 +293,6 @@ def run_stonne_through_rpc(
         remote.remove(os.path.splitext(build_result.filename)[0] + ".so")
         remote.remove("")
 
-        if len(costs) > 2:  # remove largest and smallest value to reduce variance
-            costs = list(costs)
-            costs.sort()
-            costs = tuple(costs[1:-1])
-
         # check correctness of output
         if ref_output:
             for expected, real in zip(ref_output, args):
@@ -314,8 +309,7 @@ def run_stonne_through_rpc(
         errno = MeasureErrorNo.RUNTIME_DEVICE
     tstamp = time.time()
     time.sleep(cooldown_interval)
-    print("_"*100)
-    print(costs, errno, tstamp - tic + build_result.time_cost, tstamp)
+
     return MeasureResult(costs, errno, tstamp - tic + build_result.time_cost, tstamp)
 
 

@@ -29,19 +29,12 @@ def conv2d_stonne_nchw(
     Compute conv2d using STONNE
     """
 
-
-    # Define tuning space
-    cfg.define_knob("ms_size", [8,16,64])
-    if architecture.tune:
-        knobs = architecture.knobs
-        for knob in knobs:
-            cfg.define_knob(*knob)
-
     # If the architecture is being tuned, write to the file with the
     # following name
     tuning_name = "ms_size_" + str(cfg['ms_size'])
 
     if architecture.tune:
+        
         # Change the architecture to the new settings
         architecture.ms_size = cfg['ms_size'].val
         # Create a temporary file for tuning config
@@ -85,6 +78,16 @@ def conv2d_stonne_nchw(
     # Calculate the output shape
     X_:int = ((X + 2 * pad_x - dilation[0] * (R - 1) - 1) // strides[0]) + 1
     Y_:int = ((Y + 2 * pad_y - dilation[1] * (S - 1) - 1) // strides[0]) + 1
+
+    # Define tuning space
+    if architecture.tune:
+        if architecture.tuner.tune_convolutions_tile:
+            architecture.tuner.conv_tile(R,S,C,K,G,X,Y, strides[0])
+        knobs = architecture.tuner.create_knobs()
+        for knob in knobs:
+            cfg.define_knob(*knob)
+        architecture.
+
 
     # Choose tiles
     if architecture.tile_paths and not architecture.tune:
@@ -166,6 +169,8 @@ def conv2d_strategy_cpu(attrs, inputs, out_type, target):
                     wrap_topi_schedule(schedule_conv2d_stonne),
                     name="conv2d_stonne.x86",
             )
+        if layout == "NHCW":
+            pass
     else:
         if groups == 1:
             if layout == "NCHW":

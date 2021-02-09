@@ -19,6 +19,17 @@ from bifrost.stonne.simulator import config_simulator, architecture
 
 import os
 
+config_simulator(
+    ms_size=8,
+    reduce_network_type="ASNETWORK",
+    ms_network_type= "LINEAR",
+    accumulation_buffer_enabled = False,
+    dn_bw=8,
+    rn_bw=8,
+    controller_type="MAERI_DENSE_WORKLOAD",
+
+)
+
 
 # TODO: Add a way to configure STONNE
 out_channels = 2

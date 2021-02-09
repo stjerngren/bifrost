@@ -100,7 +100,6 @@ class TestConv2d(TestCase):
         self.assertTrue(np.all(np.round(out_stonne, 4) == np.round(self.out_llvm, 4)))
         
     def test_conv2d_sigma_sparse(self):
-        import bifrost
         config_simulator(
             ms_size=16,
             reduce_network_type="ASNETWORK",

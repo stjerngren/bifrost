@@ -1,6 +1,7 @@
 """Congigure stonne"""
 import os
 from typing import List
+from ..tuner import tune_parameters
 
 # Define a new error for improper configs
 class ConfigError(Exception):
@@ -24,6 +25,8 @@ class Simulator(object):
         self.knobs:tuple = () # An empty tuple for now
         self._accumulation_buffer_enabled = 1
         self.tile_paths:List[str] = []
+        
+        self.tuner = tune_parameters
 
     @property
     def ms_size(self):
@@ -31,7 +34,8 @@ class Simulator(object):
     @ms_size.setter
     def ms_size(self, size: int):
         # Use bit manipulation magic to check if power of two
-        if (size & (size-1) == 0) and size != 0:
+        # Size also has to be >=8
+        if (size & (size-1) == 0) and size != 0 and size>=8:
             self._ms_size = size
         else:
             raise ConfigError("ms_size has to be a power of two!")
