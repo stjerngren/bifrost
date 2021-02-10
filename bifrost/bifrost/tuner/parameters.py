@@ -1,5 +1,5 @@
 from typing import List
-from .tile_tuner import create_conv_tile_tuning_space
+from .tile_tuner import create_conv_tile_tuning_space, create_fc_tile_tuning_space
 
 class TuningParameters(object):
     def __init__(
@@ -8,7 +8,7 @@ class TuningParameters(object):
         self.tune_convolutions_tile:bool = False
         self.tune_fc_tile:bool = False
         self.fc_num: int = 5
-        self.conv_num: int = 3
+        self.conv_num: int =5
         self.conv_tile_knobs:List = []
         self.fc_tile_knobs:List = []
         self.tune_accumulation_buffer: bool = False
@@ -60,5 +60,7 @@ class TuningParameters(object):
     ):
         self.conv_tile_knobs = create_conv_tile_tuning_space(R,S,C,K,G,X,Y,strides,self.conv_num)
 
+    def fc_tile(self):
+        self.fc_tile_knobs = create_fc_tile_tuning_space(self.fc_num)
 
 tune_parameters = TuningParameters()

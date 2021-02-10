@@ -22,8 +22,17 @@ class ConvTileConfig(object):
         T_N : int,
         T_X : int,
         T_Y : int,
-    ):
-        # Make tile paths if thewy don't exist
+    ) -> str:
+        """
+        Edits a tile config file and returns its path
+
+        Parameters
+        ----------
+
+        Returns
+        ----------
+        """
+        # Make tile paths if they don't exist
         if not os.path.exists("bifrost_temp"):
             os.mkdir("bifrost_temp")
         elif not os.path.exists("bifrost_temp/conv_tiles"):

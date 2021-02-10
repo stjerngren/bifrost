@@ -55,3 +55,12 @@ def create_conv_tile_tuning_space(
         ("T_X_", [x for x in rn if X_%x==0]),
         ("T_Y_", [x for x in rn if Y_%x==0]),
     ]
+
+def create_fc_tile_tuning_space(range_max=50):
+    # The amount of alternatives to generate
+    rn = range(1,range_max+1)
+    return [
+        ("T_N",  [x for x in rn]),
+        ("T_S",  [x for x in rn]),
+        ("T_K",  [x for x in rn]),
+    ]

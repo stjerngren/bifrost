@@ -24,7 +24,7 @@ if __name__ == "__main__":
 
     # Import this add stonne as an x86 co-processor
     import bifrost
-    from bifrost.tuner.stone_builder import StonneLocalBuilder, StonneLocalRunner
+    from bifrost.tuner.stonne_builder import StonneLocalBuilder, StonneLocalRunner
 
     from tvm.autotvm.tuner import XGBTuner, GATuner, RandomTuner, GridSearchTuner
     from tvm.autotvm.graph_tuner import DPTuner, PBQPTuner

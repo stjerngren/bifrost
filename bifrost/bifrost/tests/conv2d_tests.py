@@ -53,31 +53,31 @@ class TestConv2d(TestCase):
 
 
 
-    #def test_maeri(self):
-    #    """
-    #    Test running on MAERI
-    #    """
-    #    
-    #    config_simulator(
-    #        ms_size=16,
-    #        reduce_network_type="ASNETWORK",
-    #        ms_network_type= "LINEAR",
-    #        accumulation_buffer_enabled = False,
-    #        dn_bw=8,
-    #        rn_bw=8,
-    #        controller_type="MAERI_DENSE_WORKLOAD",
-#
-    #    )
-#
-    #    self.module.run()
-    #    out_stonne = self.module.get_output(
-    #        0,
-    #        tvm.nd.empty(self.out_shape)
-    #        ).asnumpy()
-    #    
-    #    # Check if output is equivalent to running the convolution on CPU 
-    #    self.assertTrue(np.all(np.round(out_stonne, 4) == np.round(self.out_llvm, 4)))
-#
+    def test_maeri(self):
+        """
+        Test running on MAERI
+        """
+        
+        config_simulator(
+            ms_size=16,
+            reduce_network_type="ASNETWORK",
+            ms_network_type= "LINEAR",
+            accumulation_buffer_enabled = False,
+            dn_bw=8,
+            rn_bw=8,
+            controller_type="MAERI_DENSE_WORKLOAD",
+
+        )
+
+        self.module.run()
+        out_stonne = self.module.get_output(
+            0,
+            tvm.nd.empty(self.out_shape)
+            ).asnumpy()
+        
+        # Check if output is equivalent to running the convolution on CPU 
+        self.assertTrue(np.all(np.round(out_stonne, 4) == np.round(self.out_llvm, 4)))
+
     def test_conv2d_tpu(self):
 
         config_simulator(

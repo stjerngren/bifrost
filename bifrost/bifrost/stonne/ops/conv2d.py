@@ -83,11 +83,11 @@ def conv2d_stonne_nchw(
         architecture.config(cfg)
 
     # Choose tiles
-    if architecture.tile_paths and not architecture.tune:
-        # TODO: Implement a way to specify tiles paths
-        tile_path = architecture.tile_paths[0]
-    #elif not architecture.tune:     
-    architecture.conv_tiles_path = architecture.conv_tiles.generate_basic_tile_config()
+    elif architecture.manual_tile_paths:
+        architecture.set_manual_tile_config("CONV")
+
+    if architecture.tune and not architecture.manual_tile_paths and not architecture.tuner.tune_convolutions_tile:    
+        architecture.conv_tiles_path = architecture.conv_tiles.generate_basic_tile_config()
 
     return te.extern(
             (N,K,X_, Y_),

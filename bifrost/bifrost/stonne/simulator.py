@@ -2,7 +2,7 @@
 import os
 from typing import List
 from ..tuner import tune_parameters
-from .tiles import conv_tiles
+from .tiles import conv_tiles, fc_tiles
 # Define a new error for improper configs
 class ConfigError(Exception):
     pass
@@ -24,12 +24,57 @@ class Simulator(object):
         self.print_stats:bool = False # Create output stats for stonne
         self.knobs:tuple = () # An empty tuple for now
         self._accumulation_buffer_enabled = 1
-        self.tile_paths:List[str] = []
-        
+       
         self.tuner = tune_parameters
+
+        # Tiles
+        #--------------------------------------
+
+        # Convolutions
         self.conv_tiles = conv_tiles
         self.conv_tiles_path:str
 
+        # Fully-connected tiles
+        self.fc_tiles = fc_tiles
+        self.fc_tiles_path:str
+
+        # Manual tile path
+        self.manual_tile_paths: bool = False
+        self.conv_cfg_paths = []
+        self.fc_cfg_paths = []
+
+    def load_tile_config(self, conv_cfg_paths:List[str] = [], fc_cfg_paths:List[str] = []):
+        self.manual_tile_paths = True
+        self.conv_cfg_paths = conv_cfg_paths
+        self.fc_cfg_paths = fc_cfg_paths
+
+    def set_manual_tile_config(self, type:str):
+        """
+        Return a tile config if available, otherwise return empty striung 
+        """
+        if type == "CONV":
+            if self.conv_cfg_paths ==[]:
+                self.conv_tiles_path = self.conv_tiles.generate_basic_tile_config()
+            else:
+                # Get next tiles path for the architecture
+                # and then move it to the end
+                path = self.conv_cfg_paths.pop(0)
+                if path == "":
+                    self.conv_tiles_path = self.conv_tiles.generate_basic_tile_config()
+                else:
+                    self.conv_tiles_path = path
+                self.conv_cfg_paths.append(path)
+
+        elif type == "FC":
+            if self.fc_cfg_paths ==[]:
+                # Get next tiles path for the architecture
+                # and then move it to the end
+                path = self.fc_cfg_paths.pop(0)
+                if path == "":
+                    self.fc_tiles_path = self.fc_tiles.generate_basic_tile_config()
+                else:
+                    self.fc_tiles_path = path
+                self.fc_cfg_paths.append(path)
     @property
     def ms_size(self):
         return self._ms_size
@@ -231,6 +276,7 @@ class Simulator(object):
             self.ms_size = cfg["ms_size"].val
         # Create a new config file depending with new tuning options
         self.create_config_file()
+
 def config_simulator(
     ms_size:int,
     reduce_network_type:str,

@@ -44,40 +44,34 @@ def dense_stonne(cfg,data, weight, units=None, out_dtype=""):
         The computed result.
     """
 
-    # If the architecture is being tuned, write to the file with the
-    # following name
-
-
-    # Define tuning space
-    cfg.define_knob("ms_size", [8,16,64])
-    if architecture.tune:
-        knobs = architecture.knobs
-        for knob in knobs:
-            cfg.define_knob(*knob)
-
-    tuning_name = "ms_size_" + str(cfg['ms_size'])
-
-    if architecture.tune:
-        # Change the architecture to the new settings
-        architecture.ms_size = cfg['ms_size']
-        # Create a temporary file for tuning config
-        architecture.create_config_file(name_config="ms_size_" + str(cfg['ms_size']))
-
+    # Get the name to store the costs
     dirname = os.path.dirname(__file__)
     costs_path = os.path.join(dirname, "../data/costs.json")
 
     M, K = get_const_tuple(data.shape)
     N, _ = get_const_tuple(weight.shape)
 
-    # Choose tiles
-    if architecture.tile_paths and not architecture.tune:
-        # TODO: Implement a way to specify tiles paths
-        tile_path = architecture.tile_paths[0]
-    else:     
-        size = fc_tiles.generate_basic_tile_config()
-        ms_size = architecture.ms_size
-        fc_tiles.create_tile_file()
+    # Define tuning space
+    if architecture.tune:
+        
+        # Generate the different fc tile options
+        if architecture.tuner.tune_fc_tile:
+            architecture.tuner.fc_tile()
 
+        # Get and register the tuning knobs
+        knobs = architecture.tuner.create_knobs()
+        for knob in knobs:
+            cfg.define_knob(*knob)
+        
+        # Create the architecture files
+        architecture.config(cfg)
+
+    # Choose tiles
+    elif architecture.manual_tile_paths:
+        architecture.set_manual_tile_config("FC")
+
+    if architecture.tune and not architecture.manual_tile_paths and not architecture.tuner.tune_fc_tile:    
+        architecture.fc_tiles_path = architecture.fc_tiles.generate_basic_tile_config()
 
     return te.extern(
             (M,N),
@@ -88,11 +82,11 @@ def dense_stonne(cfg,data, weight, units=None, out_dtype=""):
                 M,                 # [1] Batch size
                 K,                 # [2] Number of input neurons
                 N,                 # [3] Number of output neurons
-                fc_tiles.path,     # [4] Tiles path
+                architecture.fc_tiles_path,   # [4] Tiles path
                 architecture.sparsity_ratio,  # [5]
                 architecture.print_stats,     # [6] Create stats output files
                 architecture.tune, # [7] Enable if tuning
-                tuning_name,       # [8]
+                "tuning_name",     # [8]
                 costs_path,        # [9]
                 ins[0],            # [10] Data
                 ins[1],            # [11] Weight
