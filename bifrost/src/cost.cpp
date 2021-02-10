@@ -52,3 +52,35 @@ void reportCost(
     std::ofstream fout(filename);
     writer.write(fout, root);
 }
+
+void reportTotalCycles(
+    std::string tuning_name,
+    std::string filename,
+    int cycles)
+{
+    // Intialise the JSONCPP variables
+    Json::Value root;
+    Json::Reader reader;
+    Json::StyledStreamWriter writer;
+
+    // Read the file
+    std::ifstream f(filename);
+
+    // Parse the file
+    bool parsingSuccessful = reader.parse(f, root);
+    if (!parsingSuccessful)
+    {
+        // report to the user the failure and their locations in the document.
+        std::cout << "Failed to parse configuration\n"
+                    << reader.getFormattedErrorMessages();
+        return;
+    }
+    f.close();
+    
+    root["value"].append(cycles);
+    root["layer"].append(tuning_name);
+
+    // Write output
+    std::ofstream fout(filename);
+    writer.write(fout, root);
+}

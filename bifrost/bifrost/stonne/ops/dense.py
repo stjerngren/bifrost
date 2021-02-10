@@ -70,8 +70,9 @@ def dense_stonne(cfg,data, weight, units=None, out_dtype=""):
     elif architecture.manual_tile_paths:
         architecture.set_manual_tile_config("FC")
 
-    if architecture.tune and not architecture.manual_tile_paths and not architecture.tuner.tune_fc_tile:    
+    if not architecture.manual_tile_paths and not architecture.tuner.tune_fc_tile:    
         architecture.fc_tiles_path = architecture.fc_tiles.generate_basic_tile_config()
+    
 
     return te.extern(
             (M,N),
