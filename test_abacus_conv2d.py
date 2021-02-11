@@ -21,7 +21,7 @@ import os
 
 config_simulator(
     ms_size=8,
-    reduce_network_type="FENETWORK",
+    reduce_network_type="ASNETWORK",
     ms_network_type= "LINEAR",
     accumulation_buffer_enabled = False,
     dn_bw=8,
@@ -30,7 +30,8 @@ config_simulator(
 
 )
 
-
+architecture.load_tile_config(
+    conv_cfg_paths=["/Users/axelstjerngren/uni/Year4/ProjectLevel4/level-4-project/bifrost/bifrost_temp/conv_tiles/conv_tile_config_11121112.txt", "/Users/axelstjerngren/uni/Year4/ProjectLevel4/level-4-project/bifrost/bifrost_temp/conv_tiles/conv_tile_config_11111112.txt"])
 # TODO: Add a way to configure STONNE
 out_channels = 2
 batch_size = 1

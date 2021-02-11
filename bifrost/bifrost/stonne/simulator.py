@@ -64,9 +64,10 @@ class Simulator(object):
         self.sparsity_ratio,
         self.accumulation_buffer_enabled,
         )
+
     def __hash__(self):
         """
-        Return a unique hash for a given architecture config
+        Return a unique hash for a given architecture config 
         """
         return int(
             hashlib.sha224(
@@ -74,8 +75,6 @@ class Simulator(object):
             ).hexdigest()
             , 16
             )
-        
-        
 
     def load_tile_config(self, conv_cfg_paths:List[str] = [], fc_cfg_paths:List[str] = []):
         self.manual_tile_paths = True
