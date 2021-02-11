@@ -77,6 +77,8 @@ class Simulator(object):
             )
 
     def load_tile_config(self, conv_cfg_paths:List[str] = [], fc_cfg_paths:List[str] = []):
+        conv_cfg_paths.reverse()
+        fc_cfg_paths.reverse()
         self.manual_tile_paths = True
         self.conv_cfg_paths = conv_cfg_paths
         self.fc_cfg_paths = fc_cfg_paths
@@ -92,6 +94,7 @@ class Simulator(object):
                 # Get next tiles path for the architecture
                 # and then move it to the end
                 path = self.conv_cfg_paths.pop(0)
+                print(path, "path" * 100)
                 if path == "":
                     self.conv_tiles_path = self.conv_tiles.generate_basic_tile_config()
                 else:

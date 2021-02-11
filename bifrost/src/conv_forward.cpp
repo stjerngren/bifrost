@@ -81,21 +81,21 @@ namespace tvm
                     std::string layer_name = "Conv2dLayerSparse";
 
                     // Calculate im2col output as h0 * w0 * R * S * C
-                    int h0 = (X + 2 * pad_x -(dilation_x * (R - 1) + 1)) /strides_x +1;
-                    int w0 = (Y + 2 * pad_y -(dilation_y * (S - 1) + 1)) /strides_y +1;
+                    int h0 = (X + 2 * pad_x - (dilation_x * (R - 1) + 1)) / strides_x + 1;
+                    int w0 = (Y + 2 * pad_y - (dilation_y * (S - 1) + 1)) / strides_y + 1;
 
                     // Get input and convert to im2col
                     float *input_raw = static_cast<float *>(input->data);
-                    float im2col_array[h0*w0*R*S*C];
+                    float im2col_array[h0 * w0 * R * S * C];
                     float *input_im2col = im2col_array;
 
                     // Convert weight and output files to be STONNE compatible
                     float *weight_raw = static_cast<float *>(weight->data);
                     float *output_raw = static_cast<float *>(output->data);
-                        
+
                     // Note that since STONNE only supports sparse GEMM operations, we have to
                     // turn the input to im2col format and
-                    // run a GEMM operation instead a CONVOLUTION    
+                    // run a GEMM operation instead a CONVOLUTION
                     std::cout << "Run im2col" << std::endl;
                     im2col_cpu(
                         input_raw,
@@ -111,11 +111,11 @@ namespace tvm
                         dilation_x,
                         dilation_y,
                         input_im2col);
-                    
+
                     // Getting GEMM dimensions
                     int gemm_M = K;
-                    int gemm_K = R*S*C;
-                    int gemm_N = h0*w0;
+                    int gemm_K = R * S * C;
+                    int gemm_N = h0 * w0;
 
                     cycles = simulateSparseGemmForward(
                         layer_name,
@@ -131,8 +131,9 @@ namespace tvm
                         stonne_config,
                         MK_STA_KN_STR);
                 }
-                else if (!stonne_config.convOperationSupported()) { 
-                    // If CONV itself is not supported, 
+                else if (!stonne_config.convOperationSupported())
+                {
+                    // If CONV itself is not supported,
                     // run it as a GEMM (e.g., the TPU)
 
                     // Convert weight and output files to be STONNE compatible
@@ -140,12 +141,12 @@ namespace tvm
                     float *output_raw = static_cast<float *>(output->data);
 
                     // Calculate im2col output as h0 * w0 * R * S * C
-                    int h0 = (X + 2 * pad_x -(dilation_x * (R - 1) + 1)) /strides_x +1;
-                    int w0 = (Y + 2 * pad_y -(dilation_y * (S - 1) + 1)) /strides_y +1;
+                    int h0 = (X + 2 * pad_x - (dilation_x * (R - 1) + 1)) / strides_x + 1;
+                    int w0 = (Y + 2 * pad_y - (dilation_y * (S - 1) + 1)) / strides_y + 1;
 
                     // Get input and convert to im2col
                     float *input_raw = static_cast<float *>(input->data);
-                    float im2col_array[h0*w0*R*S*C];
+                    float im2col_array[h0 * w0 * R * S * C];
                     float *input_im2col = im2col_array;
                     im2col_cpu(
                         input_raw,
@@ -163,20 +164,20 @@ namespace tvm
                         input_im2col);
 
                     // Tranpose the result for the TPU
-                    float im2col_array_tranposed[h0*w0*R*S*C];
+                    float im2col_array_tranposed[h0 * w0 * R * S * C];
                     float *input_im2col_t = im2col_array_tranposed;
-                    transpose(input_im2col, input_im2col_t, R*S*C, h0*w0);
+                    transpose(input_im2col, input_im2col_t, R * S * C, h0 * w0);
 
                     // Getting GEMM dimensions
                     int gemm_M = K;
-                    int gemm_K = R*S*C;
-                    int gemm_N = h0*w0;
+                    int gemm_K = R * S * C;
+                    int gemm_N = h0 * w0;
                     cycles = simulateDenseGemmForward("TPU", input_im2col_t, weight_raw, output_raw, N, G, gemm_M, gemm_K, gemm_N, path_to_tile, stonne_config);
                 }
                 else
 
                 { // Run a dense forward convolution
-                    
+
                     // Cast pointers so they can be fed into stonne
                     float *input_raw = static_cast<float *>(input->data);
                     float *weight_raw = static_cast<float *>(weight->data);
@@ -220,13 +221,10 @@ namespace tvm
 
                     );
                 }
-                else {
-                    reportTotalCycles(
-                        tuning_name,
-                        "/Users/axelstjerngren/uni/Year4/ProjectLevel4/level-4-project/bifrost/bifrost_temp/cycles.json",
-                        cycles                     
-                    );
-                }
+                reportTotalCycles(
+                    tuning_name,
+                    "/Users/axelstjerngren/uni/Year4/ProjectLevel4/level-4-project/bifrost/bifrost_temp/cycles.json",
+                    cycles);
             });
 
     } // namespace contrib
