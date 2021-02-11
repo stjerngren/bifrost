@@ -3,6 +3,10 @@ import os
 from typing import List
 from ..tuner import tune_parameters
 from .tiles import conv_tiles, fc_tiles
+import hashlib
+import base64 
+import json
+
 # Define a new error for improper configs
 class ConfigError(Exception):
     pass
@@ -42,6 +46,36 @@ class Simulator(object):
         self.manual_tile_paths: bool = False
         self.conv_cfg_paths = []
         self.fc_cfg_paths = []
+    
+    
+    def __key(self):
+        """
+        Tuple key for an architecture config
+        """
+        return (
+        self.ms_size,
+        self.ms_rows,
+        self.ms_cols,
+        self.reduce_network_type,
+        self.ms_network_type,
+        self.dn_bw,
+        self.rn_bw,
+        self.controller_type,
+        self.sparsity_ratio,
+        self.accumulation_buffer_enabled,
+        )
+    def __hash__(self):
+        """
+        Return a unique hash for a given architecture config
+        """
+        return int(
+            hashlib.sha224(
+                json.dumps(self.__key()).encode()
+            ).hexdigest()
+            , 16
+            )
+        
+        
 
     def load_tile_config(self, conv_cfg_paths:List[str] = [], fc_cfg_paths:List[str] = []):
         self.manual_tile_paths = True
@@ -227,7 +261,8 @@ class Simulator(object):
             "bifrost_temp/architecture"
                 ) 
         # Create a unique name for the STONNE config
-        name = "stonne_config"+str(hash(self.__dict__.values()))+".cfg"
+        name = "stonne_config_"+str(hash(self))+".cfg"
+
         self.path = os.path.join(self._path,name)
 
         # write arcitecture to file

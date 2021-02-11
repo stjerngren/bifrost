@@ -1,5 +1,15 @@
 from bifrost.stonne.simulator import config_simulator, architecture
 
+config_simulator(
+    ms_size=16,
+    reduce_network_type="TEMPORALRN",
+    ms_network_type= "OS_MESH",
+    accumulation_buffer_enabled = True,
+    dn_bw=8,
+    rn_bw=8,
+    controller_type="TPU_OS_DENSE",
+    sparsity_ratio = 20,
+)
 architecture.tune = True
 architecture.tuner.tune_maeri_all()
 
@@ -65,7 +75,7 @@ if __name__ == "__main__":
     target = "llvm --libs=stonne"
 
     mod, params = testing.create_workload(simple_net)
-    log_file = "bifrost_temp/test_2_layer.log"
+    log_file = "bifrost_temp/test_2_layer_tpu.log"
 
     tuning_options = {
         "log_filename": log_file,
