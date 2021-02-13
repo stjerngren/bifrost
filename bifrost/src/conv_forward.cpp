@@ -71,6 +71,58 @@ namespace tvm
 
                 // Run different types of convolutions depending architecture
                 int cycles;
+                if (false)
+                {
+
+                    float *weight_raw = static_cast<float *>(weight->data);
+                    float *output_raw = static_cast<float *>(output->data);
+                    float *input_raw = static_cast<float *>(input->data);
+
+                    const int ifmap_size = C * ((X + 2 * pad_x) * (Y + 2 * pad_y));
+                    const int ofmap_size = K * H_out * W_out; //X_ and Y_ include padding
+                    std::cout << "Executing layer " << tuning_name << std::endl;
+                    if (path_to_tile == "")
+                    {
+                        std::cout << "Tile file parameters must be specified" << std::endl;
+                        exit(1);
+                    }
+
+                    //Loading the tile
+                    Tile tile(path_to_tile);
+
+                    float *ifmap_to_send = Transform_Ifmap_Memory_a(input_raw, C, X, Y, pad_x, pad_y);
+                    float *filters_to_send = Transform_Filters_Memory_a(weight_raw, K, G, C, R, S);
+                    float *ofmap_raw = new float[ofmap_size];
+
+                    //Tile parameters
+                    unsigned int T_R = tile.get_T_R();
+                    unsigned int T_S = tile.get_T_S();
+                    unsigned int T_C = tile.get_T_C();
+                    unsigned int T_K = tile.get_T_K();
+                    unsigned int T_G = tile.get_T_G();
+                    unsigned int T_N = tile.get_T_N();
+                    unsigned int T_X_ = tile.get_T_X_();
+                    unsigned int T_Y_ = tile.get_T_Y_();
+
+                    //Executing the accelerator
+                    Stonne *stonne_instance = new Stonne(stonne_config);
+                    stonne_instance->loadDNNLayer(CONV, tuning_name, R, S, C, K, G, N, X + 2 * pad_x, Y + 2 * pad_y, strides_x, (address_t)ifmap_to_send, (address_t)filters_to_send, (address_t)ofmap_raw, CNN_DATAFLOW);
+                    stonne_instance->loadTile(T_R, T_S, T_C, T_K, T_G, T_N, T_X_, T_Y_);
+                    unsigned int cost = stonne_instance->mem->getPsums();
+                    std::cout << cost << std::endl;
+                    //Deleting objects
+                    delete[] ofmap_raw;
+                    delete[] ifmap_to_send;
+                    delete[] filters_to_send;
+                    delete stonne_instance;
+                    reportCost(
+                        tuning_name,
+                        costs_path,
+                        cost
+
+                    );
+                    return;
+                }
 
                 if (stonne_config.sparsitySupportEnabled())
                 {

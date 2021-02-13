@@ -23,3 +23,10 @@ void im2col_cpu(const float *data_im, const int channels,
                 const int stride_h, const int stride_w,
                 const int dilation_h, const int dilation_w,
                 float *data_col);
+
+
+float *Transform_Ifmap_Memory_a(const float *bottom_data, const int C, const int X, const int Y, const int pad_x, const int pad_y);
+
+float *Transform_Filters_Memory_a(const float *weights, const int K, const int G, const int C, const int R, const int S);
+
+void Transform_Ofmap_Memory_a(const float *ofmap_data, float *top_data, const int K, const int X_, const int Y_);

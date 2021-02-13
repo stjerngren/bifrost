@@ -64,7 +64,7 @@ def dense_stonne(cfg,data, weight, units=None, out_dtype=""):
             cfg.define_knob(*knob)
         
         # Create the architecture files
-        architecture.config(cfg)
+        architecture.config(cfg, t = False)
 
     # Choose tiles
     elif architecture.manual_tile_paths:

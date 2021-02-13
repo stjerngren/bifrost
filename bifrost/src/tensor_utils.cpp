@@ -75,3 +75,86 @@ void im2col_cpu(const float *data_im, const int channels,
         }
     }
 }
+
+
+float *Transform_Ifmap_Memory_a(const float *bottom_data, const int C, const int X, const int Y, const int pad_x, const int pad_y)
+{
+    const int n_channels = C;
+    const int input_y = X;
+    const int input_x = Y;
+
+    const int input_y_pad = input_y + 2 * pad_y;
+    const int input_x_pad = input_x + 2 * pad_x;
+    int size_channel = input_y * input_x;
+    int n = n_channels * (input_y_pad * input_x_pad);
+
+    float *data_to_send = new float[n]; //Creating piece of memory that will use the simulator
+    //Adding y padding
+
+    for (int i = 0; i < n; i++)
+    {
+        data_to_send[i] = 0.0;
+    }
+    for (int i = 0; i < n_channels; i++)
+    {
+        for (int y = 0; y < input_y; y++)
+        {
+            for (int x = 0; x < input_x; x++)
+            {
+                data_to_send[(n_channels * ((y + pad_y) * input_x_pad + x + pad_x)) + i] = bottom_data[i * size_channel + y * (input_x) + x];
+            }
+        }
+    }
+
+    return data_to_send;
+}
+
+float *Transform_Filters_Memory_a(const float *weights, const int K, const int G, const int C, const int R, const int S)
+{
+
+    const int n_channels = C / G;
+    const int kernel_y = R;
+    const int kernel_x = S;
+    const int n_filters = K; //this->num_output_;
+    int size_channel = kernel_y * kernel_x;
+    int size_filter = size_channel * n_channels;
+    int n = size_filter * n_filters;
+
+    float *filters_to_send = new float[n]; //Creating piece of memory that will use the simulator
+    for (int n_f = 0; n_f < n_filters; n_f++)
+    {
+        for (int i = 0; i < n_channels; i++)
+        {
+            for (int y = 0; y < kernel_y; y++)
+            {
+                for (int x = 0; x < kernel_x; x++)
+                {
+                    filters_to_send[n_f * size_filter + (n_channels * (y * kernel_x + x)) + i] = weights[n_f * size_filter + i * size_channel + y * kernel_x + x];
+                }
+            }
+        }
+    }
+
+    return filters_to_send;
+}
+
+void Transform_Ofmap_Memory_a(const float *ofmap_data, float *top_data, const int K, const int X_, const int Y_)
+{
+    const int n_channels = K; //n_filters
+    const int output_y = X_;
+    const int output_x = Y_;
+
+    int size_channel = output_y * output_x;
+    int n = n_channels * size_channel;
+    for (int i = 0; i < n_channels; i++)
+    {
+        for (int y = 0; y < output_y; y++)
+        {
+            for (int x = 0; x < output_x; x++)
+            {
+                //data_to_send[(n_channels*(y*input_x+x)) + i]=bottom_data[i*size_channel + y*input_x + x];
+                top_data[i * size_channel + y * output_x + x] = ofmap_data[(n_channels * (y * output_x + x)) + i]; //Filling top_data
+            }
+        }
+    }
+}

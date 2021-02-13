@@ -1,11 +1,25 @@
+from os import pathsep
 import tvm
 from tvm import relay
 from tvm.contrib import graph_runtime as runtime
 
 # Import this add stonne as an x86 co-processor
 import bifrost
-from bifrost.stonne.simulator import config_simulator
+from bifrost.stonne.simulator import architecture
 from bifrost.runner.run import run_torch_stonne
+
+architecture.ms_size = 64
+paths = [
+    "/Users/axelstjerngren/uni/Year4/ProjectLevel4/level-4-project/benchmarks/alexnet/tiles/standard/1.txt",
+    "/Users/axelstjerngren/uni/Year4/ProjectLevel4/level-4-project/benchmarks/alexnet/tiles/standard/2.txt",
+    "/Users/axelstjerngren/uni/Year4/ProjectLevel4/level-4-project/benchmarks/alexnet/tiles/standard/3.txt",
+    "/Users/axelstjerngren/uni/Year4/ProjectLevel4/level-4-project/benchmarks/alexnet/tiles/standard/4.txt",
+    "/Users/axelstjerngren/uni/Year4/ProjectLevel4/level-4-project/benchmarks/alexnet/tiles/standard/5.txt",
+]
+
+architecture.load_tile_config(
+    conv_cfg_paths = paths
+    )
 
 # Download an example image from the pytorch website
 import urllib
@@ -33,8 +47,6 @@ import time
 start = time.time()
 
 run_torch_stonne(alex_model, input_batch)
-#alex_model.eval()
-#output = alex_model(input_batch)
 
 end = time.time()
 print(end - start)

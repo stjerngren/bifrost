@@ -7,8 +7,8 @@ class TuningParameters(object):
     ) -> None:
         self.tune_convolutions_tile:bool = False
         self.tune_fc_tile:bool = False
-        self.fc_num: int = 5
-        self.conv_num: int =5
+        self.fc_num: int = 7
+        self.conv_num: int = 20
         self.conv_tile_knobs:List = []
         self.fc_tile_knobs:List = []
         self.tune_accumulation_buffer: bool = False
@@ -44,9 +44,9 @@ class TuningParameters(object):
     def tune_maeri_all(self):
         self.tune_accumulation_buffer = False
         self.tune_reduce_network_type = False
-        self.tune_ms_size = True
+        self.tune_ms_size = False
         self.tune_convolutions_tile = True
-        self.tune_fc_tile = True
+        self.tune_fc_tile = False
 
     def conv_tile(self,
         R: int,

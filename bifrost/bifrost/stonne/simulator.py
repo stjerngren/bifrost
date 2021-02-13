@@ -103,6 +103,8 @@ class Simulator(object):
 
         elif type == "FC":
             if self.fc_cfg_paths ==[]:
+                self.fc_tiles_path = self.fc_tiles.generate_basic_tile_config()   
+            else:
                 # Get next tiles path for the architecture
                 # and then move it to the end
                 path = self.fc_cfg_paths.pop(0)
@@ -285,7 +287,7 @@ class Simulator(object):
             f.write(f'controller_type="{self.controller_type}"\n')
         print("New config created at ", self.path, self.ms_size)
 
-    def config(self,cfg)->None:
+    def config(self,cfg, t = True)->None:
         """
         This function generates an architecture and/or tile config depending
         on which parameters are being tuned.
@@ -296,7 +298,7 @@ class Simulator(object):
             The configuration space 
         """
         # Tiles
-        if self.tuner.tune_convolutions_tile:
+        if self.tuner.tune_convolutions_tile and t:
             # Create a new tile file
             self.conv_tiles_path = conv_tiles.edit_tile_config(
                 cfg['T_R'].val, cfg['T_S'].val, cfg['T_C'].val, cfg['T_K'].val, 

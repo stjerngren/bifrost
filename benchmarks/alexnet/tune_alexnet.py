@@ -1,13 +1,8 @@
 from bifrost.stonne.simulator import config_simulator, architecture
 
-config_simulator(
-    ms_size=16,
-    reduce_network_type="ASNETWORK",
-    dn_bw=8,
-    rn_bw=8,
-    controller_type="MAERI_DENSE_WORKLOAD",
-    tune = True
-)
+architecture.ms_size = 64
+architecture.tune = True
+architecture.tuner.tune_maeri_all()
 
 if __name__ == "__main__":
 
@@ -27,7 +22,6 @@ if __name__ == "__main__":
     from tvm.autotvm.tuner import XGBTuner, GATuner, RandomTuner, GridSearchTuner
     from tvm.autotvm.graph_tuner import DPTuner, PBQPTuner
     from alexnet import alex_model as torch_model
-    architecture.tune = True
     from run_alexnet import input_batch
 
     torch_model.eval()
@@ -39,17 +33,17 @@ if __name__ == "__main__":
     # Build and run with llvm backend, and use the
     # stonne conv2d ops
     target = "llvm --libs=stonne"
-    log_file = "test.log"
+    log_file = "alexnet.log"
 
     tuning_options = {
         "log_filename": log_file,
-        "tuner": "random",
+        "tuner": "xgb",
         "early_stopping": None,
         "measure_option": autotvm.measure_option(
             builder=StonneLocalBuilder(),
             runner=StonneLocalRunner(
                 number=0,
-                repeat=0,
+                repeat=1,
                 min_repeat_ms=0,
                 enable_cpu_cache_flush=True
             ),
@@ -90,7 +84,7 @@ if __name__ == "__main__":
             print(task.config_space)
             print(n_trial, "test")
             tuner_obj.tune(
-                n_trial=100,
+                n_trial=n_trial,
                 early_stopping=early_stopping,
                 measure_option=measure_option,
                 callbacks=[
