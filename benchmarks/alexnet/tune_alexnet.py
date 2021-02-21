@@ -1,8 +1,17 @@
 from bifrost.stonne.simulator import config_simulator, architecture
 
-architecture.ms_size = 64
+architecture.ms_size = 128
+architecture.dn_bw=64
+architecture.rn_bw=64
 architecture.tune = True
-architecture.tuner.tune_maeri_all()
+architecture.tuner.tune_psums = True
+architecture.tuner.conv_num = 20
+architecture.tuner.fc_num = 20
+architecture.tuner.tune_convolutions_tile = True
+architecture.tuner.tune_fc_tile = True
+architecture.create_config_file()
+
+
 
 if __name__ == "__main__":
 
@@ -102,7 +111,7 @@ if __name__ == "__main__":
             mod, 
             target=target, 
             params=params, 
-            ops=(relay.op.get("nn.conv2d"),)
+            ops=(relay.op.get("nn.conv2d"),relay.op.get("nn.dense"),)
     )
     print(tasks)
     tune_kernels(tasks, tuning_options["measure_option"])

@@ -94,7 +94,6 @@ class Simulator(object):
                 # Get next tiles path for the architecture
                 # and then move it to the end
                 path = self.conv_cfg_paths.pop(0)
-                print(path, "path" * 100)
                 if path == "":
                     self.conv_tiles_path = self.conv_tiles.generate_basic_tile_config()
                 else:
@@ -287,7 +286,7 @@ class Simulator(object):
             f.write(f'controller_type="{self.controller_type}"\n')
         print("New config created at ", self.path, self.ms_size)
 
-    def config(self,cfg, t = True)->None:
+    def config(self,cfg, conv = False, dense = False)->None:
         """
         This function generates an architecture and/or tile config depending
         on which parameters are being tuned.
@@ -296,23 +295,34 @@ class Simulator(object):
         ----------
         cfg: tvm.autotvm.task.space.ConfigSpace
             The configuration space 
+        conv: bool
+            If to edit the conv 
+        dense: bool
         """
         # Tiles
-        if self.tuner.tune_convolutions_tile and t:
+        if self.tuner.tune_convolutions_tile and conv:
             # Create a new tile file
             self.conv_tiles_path = conv_tiles.edit_tile_config(
                 cfg['T_R'].val, cfg['T_S'].val, cfg['T_C'].val, cfg['T_K'].val, 
                 cfg['T_G'].val, cfg['T_N'].val, cfg['T_X_'].val, cfg['T_Y_'].val
             )
-        if self.tuner.tune_fc_tile:
-            # TODO: Implement FC tuning
-            pass
+        if self.tuner.tune_fc_tile and dense:
+            self.fc_tiles_path = fc_tiles.edit_tile_config(
+                cfg['T_S'].val,
+                cfg['T_K'].val,
+            )
+            
         if self.tuner.tune_accumulation_buffer:
             self.accumulation_buffer = cfg["accumulation_buffer"].val
         if self.tuner.tune_reduce_network_type:
             self.reduce_network_type = cfg["reduce_network_type"].val
         if self.tuner.tune_ms_size:
             self.ms_size = cfg["ms_size"].val
+        if self.tuner.tune_rn_bw:
+            self.rn_bw = cfg["rn_bw"].val
+        if self.tuner.tune_dn_bw:   
+            self.dn_bw = cfg["dn_bw"].val
+
         # Create a new config file depending with new tuning options
         self.create_config_file()
 

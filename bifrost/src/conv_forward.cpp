@@ -53,11 +53,12 @@ namespace tvm
                 int sparsity_ratio = args[18];
                 bool tune = args[19];
                 std::string tuning_name = args[20];
-                std::string costs_path = args[21];
-                bool stats = args[22];
-                DLTensor *input = args[23];
-                DLTensor *weight = args[24];
-                DLTensor *output = args[25];
+                bool tune_psums = args[21];
+                std::string costs_path = args[22];
+                bool stats = args[23];
+                DLTensor *input = args[24];
+                DLTensor *weight = args[25];
+                DLTensor *output = args[26];
 
                 //Creating config  to find out if we are going to
                 // run a dense or sparse simulation
@@ -71,7 +72,7 @@ namespace tvm
 
                 // Run different types of convolutions depending architecture
                 int cycles;
-                if (false)
+                if (tune_psums)
                 {
 
                     float *weight_raw = static_cast<float *>(weight->data);
@@ -109,7 +110,6 @@ namespace tvm
                     stonne_instance->loadDNNLayer(CONV, tuning_name, R, S, C, K, G, N, X + 2 * pad_x, Y + 2 * pad_y, strides_x, (address_t)ifmap_to_send, (address_t)filters_to_send, (address_t)ofmap_raw, CNN_DATAFLOW);
                     stonne_instance->loadTile(T_R, T_S, T_C, T_K, T_G, T_N, T_X_, T_Y_);
                     unsigned int cost = stonne_instance->mem->getPsums();
-                    std::cout << cost << std::endl;
                     //Deleting objects
                     delete[] ofmap_raw;
                     delete[] ifmap_to_send;

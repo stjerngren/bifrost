@@ -7,7 +7,8 @@ class TuningParameters(object):
     ) -> None:
         self.tune_convolutions_tile:bool = False
         self.tune_fc_tile:bool = False
-        self.fc_num: int = 7
+        self.fc_num: int = 20
+
         self.conv_num: int = 20
         self.conv_tile_knobs:List = []
         self.fc_tile_knobs:List = []
@@ -17,8 +18,14 @@ class TuningParameters(object):
         self.tune_reduce_network_type:bool = False
         self.tune_ms_network_type:bool = False   
         self.tune_ms_size:bool = False
-    
-    def create_knobs(self)->List:
+        self.tune_psums:bool = False
+
+        self.tune_rn_bw:bool = False
+        self.tune_dn_bw:bool = False
+        self.rn_bw_range = [8,16,32,64,128]
+        self.dn_bw_range = [8,16,32,64,128]
+
+    def create_knobs(self, conv = False, dense = False)->List:
         """
         Based on set tuning parameters, create all the knobs
 
@@ -29,24 +36,24 @@ class TuningParameters(object):
 
         """
         all_knobs = []
-        all_knobs.extend(self.conv_tile_knobs)
-        all_knobs.extend(self.fc_tile_knobs)
+        if conv:
+            all_knobs.extend(self.conv_tile_knobs)
+        if dense:
+            all_knobs.extend(self.fc_tile_knobs)
         if self.tune_accumulation_buffer:
             all_knobs.append(("accumulation_buffer",[True,False]))
         if self.tune_reduce_network_type:
             all_knobs.append(("reduce_network_type",["ASNETWORK","FENETWORK"]))
         if self.tune_ms_size:
-            all_knobs.append(("ms_size",[32,64,128]))
+            all_knobs.append(("ms_size",[8,16,32,64,128]))
+        if self.tune_rn_bw:
+            all_knobs.append(("rn_bw",self.rn_bw_range))
+        if self.tune_dn_bw:   
+            all_knobs.append(("dn_bw",self.dn_bw_range))
         self.conv_tile_knobs = []
         self.fc_tile_knobs = []
         return all_knobs
 
-    def tune_maeri_all(self):
-        self.tune_accumulation_buffer = False
-        self.tune_reduce_network_type = False
-        self.tune_ms_size = False
-        self.tune_convolutions_tile = True
-        self.tune_fc_tile = False
 
     def conv_tile(self,
         R: int,

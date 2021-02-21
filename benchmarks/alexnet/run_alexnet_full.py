@@ -9,17 +9,10 @@ from bifrost.stonne.simulator import architecture
 from bifrost.runner.run import run_torch_stonne
 
 
-#architecture.ms_size = 128
-#architecture.dn_bw=64
-#architecture.rn_bw=64
-#paths = [
-#    "/Users/axelstjerngren/uni/Year4/ProjectLevel4/level-4-project/benchmarks/alexnet/tiles/standard/1.txt",
-#    "/Users/axelstjerngren/uni/Year4/ProjectLevel4/level-4-project/benchmarks/alexnet/tiles/standard/2.txt",
-#    "/Users/axelstjerngren/uni/Year4/ProjectLevel4/level-4-project/benchmarks/alexnet/tiles/standard/3.txt",
-#    "/Users/axelstjerngren/uni/Year4/ProjectLevel4/level-4-project/benchmarks/alexnet/tiles/standard/4.txt",
-#    "/Users/axelstjerngren/uni/Year4/ProjectLevel4/level-4-project/benchmarks/alexnet/tiles/standard/5.txt",
-#]
-#architecture.create_config_file()
+architecture.ms_size = 128
+architecture.dn_bw=64
+architecture.rn_bw=64
+architecture.create_config_file()
 #
 #architecture.load_tile_config(
 #    conv_cfg_paths = paths
@@ -46,11 +39,11 @@ preprocess = transforms.Compose([
 input_tensor = preprocess(input_image)
 input_batch = input_tensor.unsqueeze(0) # create a mini-batch as expected by the model
 
-#from alexnet import alex_model
-#import time 
-#start = time.time()
-#
-#run_torch_stonne(alex_model, input_batch)
-#
-#end = time.time()
-#print(end - start)
+from alexnet import alex_model
+import time 
+start = time.time()
+
+run_torch_stonne(alex_model, input_batch)
+
+end = time.time()
+print(end - start)

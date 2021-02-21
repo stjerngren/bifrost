@@ -12,9 +12,11 @@ class FCTileConfig(object):
         self.T_K : int 
 
     def generate_basic_tile_config(self):
-        self.T_N = 1 
-        self.T_S = 1 
-        self.T_K = 1 
+        return self.edit_tile_config(1,1)
+
+    def edit_tile_config(self,S,K):
+        self.T_S = S 
+        self.T_K = K 
 
         if not os.path.exists("bifrost_temp"):
             os.mkdir("bifrost_temp")
@@ -24,7 +26,6 @@ class FCTileConfig(object):
         self.path = os.path.join(
             os.getcwd() ,
             "bifrost_temp/fc_tiles/fc_tile_config_"
-                + str(self.T_N) 
                 + str(self.T_S) 
                 + str(self.T_K) 
                 + ".txt" 
@@ -32,9 +33,11 @@ class FCTileConfig(object):
         
         with open(self.path, "w+") as f:
             f.write(f'tile_type="FC"\n')
-            f.write(f"T_N={self.T_N}\n")
+            f.write(f"T_N=1\n")
             f.write(f"T_S={self.T_S}\n")
             f.write(f"T_K={self.T_K}\n")
         return self.path
+    
+
 
 fc_tiles = FCTileConfig()

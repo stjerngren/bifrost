@@ -306,7 +306,7 @@ def run_stonne_through_rpc(
             msg = msg[: msg.index("Stack trace returned")]
         if "CUDA Source" in msg:
             msg = msg[: msg.index("CUDA Source")]
-        average = 1000000000
+        average = 100000000000
         costs = (RuntimeError(msg[:1024]),)
 
         errno = MeasureErrorNo.RUNTIME_DEVICE

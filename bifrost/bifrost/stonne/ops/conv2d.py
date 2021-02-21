@@ -8,6 +8,7 @@ import tvm.relay.op as _op
 from tvm.relay.op.strategy.generic import *
 import os
 from ..simulator import architecture
+import random
 #from tvm.topi.nn.utils import traverse_inline
 
 # Register the compute schedule for stonne conv2d
@@ -30,7 +31,7 @@ def conv2d_stonne_nchw(
 
     # If the architecture is being tuned, write to the file with the
     # following name
-    tuning_name = "none"
+    tuning_name = str(random.randrange(10000000))
     dirname = os.path.dirname(__file__)
     costs_path = os.path.join(dirname, "../data/costs.json")
     
@@ -75,12 +76,12 @@ def conv2d_stonne_nchw(
             architecture.tuner.conv_tile(R,S,C,K,G,X,Y, strides[0])
 
         # Get and register the tuning knobs
-        knobs = architecture.tuner.create_knobs()
+        knobs = architecture.tuner.create_knobs(conv = True)
         for knob in knobs:
             cfg.define_knob(*knob)
         
         # Create the architecture files
-        architecture.config(cfg)
+        architecture.config(cfg, conv = True)
 
     # Choose tiles
     elif architecture.manual_tile_paths:
@@ -115,11 +116,12 @@ def conv2d_stonne_nchw(
                 architecture.sparsity_ratio, # [18]    
                 architecture.tune, # [19]
                 tuning_name,       # [20]
-                costs_path,        # [21]
-                architecture.print_stats, # [22]
-                ins[0],            # [23]
-                ins[1],            # [24]
-                outs[0],           # [25]
+                architecture.tuner.tune_psums, # [21]
+                costs_path,        # [22]
+                architecture.print_stats, # [23]
+                ins[0],            # [24]
+                ins[1],            # [25]
+                outs[0],           # [26]
 
 
             ),
@@ -131,8 +133,7 @@ def conv2d_stonne_nchw(
 @autotvm.register_topi_schedule("conv2d_stonne_nchw.x86")
 def schedule_conv2d_stonne(cfg, outs):
     """Create schedule for conv2d_nhwc"""
-    cfg.add_flop(2)
-
+    cfg.add_flop(1)
     return te.create_schedule([x.op for x in outs])
 
 

@@ -76,7 +76,7 @@ void reportTotalCycles(
         return;
     }
     f.close();
-    
+     
     root["value"].append(cycles);
     root["layer"].append(tuning_name);
 
