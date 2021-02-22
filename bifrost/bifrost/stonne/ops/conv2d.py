@@ -31,7 +31,7 @@ def conv2d_stonne_nchw(
 
     # If the architecture is being tuned, write to the file with the
     # following name
-    tuning_name = str(random.randrange(10000000))
+    tuning_name = "conv_" + str(random.randrange(10000000))
     dirname = os.path.dirname(__file__)
     costs_path = os.path.join(dirname, "../data/costs.json")
     

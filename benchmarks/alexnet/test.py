@@ -11,12 +11,12 @@ nice_fonts = {
     "text.usetex": False,
     "font.family": "serif",
     # Use 10pt font in plots, to match 10pt font in document
-    "axes.labelsize": 40,
+    "axes.labelsize": 15,
     "font.size": 10,
     # Make the legend/label fonts a little smaller
-    "legend.fontsize": 30,
-    "xtick.labelsize": 30,
-    "ytick.labelsize": 30,
+    "legend.fontsize": 15,
+    "xtick.labelsize": 10,
+    "ytick.labelsize": 10,
 }
  
 mpl.rcParams.update(nice_fonts)
@@ -44,6 +44,7 @@ rects2 = ax.bar(x + width/2, women_means, width, label='Bifrost tile config')
 
 # Add some text for labels, title and custom x-axis tick labels, etc.
 ax.set_ylabel('Cycles')
+ax.yaxis.grid()
 ax.set_xticks(x)
 ax.set_xticklabels(labels)
 ax.legend()
@@ -59,9 +60,8 @@ def autolabel(rects):
                     ha='center', va='bottom')
 
 
-autolabel(rects1)
-autolabel(rects2)
 
-fig.tight_layout()
+#(1+(5**1/2))/2
 
+#fig.savefig("test.pdf", bbox_inches='tight')
 plt.show()

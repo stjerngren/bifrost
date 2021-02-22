@@ -13,10 +13,24 @@ architecture.ms_size = 128
 architecture.dn_bw=64
 architecture.rn_bw=64
 architecture.create_config_file()
-#
-#architecture.load_tile_config(
-#    conv_cfg_paths = paths
-#    )
+
+
+conv_paths = [
+    "/Users/axelstjerngren/uni/Year4/ProjectLevel4/level-4-project/benchmarks/alexnet/tiles/standard/conv_1.txt",
+    "/Users/axelstjerngren/uni/Year4/ProjectLevel4/level-4-project/benchmarks/alexnet/tiles/standard/conv_2.txt",
+    "/Users/axelstjerngren/uni/Year4/ProjectLevel4/level-4-project/benchmarks/alexnet/tiles/standard/conv_3.txt",
+    "/Users/axelstjerngren/uni/Year4/ProjectLevel4/level-4-project/benchmarks/alexnet/tiles/standard/conv_4.txt",
+    "/Users/axelstjerngren/uni/Year4/ProjectLevel4/level-4-project/benchmarks/alexnet/tiles/standard/conv_5.txt"
+]
+fc_paths = [
+    "/Users/axelstjerngren/uni/Year4/ProjectLevel4/level-4-project/benchmarks/alexnet/tiles/standard/fc_1.txt",
+    "/Users/axelstjerngren/uni/Year4/ProjectLevel4/level-4-project/benchmarks/alexnet/tiles/standard/fc_2.txt",
+    "/Users/axelstjerngren/uni/Year4/ProjectLevel4/level-4-project/benchmarks/alexnet/tiles/standard/fc_3.txt", 
+]
+architecture.load_tile_config(
+    conv_cfg_paths = conv_paths,
+    fc_cfg_paths = fc_paths
+    )
 
 # Download an example image from the pytorch website
 import urllib

@@ -166,6 +166,12 @@ namespace tvm
                         cycles
 
                     );
+                } else {
+                    reportTotalCycles(
+                        tuning_name,
+                        "bifrost_temp/cycles.json",
+                        cycles
+                    );
                 }
             });
 
