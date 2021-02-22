@@ -275,7 +275,7 @@ namespace tvm
                 } else {
                 reportTotalCycles(
                     tuning_name,
-                    "/Users/axelstjerngren/uni/Year4/ProjectLevel4/level-4-project/bifrost/bifrost_temp/cycles.json",
+                    "bifrost_temp/cycles.json",
                     cycles);
                 }
             });

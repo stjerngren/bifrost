@@ -95,7 +95,7 @@ def dense_stonne(cfg,data, weight, units=None, out_dtype=""):
                 outs[0],           # [13] Output
  
             ),
-            name = "d",
+            name = "a",
             dtype = out_dtype
     )
     
@@ -115,18 +115,17 @@ def dense_strategy_cpu(attrs, inputs, out_type, target):
     dtype = inputs[0].dtype
     u8s8s32 = dtype == "uint8" and inputs[1].dtype == "int8" and out_type.dtype == "int32"
 
-    strategy.add_implementation(
-        wrap_compute_dense(topi.x86.dense_nopack),
-        wrap_topi_schedule(topi.x86.schedule_dense_nopack),
-        name="dense_nopack.x86",
-        plevel=5,
-    )
 
     if "stonne" in target.libs:
         strategy.add_implementation(
             wrap_compute_dense(dense_stonne),
             wrap_topi_schedule(schedule_dense_stonne),
             name="dense_stonne.x86",
-            plevel=15,
+        )
+    else:
+        strategy.add_implementation(
+            wrap_compute_dense(topi.x86.dense_nopack),
+            wrap_topi_schedule(topi.x86.schedule_dense_nopack),
+            name="dense_nopack.x86",
         )
     return strategy
