@@ -56,14 +56,14 @@ level-4-project
 |    |__Makefile
 ```
 
-Any new .cpp files will be automatically found by the Makefile as long as they are created within the /src folder. Before you compile the code you need STONNE and TVM as enviroment variables (see next section) You can the compile your new code with the following commands:
+Any new .cpp files will be automatically found by the Makefile as long as they are created within the /src folder. Before you compile the code you need STONNE, mRNA and TVM as enviroment variables (see next section) You can the compile your new code with the following commands:
 ```
 cd bifrost
 make -j
 ```
 
 ### C++ depdencies 
-To change the C code you need to clone the STONNE, MRNA and TVM repositories:
+To change the C code you need to clone the STONNE, mRNA and TVM repositories:
 ```
 git clone https://github.com/axelstjerngren/stonne
 git clone https://github.com/axelstjerngren/mrna
@@ -74,7 +74,7 @@ Before you can run **make** you need to export two environment variables:
 ```
 export TVM_ROOT    = path_to_tvm/tvm
 export STONNE_ROOT = path_to_stonne/stonne
-export MRNA_ROOT = path_to_stonne/stonne
+export MRNA_ROOT   = path_to_stonne/stonne
 ```
 The C++ should now compile correctly when you run **make** inside of the level-4-project/bifrost directory.
 
