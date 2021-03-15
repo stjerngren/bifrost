@@ -9,18 +9,21 @@ from bifrost.stonne.simulator import architecture
 from bifrost.runner.run import run_torch_stonne
 
 
+
 architecture.ms_size = 128
 architecture.dn_bw=64
 architecture.rn_bw=64
+architecture.controller_type = "SIGMA_SPARSE_GEMM"
+architecture.sparsity_ratio = 0
 architecture.create_config_file()
 
 
 conv_paths = [
-    "/Users/axelstjerngren/uni/Year4/ProjectLevel4/level-4-project/benchmarks/alexnet/tiles/performance/conv_1.txt",
-    "/Users/axelstjerngren/uni/Year4/ProjectLevel4/level-4-project/benchmarks/alexnet/tiles/performance/conv_2.txt",
-    "/Users/axelstjerngren/uni/Year4/ProjectLevel4/level-4-project/benchmarks/alexnet/tiles/performance/conv_3.txt",
-    "/Users/axelstjerngren/uni/Year4/ProjectLevel4/level-4-project/benchmarks/alexnet/tiles/performance/conv_4.txt",
-    "/Users/axelstjerngren/uni/Year4/ProjectLevel4/level-4-project/benchmarks/alexnet/tiles/performance/conv_5.txt"
+    "/Users/axelstjerngren/uni/Year4/ProjectLevel4/level-4-project/benchmarks/alexnet/tiles/basic/conv_1.txt",
+    "/Users/axelstjerngren/uni/Year4/ProjectLevel4/level-4-project/benchmarks/alexnet/tiles/basic/conv_2.txt",
+    "/Users/axelstjerngren/uni/Year4/ProjectLevel4/level-4-project/benchmarks/alexnet/tiles/basic/conv_3.txt",
+    "/Users/axelstjerngren/uni/Year4/ProjectLevel4/level-4-project/benchmarks/alexnet/tiles/basic/conv_4.txt",
+    "/Users/axelstjerngren/uni/Year4/ProjectLevel4/level-4-project/benchmarks/alexnet/tiles/basic/conv_5.txt"
 ]
 fc_paths = [
     "/Users/axelstjerngren/uni/Year4/ProjectLevel4/level-4-project/benchmarks/alexnet/tiles/opt/fc_1.txt",
@@ -54,6 +57,7 @@ input_tensor = preprocess(input_image)
 input_batch = input_tensor.unsqueeze(0) # create a mini-batch as expected by the model
 
 from alexnet import alex_model
+#from weight_pruning import model as alex_model
 import time 
 start = time.time()
 

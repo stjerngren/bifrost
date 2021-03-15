@@ -14,7 +14,7 @@ class TuningParameters(object):
         self.fc_tile_knobs:List = []
         self.tune_accumulation_buffer: bool = False
         self.tune_sparsity_ratio: bool = False
-        self.sparsity_ratio_num:int = 1
+        self.sparsity_ratio_range = []
         self.tune_reduce_network_type:bool = False
         self.tune_ms_network_type:bool = False   
         self.tune_ms_size:bool = False
@@ -50,6 +50,8 @@ class TuningParameters(object):
             all_knobs.append(("rn_bw",self.rn_bw_range))
         if self.tune_dn_bw:   
             all_knobs.append(("dn_bw",self.dn_bw_range))
+        if self.tune_sparsity_ratio:
+            all_knobs.append(("sparsity_ratio", self.sparsity_ratio_range))
         self.conv_tile_knobs = []
         self.fc_tile_knobs = []
         return all_knobs

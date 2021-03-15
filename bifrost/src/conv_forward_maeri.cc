@@ -30,7 +30,7 @@ namespace tvm
 
         using namespace runtime;
 
-        TVM_REGISTER_GLOBAL("tvm.contrib.stonne.conv2d.forward")
+        TVM_REGISTER_GLOBAL("tvm.contrib.stonne.conv2d.nchw")
             .set_body([](TVMArgs args, TVMRetValue *ret) {
                 std::string path_to_arch_file = args[0];
                 int R = args[1];
@@ -272,15 +272,19 @@ namespace tvm
                         cycles
 
                     );
-                } else {
-                reportTotalCycles(
-                    tuning_name,
-                    "bifrost_temp/cycles.json",
-                    cycles);
+                }
+                else
+                {
+                    reportTotalCycles(
+                        tuning_name,
+                        "bifrost_temp/cycles.json",
+                        cycles);
                 }
             });
 
     } // namespace contrib
 } // namespace tvm
 
-//
+
+
+

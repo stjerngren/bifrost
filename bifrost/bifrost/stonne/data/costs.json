@@ -1,1 +1,4 @@
-{"tuning_name": "null", "value": []}
+{
+	"tuning_name" : "conv_6473176",
+	"value" : [ 4246 ]
+}

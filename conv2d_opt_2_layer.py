@@ -1,11 +1,14 @@
 from bifrost.stonne.simulator import config_simulator, architecture
 
+architecture.ms_size = 128
+architecture.dn_bw=64
+architecture.rn_bw=64
+architecture.controller_type = "SIGMA_SPARSE_GEMM"
+architecture.sparsity_ratio = 50
 architecture.tune = True
-architecture.tuner.tune_ms_size = True
-architecture.tuner.tune_rn_bw = True
-architecture.tuner.tune_dn_bw = True
-architecture.tuner.tune_convolutions_tile = True
-
+architecture.tuner.tune_sparsity_ratio = True
+architecture.tuner.sparsity_ratio_range = [0,50]
+architecture.create_config_file()
 
 if __name__ == "__main__":
 
@@ -70,7 +73,7 @@ if __name__ == "__main__":
     target = "llvm --libs=stonne"
 
     mod, params = testing.create_workload(simple_net)
-    log_file = "bifrost_temp/test_2_layer_conv2d.log"
+    log_file = "bifrost_temp/test_2_layer_conv2d_sigma.log"
 
     tuning_options = {
         "log_filename": log_file,

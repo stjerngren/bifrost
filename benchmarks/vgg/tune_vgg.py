@@ -1,12 +1,12 @@
 from bifrost.stonne.simulator import config_simulator, architecture
 
 
-architecture.ms_size = 512
-architecture.rn_bw = 256
-architecture.dn_bw = 128
+architecture.ms_size = 128
+architecture.rn_bw = 64
+architecture.dn_bw = 64
 architecture.tune = True
 architecture.tuner.tune_psums = True
-architecture.tuner.tune_maeri_all()
+
 
 if __name__ == "__main__":
 

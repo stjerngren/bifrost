@@ -322,7 +322,8 @@ class Simulator(object):
             self.rn_bw = cfg["rn_bw"].val
         if self.tuner.tune_dn_bw:   
             self.dn_bw = cfg["dn_bw"].val
-
+        if self.tuner.tune_sparsity_ratio:   
+            self.sparsity_ratio = cfg["sparsity_ratio"].val
         # Create a new config file depending with new tuning options
         self.create_config_file()
 
