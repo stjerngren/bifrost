@@ -39,7 +39,6 @@ basic = [
 ]
 
 
-
 basic.append(sum(basic)/len(basic))
 bifrost = [ 3679680,19044096,8843136,12133632,12133120]
 bifrost.append(sum(bifrost)/len(bifrost))
@@ -66,41 +65,74 @@ test = [1 / (i/j) for i, j in zip(bifrost, basic)]
 # CONV 1,  CONV 2,  CONV 3,  CONV 4,  CONV 5 
 # 3679680,23956800,9185664,13668992,9120000 stonne paper config (from mRNA)
 # 3679680,19044096,8843136,12133632,12133120 autoTVM
+
+
+autoTVM = [3679680,19044096,8843136,12133632,12133120]
+autoTVM.append(sum(autoTVM)/len(autoTVM))
+
 mrna = [3679680,15264384,7930368,10550400,7041408,] # mRNA performance mode
+mrna.append(sum(mrna)/len(mrna))
+x = np.arange(len(labels))  # the label locations
+width = 0.35  # the width of the bars
+
+plt.figure(figsize=((1+(5**1/2))/2*10,10))
+plt.bar(x - width/2, autoTVM, width, label="Bifrost Tile Config")
+plt.bar(x + width/2, mrna, width, label='mRNA Tile Config')
+# Add some text for labels, title and custom x-axis tick labels, etc.
+plt.xticks(x, labels)
+plt.ylabel('Clock Cycles')
+
+plt.legend()
+plt.savefig("alexnet_maeri_vs_mrna.pdf", bbox_inches='tight')
+
+plt.show()
 
 
-
-label = ["CONV1","CONV2","CONV3","CONV4","CONV5","FC1","FC2","FC3"]
-sparse_0 = [ 		1164224,
-		3671808,
-		1887360,
-		2515712,
-		1706752,]
-sparse_0.append(sum(sparse_0)/len(sparse_0))
-
-sparse_50 = [ 1036768, 2056417, 1042115, 1211249, 808686, ]
-sparse_50.append(sum(sparse_50)/len(sparse_50))
-
-basic = " & ".join(["{:.1e}".format(x) for x in basic])
-bifrost = " & ".join(["{:.1e}".format(x) for x in bifrost])
-sparse_50 = " & ".join(["{:.1e}".format(x) for x in sparse_50])
-sparse_0 = " & ".join(["{:.1e}".format(x) for x in sparse_0])
-
-print(basic)
-print(bifrost)
-print(sparse_0)
-print(sparse_50)
-#x = np.arange(len(label))  # the label locations
-#width = 0.35  # the width of the bars
-#
 #plt.figure(figsize=((1+(5**1/2))/2*10,10))
-#plt.bar(x - width/2, sparse_0, width, label='SIGMA 0% Sparsity')
-#plt.bar(x + width/2, sparse_50, width, label='SIGMA 50% Sparsity')
-## Add some text for labels, title and custom x-axis tick labels, etc.
-#plt.xticks(x, label)
-#plt.ylabel('Clock Cycles')
-#plt.legend()
+#plt.grid( axis='y')
+#y_pos = np.arange(len(labels))
+#performance = [1 / (i/j) for i, j in zip(bifrost, basic)]
+#performance.append(sum(performance)/len(performance))
+#plt.bar(y_pos, performance, width = 0.5, align='center', alpha=0.8)
+#plt.xticks(y_pos, labels)
+#plt.ylabel('Speedup')
+##plt.axes().set_aspect(0.61803398875)
+#plt.savefig("alexnet_maeri.pdf", bbox_inches='tight')
 #plt.show()
+
+
+
+#label = ["CONV1","CONV2","CONV3","CONV4","CONV5","FC1","FC2","FC3"]
+#sparse_0 = [ 		1164224,
+#		3671808,
+#		1887360,
+#		2515712,
+#		1706752,]
+#sparse_0.append(sum(sparse_0)/len(sparse_0))
+#
+#sparse_50 = [ 1036768, 2056417, 1042115, 1211249, 808686, ]
+#sparse_50.append(sum(sparse_50)/len(sparse_50))
+#
+#basic = " & ".join(["{:.1e}".format(x) for x in basic])
+#bifrost = " & ".join(["{:.1e}".format(x) for x in bifrost])
+#sparse_50 = " & ".join(["{:.1e}".format(x) for x in sparse_50])
+#sparse_0 = " & ".join(["{:.1e}".format(x) for x in sparse_0])
+#
+#print(basic)
+#print(bifrost)
+#print(sparse_0)
+#print(sparse_50)
+##x = np.arange(len(label))  # the label locations
+##width = 0.35  # the width of the bars
+##
+##plt.figure(figsize=((1+(5**1/2))/2*10,10))
+##plt.bar(x - width/2, sparse_0, width, label='SIGMA 0% Sparsity')
+##plt.bar(x + width/2, sparse_50, width, label='SIGMA 50% Sparsity')
+### Add some text for labels, title and custom x-axis tick labels, etc.
+##plt.xticks(x, label)
+##plt.ylabel('Clock Cycles')
+##plt.legend()
+##plt.show()
 
 
 

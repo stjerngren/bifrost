@@ -7,28 +7,50 @@ from tvm.contrib import graph_runtime as runtime
 import bifrost
 from bifrost.stonne.simulator import architecture
 from bifrost.runner.run import run_torch_stonne
+from alexnet import alex_model
+
+################################################################################
+# Choose eval settings here
+################################################################################
+
+# choose maeri or sparse
+architecture_setting = "maeri"
+
+# chosoe sparsity ratio (ignored if not sigma)
+sparsity_ratiio = 0
+
+# choose tile config: performance, opt, stonne_paper, basic
+tiles = "performance"
 
 
-
+#################################################################################
+# Do not change anything after this
 architecture.ms_size = 128
 architecture.dn_bw=64
 architecture.rn_bw=64
-architecture.controller_type = "SIGMA_SPARSE_GEMM"
-architecture.sparsity_ratio = 0
+if architecture == "sparse":
+    architecture.controller_type = "SIGMA_SPARSE_GEMM"
+    architecture.sparsity_ratio = 0
+if sparsity_ratiio:
+    if sparsity_ratiio == 50:
+        from weight_pruning import model as alex_model
+    architecture.sparsity_ratio = 0
+
+
 architecture.create_config_file()
 
 
 conv_paths = [
-    "/Users/axelstjerngren/uni/Year4/ProjectLevel4/level-4-project/benchmarks/alexnet/tiles/basic/conv_1.txt",
-    "/Users/axelstjerngren/uni/Year4/ProjectLevel4/level-4-project/benchmarks/alexnet/tiles/basic/conv_2.txt",
-    "/Users/axelstjerngren/uni/Year4/ProjectLevel4/level-4-project/benchmarks/alexnet/tiles/basic/conv_3.txt",
-    "/Users/axelstjerngren/uni/Year4/ProjectLevel4/level-4-project/benchmarks/alexnet/tiles/basic/conv_4.txt",
-    "/Users/axelstjerngren/uni/Year4/ProjectLevel4/level-4-project/benchmarks/alexnet/tiles/basic/conv_5.txt"
+    "/Users/axelstjerngren/uni/Year4/ProjectLevel4/level-4-project/benchmarks/alexnet/tiles/%s/conv_1.txt" % tiles,
+    "/Users/axelstjerngren/uni/Year4/ProjectLevel4/level-4-project/benchmarks/alexnet/tiles/%s/conv_2.txt" % tiles,
+    "/Users/axelstjerngren/uni/Year4/ProjectLevel4/level-4-project/benchmarks/alexnet/tiles/%s/conv_3.txt" % tiles,
+    "/Users/axelstjerngren/uni/Year4/ProjectLevel4/level-4-project/benchmarks/alexnet/tiles/%s/conv_4.txt" % tiles,
+    "/Users/axelstjerngren/uni/Year4/ProjectLevel4/level-4-project/benchmarks/alexnet/tiles/%s/conv_5.txt" % tiles
 ]
 fc_paths = [
-    "/Users/axelstjerngren/uni/Year4/ProjectLevel4/level-4-project/benchmarks/alexnet/tiles/opt/fc_1.txt",
-    "/Users/axelstjerngren/uni/Year4/ProjectLevel4/level-4-project/benchmarks/alexnet/tiles/opt/fc_2.txt",
-    "/Users/axelstjerngren/uni/Year4/ProjectLevel4/level-4-project/benchmarks/alexnet/tiles/opt/fc_3.txt", 
+    "/Users/axelstjerngren/uni/Year4/ProjectLevel4/level-4-project/benchmarks/alexnet/tiles/%s/fc_1.txt" % tiles,
+    "/Users/axelstjerngren/uni/Year4/ProjectLevel4/level-4-project/benchmarks/alexnet/tiles/%s/fc_2.txt" % tiles,
+    "/Users/axelstjerngren/uni/Year4/ProjectLevel4/level-4-project/benchmarks/alexnet/tiles/%s/fc_3.txt" % tiles, 
 ]
 architecture.load_tile_config(
     conv_cfg_paths = conv_paths,
@@ -56,8 +78,6 @@ preprocess = transforms.Compose([
 input_tensor = preprocess(input_image)
 input_batch = input_tensor.unsqueeze(0) # create a mini-batch as expected by the model
 
-from alexnet import alex_model
-#from weight_pruning import model as alex_model
 import time 
 start = time.time()
 

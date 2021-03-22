@@ -80,9 +80,9 @@ def dense_stonne(cfg,data, weight, units=None, out_dtype=""):
             lambda ins, outs: tvm.tir.call_packed(
                 "tvm.contrib.stonne.dense",  
                 architecture.path, # [0] Architecture file
-                M,                 # [1] Batch size
-                K,                 # [2] Number of input neurons
-                N,                 # [3] Number of output neurons
+                M,                 # [1] 
+                K,                 # [2] 
+                N,                 # [3] 
                 architecture.fc_tiles_path,   # [4] Tiles path
                 architecture.sparsity_ratio,  # [5]
                 architecture.print_stats,     # [6] Create stats output files

@@ -90,7 +90,8 @@ def conv2d_stonne_nchw(
 
     if not architecture.manual_tile_paths and not architecture.tuner.tune_convolutions_tile:    
         architecture.conv_tiles_path = architecture.conv_tiles.generate_basic_tile_config()
-   
+    
+    print(strides, dilation,padding)
     return te.extern(
         (N,K,X_, Y_),
         [data,kernel],
@@ -209,6 +210,7 @@ def conv2d_stonne_nhwc(
     if not architecture.manual_tile_paths and not architecture.tuner.tune_convolutions_tile:    
         architecture.conv_tiles_path = architecture.conv_tiles.generate_basic_tile_config()
 
+    print(strides, dilation,padding)
     return te.extern(
         (N,X_, Y_,K),
         [data,kernel],
@@ -287,6 +289,9 @@ def conv2d_strategy_cpu(attrs, inputs, out_type, target):
                     name="conv2d_stonne.x86",
             )
     else:
+        """
+        The else part is the same part as usual in the code
+        """
         if groups == 1:
             if layout == "NCHW":
                 assert kernel_layout == "OIHW"

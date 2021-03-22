@@ -94,7 +94,7 @@ namespace tvm
 
                     float *ifmap_to_send = new float[C*X*Y];
                     Transform_Ofmap_Memory_a(input_raw,ifmap_to_send, C, X, Y);
-                    float *filters_to_send = Transform_Filters_Memory_b(weight_raw, K, G, C, R, S);
+                    float *filters_to_send = Transform_Filters_Memory_a(weight_raw, K, G, C, R, S);
 
 
 
@@ -127,6 +127,10 @@ namespace tvm
                     int gemm_N = h0 * w0;
 
                     std::cout << "Sparse conv"<< std::endl;
+                        for (int i=0;i < h0 * w0 * R * S * C;i++) {
+                           std::cout << input_im2col[i] << " ";
+                        }
+                        std::cout << std::endl;
 
                         for (int i=0;i < R*S*C;i++) {
                            std::cout << filters_to_send[i] << " ";
@@ -168,6 +172,9 @@ namespace tvm
                             MK_STA_KN_STR);
 
                     }
+
+
+
                 }
                 else if (!stonne_config.convOperationSupported())
                 {
@@ -243,7 +250,7 @@ namespace tvm
                     {
                             
                         std::cout << "Dense conv"<< std::endl;
-                        float* test =Transform_Ifmap_Memory_c(input_raw, C, X, Y, pad_x, pad_y);
+                        float* test =Transform_Ifmap_Memory_a(input_raw, C, X, Y, pad_x, pad_y);
 
                         for (int i=0;i < C*X*Y;i++) {
                            std::cout << test[i] << " ";
