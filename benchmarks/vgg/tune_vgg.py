@@ -6,7 +6,9 @@ architecture.rn_bw = 64
 architecture.dn_bw = 64
 architecture.tune = True
 architecture.tuner.tune_psums = True
-
+architecture.tuner.conv_num = 20
+architecture.tuner.tune_convolutions_tile = True
+architecture.create_config_file()
 
 if __name__ == "__main__":
 
@@ -25,7 +27,7 @@ if __name__ == "__main__":
 
     from tvm.autotvm.tuner import XGBTuner, GATuner, RandomTuner, GridSearchTuner
     from tvm.autotvm.graph_tuner import DPTuner, PBQPTuner
-    from vgg import vgg17_torch as torch_model
+    from vgg import vgg11_torch as torch_model
     from vgg import input_batch
 
     torch_model.eval()
@@ -61,7 +63,7 @@ if __name__ == "__main__":
     def tune_kernels(
         tasks, 
         measure_option, 
-        tuner="gridsearch", 
+        tuner="xgb", 
         early_stopping=None, 
         log_filename=log_file
     ):

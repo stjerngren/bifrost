@@ -19,11 +19,12 @@ from bifrost.stonne.simulator import config_simulator, architecture
 
 import os
 
-architecture.ms_size = 128
-architecture.rn_bw = 64
-architecture.dn_bw = 64
-#architecture.controller_type = "SIGMA_SPARSE_GEMM"
-#architecture.sparsity_ratio = 50
+architecture.ms_cols = 128
+architecture.ms_rows = 128
+architecture.reduce_network_type = "TEMPORALRN"
+architecture.ms_network_type = "OS_MESH"
+architecture.accumulation_buffer_enabled = True
+architecture.controller_type = "TPU_OS_DENSE"
 architecture.create_config_file()
 
 

@@ -47,7 +47,7 @@ if __name__ == "__main__":
     # Build and run with llvm backend, and use the
     # stonne conv2d ops
     target = "llvm --libs=stonne"
-    log_file = "alexnet_sigma.log"
+    log_file = "alexnet_sigma_test.log"
 
     tuning_options = {
         "log_filename": log_file,
@@ -71,7 +71,7 @@ if __name__ == "__main__":
     def tune_kernels(
         tasks, 
         measure_option, 
-        tuner="gridsearch", 
+        tuner="xgb", 
         early_stopping=None, 
         log_filename=log_file
     ):

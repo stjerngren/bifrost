@@ -1,33 +1,54 @@
-
-import torch
-from bifrost.stonne.simulator import config_simulator, architecture
-from vgg import vgg11_torch as torch_model
-from vgg import input_batch as data
-import numpy as np
-
+from os import pathsep
 import tvm
-from tvm import te, autotvm ,relay, rpc
+from tvm import relay
 from tvm.contrib import graph_runtime as runtime
+
+# Import this add stonne as an x86 co-processor
 import bifrost
+from bifrost.stonne.simulator import architecture
+from bifrost.runner.run import run_torch_stonne
+from vgg import vgg11_torch, input_batch
 
+################################################################################
+# Choose eval settings here
+################################################################################
+
+# choose maeri or sparse
+architecture_setting = "maeri"
+
+# chosoe sparsity ratio (ignored if not sigma)
+sparsity_ratiio = 0
+
+# choose tile config: basic, opt
+tiles_conv = "basic"
+
+#################################################################################
+# Do not change anything after this
 architecture.ms_size = 128
-torch_model.eval()
-trace = torch.jit.trace(torch_model, data).eval()
+architecture.dn_bw=64
+architecture.rn_bw=64
+if architecture == "sparse":
+    architecture.controller_type = "SIGMA_SPARSE_GEMM"
+    architecture.sparsity_ratio = 0
+if sparsity_ratiio:
+    #if sparsity_ratiio == 50:
+    #    from weight_pruning import model as alex_model
+    architecture.sparsity_ratio = 0
 
 
-with autotvm.apply_history_best("bifrost_temp/vgg.log"):
-    
+architecture.create_config_file()
 
-    mod, params = relay.frontend.from_pytorch(
-        trace, [("trace", data.shape)])
-    target = "llvm -libs=stonne"
-    
-    lib = relay.build(mod, target=target, params=params)
+#architecture.load_tile_config(
+#    conv_cfg_paths = conv_paths,
+#    fc_cfg_paths = fc_paths
+#    )
 
-    ctx = tvm.context(target, 0)
-    module = runtime.GraphModule(lib["default"](ctx))
-    module.set_input("trace", data)
-    module.run()
+# Download an example image from the pytorch website
 
-    test = module.get_output(0)
-print(test)
+import time 
+start = time.time()
+
+run_torch_stonne(vgg11_torch, input_batch)
+
+end = time.time()
+print(end - start)

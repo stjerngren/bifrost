@@ -279,7 +279,6 @@ def run_stonne_through_rpc(
         with open(cost_file, "r+") as f:
             json_dict = json.load(f)
             costs = json_dict["value"]
-            print(costs, "here"*1000)
             # Reset JSON file
             f.seek(0)
             f.truncate()

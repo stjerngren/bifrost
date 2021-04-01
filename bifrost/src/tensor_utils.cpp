@@ -78,6 +78,7 @@ void im2col_cpu(const float *data_im, const int channels,
     }
 }
 
+// NCHW -> NHWC
 float *Transform_Ifmap_Memory_a(const float *bottom_data, const int C, const int X, const int Y, const int pad_x, const int pad_y)
 {
     const int n_channels = C;
@@ -109,6 +110,7 @@ float *Transform_Ifmap_Memory_a(const float *bottom_data, const int C, const int
 
     return data_to_send;
 }
+
 
 float *Transform_Ifmap_Memory_b(const float *bottom_data, const int C, const int X, const int Y, const int pad_x, const int pad_y)
 {
@@ -174,7 +176,7 @@ float *Transform_Ifmap_Memory_c(const float *bottom_data, const int C, const int
     return data_to_send;
 }
 
-
+// NHWC->NCHW
 void Transform_Ofmap_Memory_a(const float *ofmap_data, float *top_data, const int K, const int X_, const int Y_)
 {
     const int n_channels = K; //n_filters
@@ -196,6 +198,7 @@ void Transform_Ofmap_Memory_a(const float *ofmap_data, float *top_data, const in
     }
 }
 
+// KCRS -> RSCK
 float *Transform_Filters_Memory_a(const float *weights, const int K, const int G, const int C, const int R, const int S)
 {
 
@@ -225,6 +228,7 @@ float *Transform_Filters_Memory_a(const float *weights, const int K, const int G
     return filters_to_send;
 }
 
+// RSCK ->CKRS
 float *Transform_Filters_Memory_b(const float *weights, const int K, const int G, const int C, const int R, const int S)
 {
 

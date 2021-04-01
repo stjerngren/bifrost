@@ -89,12 +89,14 @@ namespace tvm
                     std::string layer_name = "Conv2dLayerSparse";
 
                     // Calculate im2col output as h0 * w0 * R * S * C
-                    int h0 = (X + 2 * pad_x - (dilation_x * (R - 1) + 1)) / strides_x + 1;
-                    int w0 = (Y + 2 * pad_y - (dilation_y * (S - 1) + 1)) / strides_y + 1;
+                    int h0 = (X + 2 * pad_x - R -(R - 1)*(dilation_x-1)) / strides_x + 1;
+                    int w0 = (Y + 2 * pad_y - S -(S - 1)*(dilation_y-1)) / strides_y + 1;
 
-                    float *ifmap_to_send = new float[C*X*Y];
-                    Transform_Ofmap_Memory_a(input_raw,ifmap_to_send, C, X, Y);
-                    float *filters_to_send = Transform_Filters_Memory_a(weight_raw, K, G, C, R, S);
+                    // NHWC-> NCHW
+                    // RSCK ->CKRS
+                    //float *ifmap_to_send = new float[C*X*Y];
+                    //Transform_Ofmap_Memory_a(input_raw,ifmap_to_send, C, X, Y);
+                    ////loat *filters_to_send = Transform_Filters_Memory_b(weight_raw, K, G, C, R, S);
 
 
 
@@ -107,7 +109,7 @@ namespace tvm
                     // run a GEMM operation instead a CONVOLUTION
                     std::cout << "Run im2col" << std::endl;
                     im2col_cpu(
-                        ifmap_to_send,
+                        input_raw,
                         C,
                         X,
                         Y,
@@ -122,20 +124,10 @@ namespace tvm
                         input_im2col);
 
                     // Getting GEMM dimensions
-                    int gemm_M = K;
+                    int gemm_M = h0 * w0;
                     int gemm_K = R * S * C;
-                    int gemm_N = h0 * w0;
+                    int gemm_N = K;
 
-                    std::cout << "Sparse conv"<< std::endl;
-                        for (int i=0;i < h0 * w0 * R * S * C;i++) {
-                           std::cout << input_im2col[i] << " ";
-                        }
-                        std::cout << std::endl;
-
-                        for (int i=0;i < R*S*C;i++) {
-                           std::cout << filters_to_send[i] << " ";
-                        }
-                        std::cout << std::endl;
 
                     if (tune_psums)
                     {
@@ -143,7 +135,7 @@ namespace tvm
                         cost = simulateSparseGemmForwardPsums(
                             layer_name,
                             input_im2col,
-                            input_raw,
+                            weight_raw,
                             output_raw,
                             N,
                             G,
@@ -159,8 +151,8 @@ namespace tvm
 
                        cost = simulateSparseGemmForward(
                             layer_name,
+                            weight_raw,
                             input_im2col,
-                            filters_to_send,
                             output_raw,
                             N,
                             G,
@@ -250,7 +242,7 @@ namespace tvm
                     {
                             
                         std::cout << "Dense conv"<< std::endl;
-                        float* test =Transform_Ifmap_Memory_a(input_raw, C, X, Y, pad_x, pad_y);
+                        float* test =Transform_Ifmap_Memory_c(input_raw, C, X, Y, pad_x, pad_y);
 
                         for (int i=0;i < C*X*Y;i++) {
                            std::cout << test[i] << " ";
@@ -264,7 +256,7 @@ namespace tvm
 
                         cost = simulateDenseConvForwardNHWC(
                         layer_name,
-                        test,
+                        input_raw,
                         weight_raw,
                         output_raw,
                         R,

@@ -14,11 +14,11 @@ except: urllib.request.urlretrieve(url, filename)
 
 
 from torchvision import transforms
-from torchvision.models import vgg17
+from torchvision.models import vgg11
 from bifrost.runner.run import run_torch_stonne
 
 # Instansiate torch model
-vgg16_torch = vgg17(pretrained = True)
+vgg11_torch = vgg11(pretrained = True)
 
 # Get input
 input_image = Image.open("dog.jpg")

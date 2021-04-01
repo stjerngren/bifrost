@@ -88,7 +88,7 @@ class TestConv2d(TestCase):
             dn_bw=8,
             rn_bw=8,
             controller_type="TPU_OS_DENSE",
-            sparsity_ratio = 20,
+            sparsity_ratio = 0,
         )
         self.module.run()
         out_stonne = self.module.get_output(

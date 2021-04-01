@@ -22,8 +22,8 @@ import os
 architecture.ms_size = 128
 architecture.rn_bw = 64
 architecture.dn_bw = 64
-#architecture.controller_type = "SIGMA_SPARSE_GEMM"
-#architecture.sparsity_ratio = 50
+architecture.controller_type = "SIGMA_SPARSE_GEMM"
+architecture.sparsity_ratio = 0
 architecture.create_config_file()
 
 
@@ -44,7 +44,7 @@ bn_mmean = relay.var("bn_mean")
 bn_mvar = relay.var("bn_var")
 
 simple_net = relay.nn.conv2d(
-    data=data, weight=weight, kernel_size=(3, 3), channels=out_channels, padding=(0, 0), data_layout = "NHWC", kernel_layout='HWIO'
+    data=data, weight=weight, kernel_size=(3, 3), channels=out_channels, padding=(1, 2), data_layout = "NHWC", kernel_layout='HWIO'
 )
 
 
@@ -65,7 +65,7 @@ ctx = tvm.context(target, 0)
 module = runtime.GraphModule(lib["default"](ctx))
 module.set_input("data", data)
 module.run()
-out_shape = (batch_size, 3, 3, out_channels)
+out_shape = (batch_size, 5, 7, out_channels)
 out = module.get_output(0, tvm.nd.empty(out_shape))
 out_llvm = out.asnumpy()
 
@@ -80,7 +80,7 @@ ctx = tvm.context(target, 0)
 module = runtime.GraphModule(lib["default"](ctx))
 module.set_input("data", data)
 module.run()
-out_shape = (batch_size, 3, 3, out_channels)
+out_shape = (batch_size, 5, 7, out_channels)
 out = module.get_output(0, tvm.nd.empty(out_shape))
 out_stonne = out.asnumpy()
 

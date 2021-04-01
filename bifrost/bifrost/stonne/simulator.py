@@ -142,29 +142,21 @@ class Simulator(object):
         # Use bit manipulation magic to check if power of two
         if (size & (size-1) == 0) and size != 0:
             self._dn_bw= size
+        elif self.controller_type == "TPU_OS_DENSE":
+            self._dn_bw= size
         else:
             raise ConfigError("dn_bw has to be a power of two!")
     
     @property
     def rn_bw(self):
-        return self._dn_bw
+        return self._rn_bw
+
     @rn_bw.setter
     def rn_bw(self, size: int):
         # Use bit manipulation magic to check if power of two
         if (size & (size-1) == 0) and size != 0:
             self._rn_bw= size
 
-        else:
-            raise ConfigError("dn_bw has to be a power of two!")
-    
-    @property
-    def rn_bw(self):
-        return self._dn_bw
-    @rn_bw.setter
-    def rn_bw(self, size: int):
-        # Use bit manipulation magic to check if power of two
-        if (size & (size-1) == 0) and size != 0:
-            self._rn_bw= size
         else:
             raise ConfigError("dn_bw has to be a power of two!")
 
@@ -184,7 +176,7 @@ class Simulator(object):
                 print("Reduce network to TEMPORALRN")
                 print("MS network to OS_MESH")
                 print(f"dn_bw to {self.dn_bw}")
-                print(f"dn_bw to {self.rn_bw}")
+                print(f"rn_bw to {self.rn_bw}")
         else:
             raise ConfigError("SDMemory controller type has to be MAERI_DENSE_WORKLOAD,SIGMA_SPARSE_GEMM,MAGMA_SPARSE_DENSE or TPU_OS_DENSE") 
 

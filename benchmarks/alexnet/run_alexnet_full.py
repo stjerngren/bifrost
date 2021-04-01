@@ -14,25 +14,31 @@ from alexnet import alex_model
 ################################################################################
 
 # choose maeri or sparse
-architecture_setting = "maeri"
+architecture_setting = "tpu"
 
 # chosoe sparsity ratio (ignored if not sigma)
 sparsity_ratiio = 0
 
 # choose tile config: performance, opt, stonne_paper, basic
-tiles = "performance"
-
+# If using sparse, these will be ignored.
+tiles_conv = "performance"
+tiles_fc = "basic"
+architecture.ms_size = 128
 
 #################################################################################
 # Do not change anything after this
-architecture.ms_size = 128
 architecture.dn_bw=64
 architecture.rn_bw=64
-if architecture == "sparse":
+if architecture_setting == "sparse":
     architecture.controller_type = "SIGMA_SPARSE_GEMM"
     architecture.sparsity_ratio = 0
+elif architecture_setting == "tpu":
+    architecture.reduce_network_type = "TEMPORALRN"
+    architecture.ms_network_type = "OS_MESH"
+    architecture.accumulation_buffer_enabled = True
+    architecture.controller_type = "TPU_OS_DENSE"
 if sparsity_ratiio:
-    if sparsity_ratiio == 50:
+    if sparsity_ratio == 50:
         from weight_pruning import model as alex_model
     architecture.sparsity_ratio = 0
 
@@ -41,16 +47,16 @@ architecture.create_config_file()
 
 
 conv_paths = [
-    "/Users/axelstjerngren/uni/Year4/ProjectLevel4/level-4-project/benchmarks/alexnet/tiles/%s/conv_1.txt" % tiles,
-    "/Users/axelstjerngren/uni/Year4/ProjectLevel4/level-4-project/benchmarks/alexnet/tiles/%s/conv_2.txt" % tiles,
-    "/Users/axelstjerngren/uni/Year4/ProjectLevel4/level-4-project/benchmarks/alexnet/tiles/%s/conv_3.txt" % tiles,
-    "/Users/axelstjerngren/uni/Year4/ProjectLevel4/level-4-project/benchmarks/alexnet/tiles/%s/conv_4.txt" % tiles,
-    "/Users/axelstjerngren/uni/Year4/ProjectLevel4/level-4-project/benchmarks/alexnet/tiles/%s/conv_5.txt" % tiles
+    "/Users/axelstjerngren/uni/Year4/ProjectLevel4/level-4-project/benchmarks/alexnet/tiles/%s/conv_1.txt" % tiles_conv,
+    "/Users/axelstjerngren/uni/Year4/ProjectLevel4/level-4-project/benchmarks/alexnet/tiles/%s/conv_2.txt" % tiles_conv,
+    "/Users/axelstjerngren/uni/Year4/ProjectLevel4/level-4-project/benchmarks/alexnet/tiles/%s/conv_3.txt" % tiles_conv,
+    "/Users/axelstjerngren/uni/Year4/ProjectLevel4/level-4-project/benchmarks/alexnet/tiles/%s/conv_4.txt" % tiles_conv,
+    "/Users/axelstjerngren/uni/Year4/ProjectLevel4/level-4-project/benchmarks/alexnet/tiles/%s/conv_5.txt" % tiles_conv
 ]
 fc_paths = [
-    "/Users/axelstjerngren/uni/Year4/ProjectLevel4/level-4-project/benchmarks/alexnet/tiles/%s/fc_1.txt" % tiles,
-    "/Users/axelstjerngren/uni/Year4/ProjectLevel4/level-4-project/benchmarks/alexnet/tiles/%s/fc_2.txt" % tiles,
-    "/Users/axelstjerngren/uni/Year4/ProjectLevel4/level-4-project/benchmarks/alexnet/tiles/%s/fc_3.txt" % tiles, 
+    "/Users/axelstjerngren/uni/Year4/ProjectLevel4/level-4-project/benchmarks/alexnet/tiles/%s/fc_1.txt" % tiles_fc,
+    "/Users/axelstjerngren/uni/Year4/ProjectLevel4/level-4-project/benchmarks/alexnet/tiles/%s/fc_2.txt" % tiles_fc,
+    "/Users/axelstjerngren/uni/Year4/ProjectLevel4/level-4-project/benchmarks/alexnet/tiles/%s/fc_3.txt" % tiles_fc, 
 ]
 architecture.load_tile_config(
     conv_cfg_paths = conv_paths,

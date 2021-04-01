@@ -22,7 +22,6 @@ def conv2d_stonne_nchw(
     strides, 
     padding, 
     dilation, 
-    groups=1, 
     out_dtype="float32"
     
     ):    
@@ -64,7 +63,6 @@ def conv2d_stonne_nchw(
     N = 1 
     pad_x = padding[0] 
     pad_y = padding[1]
-
     # Calculate the output shape
     X_:int = ((X + 2 * pad_x - dilation[0] * (R - 1) - 1) // strides[0]) + 1
     Y_:int = ((Y + 2 * pad_y - dilation[1] * (S - 1) - 1) // strides[0]) + 1
@@ -230,7 +228,7 @@ def conv2d_stonne_nhwc(
             strides[0],        # [11] 
             strides[1],        # [12]       
             pad_x,             # [13]    
-            pad_y,             # [14]    
+            pad_y,             # [14]     
             dilation[0],       # [15]
             dilation[1],       # [16]
             architecture.conv_tiles_path, # [17]     
@@ -250,8 +248,15 @@ def conv2d_stonne_nhwc(
         )
 
 # Use the genric schedule
-@autotvm.register_topi_schedule("conv2d_stonne.x86")
-def schedule_conv2d_stonne(cfg, outs):
+@autotvm.register_topi_schedule("conv2d_stonne_nchw.x86")
+def schedule_conv2d_stonne_nchw(cfg, outs):
+    """Create schedule for conv2d_nhwc"""
+    cfg.add_flop(1)
+    return te.create_schedule([x.op for x in outs])
+
+# Use the genric schedule
+@autotvm.register_topi_schedule("conv2d_stonne_nhwc.x86")
+def schedule_conv2d_stonne_nhwc(cfg, outs):
     """Create schedule for conv2d_nhwc"""
     cfg.add_flop(1)
     return te.create_schedule([x.op for x in outs])
@@ -278,14 +283,14 @@ def conv2d_strategy_cpu(attrs, inputs, out_type, target):
             assert kernel_layout == "OIHW"
             strategy.add_implementation(
                     wrap_compute_conv2d(conv2d_stonne_nchw),
-                    wrap_topi_schedule(schedule_conv2d_stonne),
+                    wrap_topi_schedule(schedule_conv2d_stonne_nchw),
                     name="conv2d_stonne.x86",
             )
         elif layout == "NHWC":
             assert kernel_layout == "HWIO"
             strategy.add_implementation(
                     wrap_compute_conv2d(conv2d_stonne_nhwc),
-                    wrap_topi_schedule(schedule_conv2d_stonne),
+                    wrap_topi_schedule(schedule_conv2d_stonne_nhwc),
                     name="conv2d_stonne.x86",
             )
     else:
