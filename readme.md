@@ -1,6 +1,6 @@
 # Bifrost
 
-Bifrost (/ˈbɪvrɒst/) is a tool for evaulation and optimization of DNN accelerators. The Bifrost interface bridges [Apache TVM](https://tvm.apache.org) (a deep learning compiler) with STONNE (a simulator for DNN accelerators).
+Bifrost (/ˈbɪvrɒst/) is a tool for evaulation and optimization of DNN accelerators. The Bifrost interface bridges [Apache TVM](https://tvm.apache.org) (a deep learning compiler) with [STONNE](https://arxiv.org/pdf/2006.07137.pdf) (a simulator for DNN accelerators).
 
 The name is taken from Norse mythology, where Bifrost is the bridge between Midgard and Asgard. 
 
@@ -164,6 +164,8 @@ python setup.py
 Tested on macOS Big Sur (11.1) and Manjaro 20.2.1 
 
 ### Architecture
+
+![Bifrost diagram](https://drive.google.com/file/d/1YNvC9asfmgpLy4Pl6nDMuHG23A1TneEj/preview)
 
 
 
