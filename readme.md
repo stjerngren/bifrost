@@ -1,6 +1,6 @@
 # Bifrost
 
-Bifrost (/ˈbɪvrɒst/) is a tool for evaulation and optimization of DNN accelerators. The Bifrost interface bridges [Apache TVM](https://tvm.apache.org) (a deep learning compiler) with [STONNE](https://arxiv.org/pdf/2006.07137.pdf) (a simulator for DNN accelerators).
+Bifrost (/ˈbɪvrɒst/) is a tool for evaulation and optimization of DNN accelerators. The Bifrost interface bridges [Apache TVM](https://tvm.apache.org) (a deep learning compiler) with [STONNE](https://arxiv.org/pdf/2006.07137.pdf) (a simulator for DNN accelerators). Bifrost let's you run DNN models on simulated reconfigurable DNN accelerators.
 
 The name is taken from Norse mythology, where Bifrost is the bridge between Midgard and Asgard. 
 
@@ -12,7 +12,8 @@ The name is taken from Norse mythology, where Bifrost is the bridge between Midg
 pip install git+https://github.com/axelstjerngren/level-4-project#"egg=bifrost&subdirectory=bifrost"
 ```
 This will enable to you to use the latest version of Bifrost.
-**N.B** You need to have Apache TVM installed. You can find installation instructions [here](https://tvm.apache.org/docs/install/index.html).
+
+**N.B You need to have Apache TVM installed. You can find installation instructions [here](https://tvm.apache.org/docs/install/index.html).**
 
 ## How to use
 
@@ -27,10 +28,12 @@ Importing TVM and Bifrost in this order is essential. Bifrost overrides the LLVM
 ### Running a model
 There are two ways to run a model.
 
-The simplest version 
+The simplest version is using Bifrost's built in runners
 
 
 ``` python
+from bifrost.runner.run import run_torch
+from bifrost.runner.run import run_onnx
 
 ```
 
