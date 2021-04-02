@@ -11,17 +11,66 @@ The name is taken from Norse mythology, where Bifrost is the bridge between Midg
 ```
 pip install git+https://github.com/axelstjerngren/level-4-project#"egg=bifrost&subdirectory=bifrost"
 ```
-This will enable to you to use the latest version of *Bifrost*. 
+This will enable to you to use the latest version of Bifrost.
 **N.B** You need to have Apache TVM installed. You can find installation instructions [here](https://tvm.apache.org/docs/install/index.html).
 
 ## How to use
 
 All scripts which use must import TVM and Bifrost:
-```
+``` python
 import tvm
 import bifrost
 ```
-Importing TVM and Bifrost in this order is essential. The reason why 
+Importing TVM and Bifrost in this order is essential. Bifrost overrides the LLVM operators and adds new external ones which calls the STONNE library.
+
+
+### Running a model
+There are two ways to run a model.
+
+The simplest version 
+
+
+``` python
+
+```
+
+
+### Configuring the simulated architecture
+
+``` python
+from bifrost.stonne.simulator import architecture
+```
+
+Adter configuration you need to make sure thst a configuration file has been created.
+``` python
+architecture.create_config_file()
+```
+
+
+``` python
+
+```
+
+controller_type
+ms_size 
+
+
+### Tuning 
+When tuning the mapping or the hardware for a DNN, we first need to set 
+``` python
+from bifrost.stonne.simulator import architecture
+
+# Set the tuning to true
+architecture.tune = True
+
+```
+You need to access the tuning module to create the tuning space
+``` python
+architecture.tuner
+```
+
+An example of tuning is availble in ```becnhmarks/alexnet/alexnet_tune.py```
+
 
 
 
