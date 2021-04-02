@@ -16,6 +16,12 @@ This will enable to you to use the latest version of *Bifrost*.
 
 ## How to use
 
+All scripts which use must import TVM and Bifrost:
+```
+import tvm
+import bifrost
+```
+Importing TVM and Bifrost in this order is essential. The reason why 
 
 
 
