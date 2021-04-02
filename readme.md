@@ -1,17 +1,12 @@
 # Bifrost
 
-Bifrost (/ˈbɪvrɒst/) is a tool for evaulation and optimization of reconfigurable accelerators.
-
-a bridge between [Apache TVM](https://tvm.apache.org) and [STONNE]().
+Bifrost (/ˈbɪvrɒst/) is a tool for evaulation and optimization of DNN accelerators. The Bifrost interface bridges [Apache TVM](https://tvm.apache.org) (a deep learning compiler) with STONNE (a simulator for DNN accelerators).
 
 The name is taken from Norse mythology, where Bifrost is the bridge between Midgard and Asgard. 
 
-## Dissertation formalities
-* [Overleaf Dissertation](https://www.overleaf.com/project/5f756faefef3ec00014e888a)
-* [Timelog](https://github.com/axelstjerngren/level-4-project/wiki/Timelog)
-* [Meeting Notes](https://github.com/axelstjerngren/level-4-project/wiki/Meeting-Notes)
+# Quickstart Guide
 
-## Quickstart
+## Installation
 *Bifrost* is a Python tool. You can install it with one command:
 ```
 pip install git+https://github.com/axelstjerngren/level-4-project#"egg=bifrost&subdirectory=bifrost"
@@ -19,6 +14,19 @@ pip install git+https://github.com/axelstjerngren/level-4-project#"egg=bifrost&s
 This will enable to you to use the latest version of *Bifrost*. 
 **N.B** You need to have Apache TVM installed. You can find installation instructions [here](https://tvm.apache.org/docs/install/index.html).
 
+## How to use
+
+
+
+
+
+
+
+
+
+
+
+# Advanced Instructions 
 ## Build from source
 
 Install Apache TVM using the installation instructions [here](https://tvm.apache.org/docs/install/index.html).
@@ -81,12 +89,10 @@ The C++ should now compile correctly when you run **make** inside of the level-4
 ## Dependecies
 
 
-
 Python >=3.8
 * Apache TVM |  | 
 * STONNE |A cycle-accurate simulator for reconfigurable DNN accelerators written in C++, a forked version is required for Bifrost| 
-* MRNA.  |A cycle-accurate simulator for reconfigurable DNN accelerators written in C++, a forked version is required for Bifrost |
-* JSONCPP |A library to read/write JSON files for C++| https://github.com/open-source-parsers/jsoncpp
+]* JSONCPP |A library to read/write JSON files for C++| https://github.com/open-source-parsers/jsoncpp
 
 STONNE
 TVM
