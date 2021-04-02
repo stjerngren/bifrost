@@ -165,7 +165,8 @@ Tested on macOS Big Sur (11.1) and Manjaro 20.2.1
 
 ### Architecture
 
-![Bifrost diagram](https://drive.google.com/file/d/1YNvC9asfmgpLy4Pl6nDMuHG23A1TneEj/preview)
+![Bifrost diagram](https://drive.google.com/uc?export=view&id=1YNvC9asfmgpLy4Pl6nDMuHG23A1TneEj)
+
 
 
 
