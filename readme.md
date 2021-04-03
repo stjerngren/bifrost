@@ -28,7 +28,7 @@ Importing TVM and Bifrost in this order is essential. Bifrost overrides the LLVM
 
 ### Running a DNN model
 
-The simplest way to execute a model is to use the built-in runners in Bifrost. Currently, PyTorch and ONNX models are supported.
+The simplest way to execute a DNN model is to use the built-in runners in Bifrost. Currently, PyTorch and ONNX models are supported.
 ``` python
  # Import the runner
 from bifrost.runner.run import run_torch, run_onnx
@@ -41,30 +41,35 @@ from alexnet import torch_model, input
 output = run_torch(torch_model, input)
 ```
 
-You can also run any model which is supported by TVM
+You can also run models from all deep learning librarues which are supported by TVM. Models from deep learning libraries other than PyTorch and ONNX can be used compiling them using TVM. [The TVM documentation contains gudies for PyTorch, Tensorflow, ONNX, MXNet, etc](https://tvm.apache.org/docs/tutorials/index.html#compile-deep-learning-models) models, just replace the target string with ```target = "llvm -libs=stone"```. 
 
 
 ```python
-# Import tvm and initalise output
+# Import tvm and bifrost
 import tvm
 import bifrost
 
 # Get model and input
 from alexnet import torch_model, input
 
+# Trace torch model and load into tvm
 torch_model.eval()
 trace = torch.jit.trace(torch_model, input).eval()
 mod, params = relay.frontend.from_pytorch(trace, [("trace", input.shape)])
+
+# Use STONNE as an external library
 target = "llvm -libs=stonne"
+
+# Run the model
 lib = relay.build(mod, target=target, params=params)
 ctx = tvm.context(target, 0)
 module = runtime.GraphModule(lib["default"](ctx))
 module.set_input("trace", input)
-module.run()
+output = module.run()
 ```
 
 
-The ```target = "llvm -libs=stone"``` 
+
 
 
 ### Configuring the simulated architecture
