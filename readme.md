@@ -7,7 +7,7 @@ The name is taken from Norse mythology, where Bifrost is the bridge between Midg
 # Quickstart Guide
 
 ## Installation
-*Bifrost* is a Python tool. You can install it with one command:
+Bifrost is a Python tool. You can install it using pip:
 ```
 pip install git+https://github.com/axelstjerngren/level-4-project#"egg=bifrost&subdirectory=bifrost"
 ```
@@ -17,6 +17,7 @@ This will enable to you to use the latest version of Bifrost.
 
 ## How to use
 
+Bifrost extends TVM to support STONNE as an external library. Most of the workflow is identical to the usual TVM workflow, but with extra functinality defined to configure the simulated accelerator and its dataflow mapping.
 All scripts which use must import TVM and Bifrost:
 ``` python
 import tvm
@@ -25,20 +26,59 @@ import bifrost
 Importing TVM and Bifrost in this order is essential. Bifrost overrides the LLVM operators and adds new external ones which calls the STONNE library.
 
 
-### Running a model
-There are two ways to run a model.
+### Running a DNN model
 
-The simplest version is using Bifrost's built in runners
-
-
+The simplest way to execute a model
 ``` python
 from bifrost.runner.run import run_torch
 from bifrost.runner.run import run_onnx
 
 ```
 
+If no architecture has been specified 
+
+
+
+
+
+The ```target = "llvm -libs=stone"``` 
+
+```python
+    torch_model.eval()
+    trace = torch.jit.trace(torch_model, input).eval()
+    mod, params = relay.frontend.from_pytorch(trace, [("trace", input.shape)])
+    target = "llvm -libs=stonne"
+    lib = relay.build(mod, target=target, params=params)
+    ctx = tvm.context(target, 0)
+    module = runtime.GraphModule(lib["default"](ctx))
+    module.set_input("trace", input)
+    module.run()
+  ```
+
+
 
 ### Configuring the simulated architecture
+
+|Option|Description|Restriction|
+| --- | --- | --- |
+|      |           |           |
+
+Bifrost has a default architecture which will be executed:
+
+|Option|Default|
+| -- | -- |
+|ms_size|16|
+|reduce_network_type|ASNETWORK|
+|ms_network_type|LINEAR|
+|dn_bw|8|
+|rn_bw|8|
+|controller_type|MAERI_DENSE_WORKLOAD|
+|accumulation_buffer_enabled|True|
+
+By default STONNE will not create any output files during execution. This setting can be enabled by setting ```architecture.print_stats = True```
+
+
+
 
 ``` python
 from bifrost.stonne.simulator import architecture
@@ -54,8 +94,16 @@ architecture.create_config_file()
 
 ```
 
-controller_type
-ms_size 
+
+
+### Configure mapping
+architecture.load_mapping(
+  conv = [],
+  fc =[],
+)
+
+
+
 
 
 ### Tuning 
