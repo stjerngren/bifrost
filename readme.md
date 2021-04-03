@@ -67,18 +67,20 @@ module.set_input("trace", input)
 output = module.run()
 ```
 ### Configuring the simulated architecture
+![STONNE structure](https://drive.google.com/uc?export=view&id=15K-3DWHoYzPDFAWrTtioaOmvrL_8bMx0)
+
 
 
 |Option|Description|Options|
 | --- | --- | --- |
 | controller_type |The simulated architecture such as MAERI, SIGMA, and the TPU|"MAERI_DENSE_WORKLOAD", "SIGMA_SPARSE_GEMM", or "TPU_OS_DENSE"|
-| ms_network_type |           |"LINEAR","OS_MESH"|
-| ms_size | The number of multipliers (PEs) in the architecture|Power of two and => 8 |
-| ms_row  |           |           |
-| ms_col  |           |           |
+| ms_network_type |Defines the mulitplier type. Fleible architectures use LINEAR while rigid ones like the TPU must use OS_MESH|"LINEAR","OS_MESH"|
+| ms_size | The number of multipliers (PEs) in the architecture|Power of two and >= 8 |
+| ms_row  | Number of read ports|           |
+| ms_col  | Number of write ports  |           |
 | reduce_network_type |           |           |
-| dn_bw |           |           |
-| rn_bw |           |           |
+| dn_bw |           |Power of two and >= 8 |
+| rn_bw |           |Power of two and >= 8 |
 | sparsity_ratio |           |           |
 | accumulation_buffer_enabled |Accumulation buffer, required to be enabled for rigid architectures like the TPU  |True or False|
 
