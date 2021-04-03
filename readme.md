@@ -69,9 +69,19 @@ output = module.run()
 ### Configuring the simulated architecture
 
 
-|Option|Description|Restriction|
+|Option|Description|Options|
 | --- | --- | --- |
-|      |           |           |
+| controller_type |The simulated architecture such as MAERI, SIGMA, and the TPU|"MAERI_DENSE_WORKLOAD", "SIGMA_SPARSE_GEMM", or "TPU_OS_DENSE"|
+| ms_network_type |           |"LINEAR","OS_MESH"|
+| ms_size | The number of multipliers (PEs) in the architecture|Power of two and => 8 |
+| ms_row  |           |           |
+| ms_col  |           |           |
+| reduce_network_type |           |           |
+| dn_bw |           |           |
+| rn_bw |           |           |
+| sparsity_ratio |           |           |
+| accumulation_buffer_enabled |Accumulation buffer, required to be enabled for rigid architectures like the TPU  |True or False|
+
 
 ``` python
 # Import the architecture module 

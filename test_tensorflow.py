@@ -74,8 +74,8 @@ label_map_url = os.path.join(repo_base, label_map)
 # target_host = 'llvm'
 # layout = "NCHW"
 # ctx = tvm.gpu(0)
-target = "llvm -libs=stonne"
-target_host = "llvm -libs=stonne"
+target = "llvm"
+target_host = "llvm "
 layout = None
 ctx = tvm.cpu(0)
 

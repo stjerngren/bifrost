@@ -58,9 +58,9 @@ fc_paths = [
     "/Users/axelstjerngren/uni/Year4/ProjectLevel4/level-4-project/benchmarks/alexnet/tiles/%s/fc_2.txt" % tiles_fc,
     "/Users/axelstjerngren/uni/Year4/ProjectLevel4/level-4-project/benchmarks/alexnet/tiles/%s/fc_3.txt" % tiles_fc, 
 ]
-architecture.load_tile_config(
-    conv_cfg_paths = conv_paths,
-    fc_cfg_paths = fc_paths
+architecture.load_mapping(
+    conv = conv_paths,
+    fc = fc_paths
     )
 
 # Download an example image from the pytorch website
