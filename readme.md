@@ -41,8 +41,7 @@ from alexnet import torch_model, input
 output = run_torch(torch_model, input)
 ```
 
-You can also run models from all deep learning librarues which are supported by TVM. Models from deep learning libraries other than PyTorch and ONNX can be used compiling them using TVM. [The TVM documentation contains gudies for PyTorch, Tensorflow, ONNX, MXNet, etc](https://tvm.apache.org/docs/tutorials/index.html#compile-deep-learning-models) models, just replace the target string with ```target = "llvm -libs=stone"```. 
-
+You can also run models from all deep learning librarues which are supported by TVM. Models from deep learning libraries other than PyTorch and ONNX can be used compiling them using TVM. [The TVM documentation contains gudies for PyTorch, Tensorflow, ONNX, MXNet, etc](https://tvm.apache.org/docs/tutorials/index.html#compile-deep-learning-models) models, just replace the target string with ```target = "llvm -libs=stone"```. The following example shows how to run a PyTorch model without using the Bifrost runner:
 
 ```python
 # Import tvm and bifrost
@@ -67,19 +66,28 @@ module = runtime.GraphModule(lib["default"](ctx))
 module.set_input("trace", input)
 output = module.run()
 ```
-
-
-
-
-
 ### Configuring the simulated architecture
+
 
 |Option|Description|Restriction|
 | --- | --- | --- |
 |      |           |           |
 
-Bifrost has a default architecture which will be executed:
+``` python
+# Import the architecture module 
+from bifrost.stonne.simulator import architecture
 
+# Configure the simulated architecture
+architecture.ms_size = 128
+architecture.rn_bw = 64
+architecture.dn_bw = 64
+architecture.controller_type = "SIGMA_SPARSE_GEMM"
+architecture.sparsity_ratio = 0
+
+# Create the config file which is used by STONNE
+architecture.create_config_file()
+```
+If the architecture is not configured the following configuration is used:
 |Option|Default|
 | -- | -- |
 |ms_size|16|
@@ -93,21 +101,6 @@ Bifrost has a default architecture which will be executed:
 By default STONNE will not create any output files during execution. This setting can be enabled by setting ```architecture.print_stats = True```
 
 
-
-
-``` python
-from bifrost.stonne.simulator import architecture
-```
-
-Adter configuration you need to make sure that a configuration file has been created.
-``` python
-architecture.create_config_file()
-```
-
-
-``` python
-
-```
 
 
 
