@@ -67,8 +67,8 @@ module.set_input("trace", input)
 output = module.run()
 ```
 ### Configuring the simulated architecture
-![STONNE structure](https://drive.google.com/uc?export=view&id=15K-3DWHoYzPDFAWrTtioaOmvrL_8bMx0)
 
+![STONNE structure](https://drive.google.com/uc?export=view&id=15K-3DWHoYzPDFAWrTtioaOmvrL_8bMx0)
 
 
 |Option|Description|Options|
@@ -76,12 +76,12 @@ output = module.run()
 | controller_type |The simulated architecture such as MAERI, SIGMA, and the TPU|"MAERI_DENSE_WORKLOAD", "SIGMA_SPARSE_GEMM", or "TPU_OS_DENSE"|
 | ms_network_type |Defines the mulitplier type. Fleible architectures use LINEAR while rigid ones like the TPU must use OS_MESH|"LINEAR","OS_MESH"|
 | ms_size | The number of multipliers (PEs) in the architecture|Power of two and >= 8 |
-| ms_row  | Number of read ports|           |
-| ms_col  | Number of write ports  |           |
-| reduce_network_type |           |           |
-| dn_bw |           |Power of two and >= 8 |
-| rn_bw |           |Power of two and >= 8 |
-| sparsity_ratio |           |           |
+| ms_row  |  |           |
+| ms_col  |  |           |
+| reduce_network_type |The type of reduction network|"ASNETWORK","FENETWORK","TEMPORALRN"|
+| dn_bw | Number of read ports (distribution network)|Power of two and >= 8 |
+| rn_bw | Number of write ports (reduction network)|Power of two and >= 8 |
+| sparsity_ratio | The sparsity of the architecture|[0,10]|
 | accumulation_buffer_enabled |Accumulation buffer, required to be enabled for rigid architectures like the TPU  |True or False|
 
 
@@ -132,7 +132,6 @@ architecture.load_mapping(
 When tuning the mapping or the hardware for a DNN, we first need to set 
 ``` python
 from bifrost.stonne.simulator import architecture
-
 # Set the tuning to true
 architecture.tune = True
 
@@ -141,6 +140,12 @@ You need to access the tuning module to create the tuning space
 ``` python
 architecture.tuner
 ```
+
+|Setting|Variable|Options|
+| -- | -- | -- |
+
+
+
 
 An example of tuning is availble in ```becnhmarks/alexnet/alexnet_tune.py```
 
