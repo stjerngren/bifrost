@@ -17,7 +17,7 @@ This will enable to you to use the latest version of Bifrost.
 
 ## How to use
 
-Bifrost extends TVM to support STONNE as an external library. Most of the workflow is identical to the usual TVM workflow, but with extra functinality defined to configure the simulated accelerator and its dataflow mapping.
+Bifrost extends TVM to support STONNE as an external library. Most of the workflow is identical to the usual TVM workflow, but with extra fucntionality defined to configure the simulated accelerator and its dataflow mapping.
 All scripts which use must import TVM and Bifrost:
 ``` python
 import tvm
@@ -67,24 +67,32 @@ module.set_input("trace", input)
 output = module.run()
 ```
 ### Configuring the simulated architecture
-
+The general structure of a simulated DNN accelerator comprises of a spatial array of processing elements (PEs). Each PE contains a multiply-accumulate unit (MAC). The PEs receive their inputs and weights from the distribution network and write outputs back to the buffer using the reduction network:
 ![STONNE structure](https://drive.google.com/uc?export=view&id=15K-3DWHoYzPDFAWrTtioaOmvrL_8bMx0)
 
-
-|Option|Description|Options|
+|Setting|Description|Options|
 | --- | --- | --- |
 | controller_type |The simulated architecture such as MAERI, SIGMA, and the TPU|"MAERI_DENSE_WORKLOAD", "SIGMA_SPARSE_GEMM", or "TPU_OS_DENSE"|
-| ms_network_type |Defines the mulitplier type. Fleible architectures use LINEAR while rigid ones like the TPU must use OS_MESH|"LINEAR","OS_MESH"|
-| ms_size | The number of multipliers (PEs) in the architecture|Power of two and >= 8 |
-| ms_row  |  |           |
-| ms_col  |  |           |
+| ms_network_type |Defines the mulitplier type. Flexible architectures use LINEAR while rigid ones like the TPU must use OS_MESH |"LINEAR","OS_MESH"|
+| ms_size | The number of multipliers (PEs) in the architecture, used if ms_network_type is LINEAR (not OS_MESH.)|Power of two and >= 8 |
+| ms_row  | If ms_network_type is OS_MESH the PEs are organised into rows and columns,  |Power of two and >= 8|
+| ms_col  | If ms_network_type is OS_MESH the PEs are organised into rows and columns,  |Power of two and >= 8|
 | reduce_network_type |The type of reduction network|"ASNETWORK","FENETWORK","TEMPORALRN"|
 | dn_bw | Number of read ports (distribution network)|Power of two and >= 8 |
 | rn_bw | Number of write ports (reduction network)|Power of two and >= 8 |
 | sparsity_ratio | The sparsity of the architecture|[0,10]|
 | accumulation_buffer_enabled |Accumulation buffer, required to be enabled for rigid architectures like the TPU  |True or False|
 
+To use the TPU the following settings are required:
+|Setting|Selected Option|
+| -- | -- |
+|controller_type |TPU_OS_DENSE|
+|ms_network_type|OS_MESH|
+|ms_row|Integer which is a power two and >= 8|
+|ms_col|Integer which is a power two and >= 8|
+|accumulation_buffer_enabled|True|
 
+The simulated architecture is configured trhough the architecture module:
 ``` python
 # Import the architecture module 
 from bifrost.stonne.simulator import architecture
@@ -111,10 +119,6 @@ If the architecture is not configured the following configuration is used:
 |accumulation_buffer_enabled|True|
 
 By default STONNE will not create any output files during execution. This setting can be enabled by setting ```architecture.print_stats = True```
-
-
-
-
 
 ### Configure mapping
 ```
