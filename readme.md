@@ -363,9 +363,9 @@ if architecture.tune:
     architecture.config(cfg, conv = True)
 ```
 Finally, the compute function returns an external tensor function which calls the corresponding function from the STONNE-Bifrost API:
-```
+``` python
 return te.extern(
-    (N,K,X_, Y_), # Output dimensions calcualted
+    (N,K,X_, Y_), # Output dimensions calculated above
     [data,kernel], # The "ins" data 
     lambda ins, outs: tvm.tir.call_packed(
             
@@ -386,6 +386,35 @@ return te.extern(
 ### STONNE-Bifrost API
 
 The STONNE-Bifrost API is a collection of functions written in C++ which bridges TVM with STONNE. The compiled binary ```stonne_lib.so``` is included in the ```bifrost/bifrost/stonne/stonne_lib"```. When importing Bifrost the ```load_lib``` function from ```bifrost/bifrost/stonne/connect_stonne.py"``` is called. This function loads the .so binary using ctypes and exposes the fucntions defined in the API to TVM.
+#### Functions
+For each new operator in the Bifrost TOPI strategies, a corresponding function is defined in the STONNE-Bifrost API.  Each fucntion is registered to TVM's global function registry using type erased functions:
+```cpp
+TVM_REGISTER_GLOBAL("tvm.contrib.stonne.conv2d.nchw")
+    .set_body([](TVMArgs args, TVMRetValue *ret) {
+        std::string path_to_arch_file = args[0];
+        ...,
+        DLTensor *input = args[24];
+        DLTensor *weight = args[25];
+        DLTensor *output = args[26];
+```
+All functions follow the same general pattern, first the function is registered as above. Then the simulated architecture on STONNE is intialised:
+```cpp
+//Creating config  to find out if we are going to
+// run a dense or sparse simulation
+Config stonne_config;
+if (path_to_arch_file != "")
+{
+    stonne_config.loadFile(path_to_arch_file);
+}
+// Set output files
+stonne_config.print_stats_enabled = stats;
+```
+Depending on the simulated architecture, the input (data) and weight float arrays are modified for execution on STONNE. For example NCHW conv2d on MAERI requires a conversion to NHWC and additional padding, while for the SIGMA architecture im2col is applied to the input array as the convolution is executed as a matrix multiplication. Finally the workload is executed on STONNE using a fucntion from the STONNE API:
+``` cpp
+cost = simulateDenseConvForward(layer_name,...,stonne_config); # Get the cycle cost
+```
+STONNE has been forked specifically for Bifrost and can be found here: https://github.com/axelstjerngren/stonne. The forked version of STONNE includes an extended API for STONNE.
+Finally, the cost (cycles) is recorded to ```bifrost_temp/cycles.json```. If the user is tuning, the cost (either cycles or psums) is also recorded to ```bifrost/bifrost/stonne/data/costs.json```.  
 
 #### Modifying the C++ code in the STONNE-Bifrost API. 
 All of the C++ files can be found under:
