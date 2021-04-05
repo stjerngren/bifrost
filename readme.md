@@ -134,6 +134,7 @@ The parameters which determine the a mapping in MAERI depend on the workload bei
 | T_N  | Number of inputs mapped at a time (Only 1 is supported so far by STONNE)|  
 | T_X_ | Number of output rows mapped at a time                                 |
 | T_Y_ | Number of input columns mapped a time  |
+
 For fully connected layers:
 |**Tile** | **Description**|
 | --|--|
