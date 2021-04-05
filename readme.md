@@ -121,19 +121,52 @@ By default STONNE will not create any output files during execution. This settin
 
 ### Configure dataflow mapping
 
+The energy efficiency and performance of DNN accelerator is determined by its *dataflow*. The computation is divided up by grouping neurons into \emph{tiles} which defines how a group of neurons' inputs, weights, and intermediate outputs (psums) are delivered and reused within the accelerator. This pattern is the dataflow in the accelerator. A mapping is a specific instance of a dataflow. In a reconfigurable accelerator, a workload can be scheduled and staged in many different ways depending on the mapping for that specific workload. MAERI and SIGMA are both reconfigurable accelerators. The SIGMA memory controller automatically generates a mapping based on the sparsity level, but when using the MAERI architecture this mapping must be manually provided (efficient mappings can be generated with the the help of AutoTVM).
 
+The parameters which determine the a mapping in MAERI depend on the workload being executed. For convolutions the following parameters are used: 
+|**Tile** | **Description**|
+| --|--|
+| T_R  | Number of filter rows mapped at a time                                  |  
+| T_S  | Number of filter columns mapped at a time                               |  
+| T_C  | Number of filter and input channels per group mapped at a time          |  
+| T_K  | Number of filters and output channels per group mapped at a time        |  
+| T_G  | Number of groups mapped at a time                                       |  
+| T_N  | Number of inputs mapped at a time (Only 1 is supported so far by STONNE)|  
+| T_X_ | Number of output rows mapped at a time                                 |
+| T_Y_ | Number of input columns mapped a time  |
+For fully connected layers:
+|**Tile** | **Description**|
+| --|--|
+| T_M | Number of output neurons mapped at a time |
+| T_N | Number of batches mapped at a time |
+| T_K | Number of input neurons mapped at a time |  
 
+When executing a DNN model on MAERI with a specific mapping you simply provide the mapping in the same order as the layers in the model are executed. The following example demonstrates how the mappings for the layers in Alexnet are provided, a CNN model with five conv layers followed by three fully connected layers. If no mapping is provided, a basic one will be generated with all parameters set to 1 (this will be very inefficient).
+``` python
+# Mappings can be provided as txt files
+# Alexnet has five conv layers, these mappings will be applied in order
+conv_mappings = [
+ "path/to/conv_mapping1.txt",
+ "path/to/conv_mapping2.txt",
+ "",                          # Empty string, basic mapping will be used
+ "path/to/conv_mapping4.txt",
+ "path/to/conv_mapping5.txt",
+]
 
-```
+# Mappings can also be provided as python dictionaries
+fc_mappings = [
+ {"T_S":12, "T_K":8, "T_N":1},
+ {},  # Empty dictionary, basic mapping will be used
+ {"T_S":8, "T_K":10, "T_N":1},
+]
+
+# The load_mapping from the architecture module is used
+# to configure the mapping
 architecture.load_mapping(
-  conv = [],
-  fc =[],
+  conv = conv_mappings,
+  fc = fc_mappings,
 )
 ```
-
-
-
-
 
 ### Tuning 
 When tuning the mapping or the hardware for a DNN, we first need to set 
@@ -242,8 +275,22 @@ if __name__ == "__main__":
     ],
 
 ```
+## Dependecies
 
 
+Python >=3.8
+* Apache TVM |A deep learning compiler stack | https://tvm.apache.org
+* STONNE |A cycle-accurate simulator for reconfigurable DNN accelerators written in C++, a forked version is required for Bifrost| URL retracted a STONNE source is not public yet
+* MRNA | A mapping exploration for MAERI by theGA Tech Synergy lab | https://github.com/georgia-tech-synergy-lab/mRNA
+* JSONCPP |A library to read/write JSON files for C++| https://github.com/open-source-parsers/jsoncpp
+
+## Tests
+Bifrost includes a test suite to ensure the correctness of the supported operations. This will run all implemented layers (conv2d and dense) on STONNE and compare the output against the TVM LLVM implementation for correctness. The MAERI, SIGMA, and TPU architectures will be tested. You can run the tests using the following commands:
+```
+cd bifrost
+python setup.py
+```
+Tested on macOS Big Sur (11.1) and Manjaro 20.2.1 
 
 
 # Advanced Instructions 
@@ -268,8 +315,80 @@ export BIFROST=/path/to/level-4-project/bifrost/
 export PYTHONPATH=$BIFROST/python:${PYTHONPATH}
 ```
 
-## Modifying the C++ code 
-All of the C++ files can be found in under:
+
+## Bifrost Component Overview
+The following diagram shows an overview of Bifrost.
+![Bifrost diagram](https://drive.google.com/uc?export=view&id=1YNvC9asfmgpLy4Pl6nDMuHG23A1TneEj)
+
+### Bifrost TOPI Strategies
+These can found be under ```bifrost/bifrost/stonne/ops/```. Currently conv2d and dense (fully connected) operators are fully implemented, these operators are exposed through ```__init__.py``` in the same directory. Both operators are implemented in the same fashion. First the Relay strategies are redefined:
+``` python 
+@conv2d_strategy.register("cpu")
+def conv2d_strategy_cpu(attrs, inputs, out_type, target):
+# Dense strategies are redefined in the same fashion as above
+``` 
+which means that when Bifrost is imported the TVM llvm strategies are overriden. In the new strategies, new implementation are added when "stonne" is included in target.libs:
+``` python
+# Example from conv2d.py
+if "stonne" in target.libs:
+    if layout == "NCHW":
+        assert kernel_layout == "OIHW"
+        strategy.add_implementation(
+                wrap_compute_conv2d(conv2d_stonne_nchw),
+                wrap_topi_schedule(schedule_conv2d_stonne_nchw),
+                name="conv2d_stonne.x86",
+        )
+```
+Each implementation includes a scheduling function and a compute function. STONNE does not include support for us to schedule the offloaded operators and as such dummy schedule functions are used instead:
+``` python
+# Example from conv2d.py
+# Create a dummy schedule which does nothing
+@autotvm.register_topi_schedule("conv2d_stonne_nchw.x86")
+def schedule_conv2d_stonne_nchw(cfg, outs):
+    """Create schedule for conv2d_nhwc"""
+    cfg.add_flop(1) # Add a flop estimator as AutoTVM breaks othnerwise (even if the flop is never used)
+    return te.create_schedule([x.op for x in outs])
+```
+The compute function is where the the execution of the operator is offloaded to STONNE. First the layer infromation is parsed and the output dimenions are calculated depending on the operator. It is in the compute function where *tuning knobs* are implemented. A tuning knob is a tuple with a parameter and a list of options which the AutoTVM module uses to define the tuning space. An example of a tuning knob is ```("T_X", [0,1,2,3,4,5,6,7,8,9,10])``` where ```T_X``` is MAERI dataflow tile and the list is a number of options. These knobs are fetched from the ```tuner``` module:
+```python
+# Define tuning space
+if architecture.tune:
+    # Get and register the tuning knobs
+    knobs = architecture.tuner.create_knobs(conv = True)
+    for knob in knobs:
+        cfg.define_knob(*knob)
+    
+    # Config architecture and set dataflow mapping using the knobs (parameters)
+    # selected by AutoTVM. 
+    architecture.config(cfg, conv = True)
+```
+Finally, the compute function returns an external tensor function which calls the corresponding function from the STONNE-Bifrost API:
+```
+return te.extern(
+    (N,K,X_, Y_), # Output dimensions calcualted
+    [data,kernel], # The "ins" data 
+    lambda ins, outs: tvm.tir.call_packed(
+            
+        # The name of the corresponding function in the STONNE-Bifrost API
+        "tvm.contrib.stonne.conv2d.nchw",  
+        # Parameters such as layer information, architecture configuration, and mapping
+        architecture.path, # [0]
+        ..., # Leave out options  for brevity
+        ins[0],            # [24] # Data
+        ins[1],            # [25] # Weight (kernel)
+        outs[0],           # [26] # Output (array of floats) 
+        ),
+    name = "s",
+    dtype = out_dtype
+)
+```
+
+### STONNE-Bifrost API
+
+The STONNE-Bifrost API is a collection of functions written in C++ which bridges TVM with STONNE. The compiled binary ```stonne_lib.so``` is included in the ```bifrost/bifrost/stonne/stonne_lib"```. When importing Bifrost the ```load_lib``` function from ```bifrost/bifrost/stonne/connect_stonne.py"``` is called. This function loads the .so binary using ctypes and exposes the fucntions defined in the API to TVM.
+
+#### Modifying the C++ code in the STONNE-Bifrost API. 
+All of the C++ files can be found under:
 ```
 level-4-project
 |___bifrost
@@ -290,7 +409,7 @@ cd bifrost
 make -j
 ```
 
-### C++ depdencies 
+#### C++ depdencies 
 To change the C code you need to clone the STONNE, mRNA and TVM repositories:
 ```
 git clone https://github.com/axelstjerngren/stonne
@@ -304,33 +423,7 @@ export TVM_ROOT    = path_to_tvm/tvm
 export STONNE_ROOT = path_to_stonne/stonne
 export MRNA_ROOT   = path_to_stonne/stonne
 ```
-The C++ should now compile correctly when you run **make** inside of the level-4-project/bifrost directory.
-
-## Dependecies
-
-
-Python >=3.8
-* Apache TVM |  | 
-* STONNE |A cycle-accurate simulator for reconfigurable DNN accelerators written in C++, a forked version is required for Bifrost| 
-]* JSONCPP |A library to read/write JSON files for C++| https://github.com/open-source-parsers/jsoncpp
-
-STONNE
-TVM
-MRNA
-
-**N.B** If you have TVM installed, you only need to run the pip command above. The C++ dependencies come pre-packaged together with Bifrost
-
-## Run the tests
-Bifrost includes a test suite to ensure the correctness of the supported operations. This will run all implemented layers (conv2d and dense) on STONNE and compare the output against the TVM LLVM implementation for correctness. The MAERI, SIGMA, and TPU architectures will be tested. You can run the tests using the following commands:
-```
-cd bifrost
-python setup.py
-```
-Tested on macOS Big Sur (11.1) and Manjaro 20.2.1 
-
-### Architecture
-
-![Bifrost diagram](https://drive.google.com/uc?export=view&id=1YNvC9asfmgpLy4Pl6nDMuHG23A1TneEj)
+The C++ should now compile correctly when you run **make** inside of the /bifrost directory.
 
 
 
