@@ -387,7 +387,7 @@ return te.extern(
 
 The STONNE-Bifrost API is a collection of functions written in C++ which bridges TVM with STONNE. The compiled binary ```stonne_lib.so``` is included in the ```bifrost/bifrost/stonne/stonne_lib"```. When importing Bifrost the ```load_lib``` function from ```bifrost/bifrost/stonne/connect_stonne.py"``` is called. This function loads the .so binary using ctypes and exposes the fucntions defined in the API to TVM.
 #### Functions
-For each new operator in the Bifrost TOPI strategies, a corresponding function is defined in the STONNE-Bifrost API.  Each fucntion is registered to TVM's global function registry using type erased functions:
+For each new operator in the Bifrost TOPI strategies, a corresponding function is defined in the STONNE-Bifrost API.  Each function is registered to TVM's global function registry using type erased functions:
 ```cpp
 TVM_REGISTER_GLOBAL("tvm.contrib.stonne.conv2d.nchw")
     .set_body([](TVMArgs args, TVMRetValue *ret) {
@@ -455,7 +455,43 @@ export MRNA_ROOT   = path_to_stonne/stonne
 The C++ should now compile correctly when you run **make** inside of the /bifrost directory.
 
 ### Simulator configurator
-This module can be found in ```bifrost/bifrost/stonne/simulator.py```.
+This module can be found in ```bifrost/bifrost/stonne/simulator.py```. The simulated architecture is contained in a class called ```Simulator```:
+```python
+class Simulator(object):
+    def __init__(self):
+        #
+        self._ms_size:int= 16
+        ... # Variables for all other architecture parameters
+```
+Each architecture variable has a corresponding getter and setter. The setter function validates the user input and makes sure that the user is not able to create invalid configurations:
+```python
+@property
+def ms_size(self):
+    return self._ms_size
+
+@ms_size.setter
+def ms_size(self, size: int):
+    # Use bit manipulation magic to check if power of two
+    # Size also has to be >=8
+    if (size & (size-1) == 0) and size != 0 and size>=8:
+        self._ms_size = size
+    else:
+        raise ConfigError("ms_size has to be a power of two!")
+```
+STONNE requires .cfg files as input to configure the simulated accelerator. The architecture contains a fucntion to generate config files which are created in the ```bifrost_temp/architecture``` directory:
+``` python
+def create_config_file(self):
+    """
+    This will create a config file for STONNE
+
+    """
+    # Create a file
+    with open(self.path, "w+") as f:
+        f.write("[MSNetwork]\n")
+        ...
+        f.write(f'controller_type="{self.controller_type}"\n')
+```
+
 
 
 
