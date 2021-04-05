@@ -76,9 +76,12 @@ class Simulator(object):
             , 16
             )
 
-    def load_tile_config(self, conv_cfg_paths:List[str] = [], fc_cfg_paths:List[str] = []):
-        conv_cfg_paths.reverse()
-        fc_cfg_paths.reverse()
+    def load_mapping(self, conv:List = [], fc:List = []):
+
+        conv.reverse()
+        fc.reverse()
+
+
         self.manual_tile_paths = True
         self.conv_cfg_paths = conv_cfg_paths
         self.fc_cfg_paths = fc_cfg_paths
