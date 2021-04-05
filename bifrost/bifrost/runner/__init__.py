@@ -1,1 +1,1 @@
-from .run import run_torch_stonne
+from .run import run_torch, run_onnx

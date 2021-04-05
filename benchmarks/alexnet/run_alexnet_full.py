@@ -6,15 +6,15 @@ from tvm.contrib import graph_runtime as runtime
 # Import this add stonne as an x86 co-processor
 import bifrost
 from bifrost.stonne.simulator import architecture
-from bifrost.runner.run import run_torch_stonne
+from bifrost.runner.run import run_torch
 from alexnet import alex_model
 
 ################################################################################
 # Choose eval settings here
 ################################################################################
 
-# choose maeri or sparse
-architecture_setting = "tpu"
+# choose "maeri", "sparse", or "tpu"
+architecture_setting = "maeri"
 
 # chosoe sparsity ratio (ignored if not sigma)
 sparsity_ratiio = 0
@@ -22,7 +22,7 @@ sparsity_ratiio = 0
 # choose tile config: performance, opt, stonne_paper, basic
 # If using sparse, these will be ignored.
 tiles_conv = "performance"
-tiles_fc = "basic"
+tiles_fc = "performance"
 architecture.ms_size = 128
 
 #################################################################################
@@ -87,7 +87,7 @@ input_batch = input_tensor.unsqueeze(0) # create a mini-batch as expected by the
 import time 
 start = time.time()
 
-run_torch_stonne(alex_model, input_batch)
+run_torch(alex_model, input_batch)
 
 end = time.time()
 print(end - start)
