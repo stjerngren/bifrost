@@ -454,6 +454,8 @@ export MRNA_ROOT   = path_to_stonne/stonne
 ```
 The C++ should now compile correctly when you run **make** inside of the /bifrost directory.
 
+### Simulator configurator
+This module can be found in ```bifrost/bifrost/stonne/simulator.py```.
 
 
 
