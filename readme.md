@@ -316,7 +316,7 @@ export PYTHONPATH=$BIFROST/python:${PYTHONPATH}
 ```
 
 
-## Bifrost Component Overview
+## Bifrost Deep Dive
 The following diagram shows an overview of Bifrost.
 ![Bifrost diagram](https://drive.google.com/uc?export=view&id=1YNvC9asfmgpLy4Pl6nDMuHG23A1TneEj)
 
@@ -491,7 +491,8 @@ def create_config_file(self):
         ...
         f.write(f'controller_type="{self.controller_type}"\n')
 ```
+### Mapping configurator
 
-
+### AutoTVM Module
 
 
