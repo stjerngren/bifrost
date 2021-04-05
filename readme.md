@@ -293,6 +293,7 @@ python setup.py
 ```
 Tested on macOS Big Sur (11.1) and Manjaro 20.2.1 
 
+# Benchmarks
 
 # Advanced Instructions 
 ## Build from source
@@ -495,5 +496,9 @@ def create_config_file(self):
 ### Mapping configurator
 
 ### AutoTVM Module
+The AutoTVM mopdule consists of several components:
+```bifrost/bifrost/tuner/stonne_builder.py```
+```bifrost/bifrost/tuner/parameters.py```
+
 
 
