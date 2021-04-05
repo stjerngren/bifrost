@@ -83,8 +83,8 @@ class Simulator(object):
 
 
         self.manual_tile_paths = True
-        self.conv_cfg_paths = conv_cfg_paths
-        self.fc_cfg_paths = fc_cfg_paths
+        self.conv_cfg_paths = conv
+        self.fc_cfg_paths = fc
 
     def set_manual_tile_config(self, type:str):
         """
@@ -126,7 +126,7 @@ class Simulator(object):
             self._ms_size = size
         else:
             raise ConfigError("ms_size has to be a power of two!")
-    
+
     @property
     def reduce_network_type(self):
         return self._reduce_network_type
@@ -242,12 +242,10 @@ class Simulator(object):
 
     def create_config_file(self):
         """
-        This will create a config file at a desired location
+        This will create a config file for STONNE
 
-        Parameters
-        ----------
         """
-   
+
         # Make tile paths if they don't exist
         if not os.path.exists("bifrost_temp"):
             os.mkdir("bifrost_temp")
