@@ -2,19 +2,3 @@ tile_type="FC"
 T_S=8
 T_K=10
 T_N=1
-
-whta rhw hr
-
-
-
-
-|**Tile** | **Description**|
-| --|--|
-| T_R  | Number of filter rows mapped at a time                                  |  
-| T_S  | Number of filter columns mapped at a time                               |  
-| T_C  | Number of filter and input channels per group mapped at a time          |  
-| T_K  | Number of filters and output channels per group mapped at a time        |  
-| T_G  | Number of groups mapped at a time                                       |  
-| T_N  | Number of inputs mapped at a time (Only 1 is supported so far by STONNE)|  
-| T_X_ | Number of output rows mapped at a time                                 |
-| T_Y_ | Number of input columns mapped a time  |

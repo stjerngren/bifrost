@@ -14,10 +14,10 @@ from alexnet import alex_model
 ################################################################################
 
 # choose "maeri", "sparse", or "tpu"
-architecture_setting = "maeri"
+architecture_setting = "sparse"
 
 # chosoe sparsity ratio (ignored if not sigma)
-sparsity_ratiio = 0
+sparsity_ratio = 50
 
 # choose tile config: performance, opt, stonne_paper, basic
 # If using sparse, these will be ignored.
@@ -37,10 +37,12 @@ elif architecture_setting == "tpu":
     architecture.ms_network_type = "OS_MESH"
     architecture.accumulation_buffer_enabled = True
     architecture.controller_type = "TPU_OS_DENSE"
-if sparsity_ratiio:
+if sparsity_ratio:
     if sparsity_ratio == 50:
         from weight_pruning import model as alex_model
-    architecture.sparsity_ratio = 0
+        architecture.sparsity_ratio = 50
+    else:
+        architecture.sparsity_ratio = 0
 
 
 architecture.create_config_file()

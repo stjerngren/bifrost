@@ -79,7 +79,7 @@ def conv2d_stonne_nchw(
         for knob in knobs:
             cfg.define_knob(*knob)
         
-        # Create the architecture files
+        # Create the architecture files and set mapping
         architecture.config(cfg, conv = True)
 
     # Choose tiles

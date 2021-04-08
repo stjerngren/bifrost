@@ -19,15 +19,12 @@ architecture_setting = "sparse"
 # chosoe sparsity ratio (ignored if not sigma)
 sparsity_ratio = 0
 
-# choose tile config: basic, opt
-tiles_conv = "basic"
-
 #################################################################################
 # Do not change anything after this
 architecture.ms_size = 128
 architecture.dn_bw=64
 architecture.rn_bw=64
-if architecture_setting == "sparse":
+if architecture == "sparse":
     architecture.controller_type = "SIGMA_SPARSE_GEMM"
     architecture.sparsity_ratio = 0
 

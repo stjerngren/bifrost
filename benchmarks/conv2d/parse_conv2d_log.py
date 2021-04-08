@@ -70,17 +70,18 @@ mpl.rcParams.update(nice_fonts)
 labels = [8,16,32,64,128]
 x = np.arange(len(labels))  # the label locations
 width = 0.35  # the width of the bars
-
-# Create a figure, set aspect ratio to golden ratio
-plt.figure(figsize=((1+(5**1/2))/2*10,10))
-plt.bar(x - width/2, worst.values(), width, label='Suboptimal Configuration')
-plt.bar(x + width/2, best.values(), width, label='Optimal Configuration')
-# Add some text for labels, title and custom x-axis tick labels, etc.
-plt.xticks(x, labels)
-plt.ylabel('Clock Cycles')
-plt.xlabel('The number of mulitpliers')
-plt.yscale('log')
-plt.legend()
-plt.savefig("conv2d_maeri.pdf", bbox_inches='tight')
-
-plt.show()
+print(list(worst.values()))
+print(list(best.values()))
+## Create a figure, set aspect ratio to golden ratio
+#plt.figure(figsize=((1+(5**1/2))/2*10,10))
+#plt.bar(x - width/2, worst.values(), width, label='Suboptimal Configuration')
+#plt.bar(x + width/2, best.values(), width, label='Optimal Configuration')
+## Add some text for labels, title and custom x-axis tick labels, etc.
+#plt.xticks(x, labels)
+#plt.ylabel('Clock Cycles')
+#plt.xlabel('The number of mulitpliers')
+#plt.yscale('log')
+#plt.legend()
+#plt.savefig("conv2d_maeri.pdf", bbox_inches='tight')
+#
+#plt.show()

@@ -15,7 +15,6 @@ except: urllib.request.urlretrieve(url, filename)
 
 from torchvision import transforms
 from torchvision.models import vgg11
-from bifrost.runner.run import run_torch_stonne
 
 # Instansiate torch model
 vgg11_torch = vgg11(pretrained = True)
