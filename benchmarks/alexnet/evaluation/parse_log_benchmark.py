@@ -2,7 +2,7 @@ import json
 
 ms_size_64_cycles  = list()
 ms_size_64_psums = list()
-path = "/Users/axelstjerngren/uni/Year4/ProjectLevel4/level-4-project/bifrost/alexnet.log"
+path = "alexnet.log"
 
 best = {}
 tr = {}

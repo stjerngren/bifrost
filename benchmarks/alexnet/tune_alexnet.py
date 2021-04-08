@@ -47,7 +47,7 @@ if __name__ == "__main__":
     # Build and run with llvm backend, and use the
     # stonne conv2d ops
     target = "llvm --libs=stonne"
-    log_file = "alexnet_sigma_test.log"
+    log_file = "evaluation/alexnet.log"
 
     tuning_options = {
         "log_filename": log_file,

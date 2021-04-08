@@ -49,16 +49,16 @@ architecture.create_config_file()
 
 
 conv_paths = [
-    "/Users/axelstjerngren/uni/Year4/ProjectLevel4/level-4-project/benchmarks/alexnet/tiles/%s/conv_1.txt" % tiles_conv,
-    "/Users/axelstjerngren/uni/Year4/ProjectLevel4/level-4-project/benchmarks/alexnet/tiles/%s/conv_2.txt" % tiles_conv,
-    "/Users/axelstjerngren/uni/Year4/ProjectLevel4/level-4-project/benchmarks/alexnet/tiles/%s/conv_3.txt" % tiles_conv,
-    "/Users/axelstjerngren/uni/Year4/ProjectLevel4/level-4-project/benchmarks/alexnet/tiles/%s/conv_4.txt" % tiles_conv,
-    "/Users/axelstjerngren/uni/Year4/ProjectLevel4/level-4-project/benchmarks/alexnet/tiles/%s/conv_5.txt" % tiles_conv
+    "tiles/%s/conv_1.txt" % tiles_conv,
+    "tiles/%s/conv_2.txt" % tiles_conv,
+    "tiles/%s/conv_3.txt" % tiles_conv,
+    "tiles/%s/conv_4.txt" % tiles_conv,
+    "tiles/%s/conv_5.txt" % tiles_conv
 ]
 fc_paths = [
-    "/Users/axelstjerngren/uni/Year4/ProjectLevel4/level-4-project/benchmarks/alexnet/tiles/%s/fc_1.txt" % tiles_fc,
-    "/Users/axelstjerngren/uni/Year4/ProjectLevel4/level-4-project/benchmarks/alexnet/tiles/%s/fc_2.txt" % tiles_fc,
-    "/Users/axelstjerngren/uni/Year4/ProjectLevel4/level-4-project/benchmarks/alexnet/tiles/%s/fc_3.txt" % tiles_fc, 
+    "tiles/%s/fc_1.txt" % tiles_fc,
+    "tiles/%s/fc_2.txt" % tiles_fc,
+    "tiles/%s/fc_3.txt" % tiles_fc, 
 ]
 architecture.load_mapping(
     conv = conv_paths,
