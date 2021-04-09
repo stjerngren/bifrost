@@ -176,17 +176,43 @@ from bifrost.stonne.simulator import architecture
 # Set the tuning to true
 architecture.tune = True
 
-```
-You need to access the tuning module to create the tuning space
-``` python
-architecture.tuner
+# I you want to tune using partial 
+# sums instead of cycles:
+architecture.tune_psums = True
 ```
 
-|Setting|Variable|Options|
+The next step is choosing what paramaters you want to tune:
+
+The settings column corresponds to the boolean value you need to set to true to include that parameter in the optimisation space. If the settings can be a range of values, the variable is used to set the search space:
+|Setting|Variable|Valid options for variable|
 | -- | -- | -- |
-|tune_convolutions_tile|conv_num|Integer|
+|tune_convolutions_tile|conv_range|List of integers|
+|tune_fc_tile|fc_range|List of integers|
+|tune_accumulation_buffer|N/A|N/A|
+|tune_sparsity_ratio|sparsity_ratio_range|List of integers|
+|tune_ms_size|ms_size_range|List of integers|
+|tune_rn_bw|rn_bw_range|List of integers|
+|tune_dn_bw|dn_bw_range|List of integers|
 
+You need to access the tuning module to create the tuning space:
+``` python
+from bifrost.stonne.simulator import architecture
+architecture.tuner
+# Enable tuning
+architecture.tune = True
 
+# Tune ms_size
+architecture.tuner.tune_ms_size = True
+# Set the options for the tuning space
+architecture.tuner.ms_size_range = [128,256,2048]
+
+# Tune sparsity
+architecture.tuner.tune_sparsity_ratio = True
+# Set the options for the tuning space
+architecture.tuner.sparsity_ratio_range = [0,20,40,60,80,100]
+```
+
+Here is a full example of tuning the dataflow for AlexNet:
 ``` python
 from bifrost.stonne.simulator import config_simulator, architecture
 
@@ -281,7 +307,7 @@ if __name__ == "__main__":
 
 Python >=3.8
 * Apache TVM |A deep learning compiler stack | https://tvm.apache.org
-* STONNE |A cycle-accurate simulator for reconfigurable DNN accelerators written in C++, a forked version is required for Bifrost| URL retracted a STONNE source is not public yet
+* STONNE |A cycle-accurate simulator for reconfigurable DNN accelerators written in C++, a forked version is required for Bifrost| https://github.com/francisco-munoz/stonne
 * MRNA | A mapping exploration for MAERI by theGA Tech Synergy lab | https://github.com/georgia-tech-synergy-lab/mRNA
 * JSONCPP |A library to read/write JSON files for C++| https://github.com/open-source-parsers/jsoncpp
 
@@ -294,6 +320,7 @@ python setup.py
 Tested on macOS Big Sur (11.1) and Manjaro 20.2.1 
 
 # Benchmarks
+
 
 # Advanced Instructions 
 ## Build from source
