@@ -545,11 +545,15 @@ def create_config_file(self):
         f.write(f'controller_type="{self.controller_type}"\n')
 ```
 ### Mapping configurator
-
+The mapping configurator just takes mappings parameters and produces files. STONNE is able to validate these mappings without the need for external checks.
 ### AutoTVM Module
-The AutoTVM mopdule consists of several components:
-```bifrost/bifrost/tuner/stonne_builder.py```
-```bifrost/bifrost/tuner/parameters.py```
 
+The AutoTVM module consists of several modules:
+
+```bifrost/bifrost/tuner/stonne_builder.py```
+Tuning using AutoTVM uses local RPC devices. The stonne_builder overrides these to upload the STONNE-Bifrost API .so file. It also overwrites the cost function/
+
+```bifrost/bifrost/tuner/parameters.py```
+This is where the tunable parameters are defined.
 
 
