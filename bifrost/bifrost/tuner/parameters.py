@@ -7,17 +7,21 @@ class TuningParameters(object):
     ) -> None:
         self.tune_convolutions_tile:bool = False
         self.tune_fc_tile:bool = False
-        self.fc_num: int = 20
 
+        self.fc_num: int = 20
         self.conv_num: int = 20
+
         self.conv_tile_knobs:List = []
         self.fc_tile_knobs:List = []
+
         self.tune_accumulation_buffer: bool = False
         self.tune_sparsity_ratio: bool = False
         self.sparsity_ratio_range = []
         self.tune_reduce_network_type:bool = False
         self.tune_ms_network_type:bool = False   
         self.tune_ms_size:bool = False
+        self.ms_size_range = [8,16,32,64,128]
+        
         self.tune_psums:bool = False
 
         self.tune_rn_bw:bool = False
@@ -45,7 +49,7 @@ class TuningParameters(object):
         if self.tune_reduce_network_type:
             all_knobs.append(("reduce_network_type",["ASNETWORK","FENETWORK"]))
         if self.tune_ms_size:
-            all_knobs.append(("ms_size",[8,16,32,64,128]))
+            all_knobs.append(("ms_size",self.ms_size_range))
         if self.tune_rn_bw:
             all_knobs.append(("rn_bw",self.rn_bw_range))
         if self.tune_dn_bw:   

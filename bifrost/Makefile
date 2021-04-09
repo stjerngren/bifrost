@@ -1,4 +1,4 @@
-# Minimum Makefile for the extension package
+# Makefie for Bifrost-STONNE API
 PKG_CFLAGS = -std=c++17 -stdlib=libc++ -O2 -fPIC -Iinclude/ -Iexternal/\
 	-I${TVM_ROOT}/include\
 	-I${TVM_ROOT}/3rdparty/dmlc-core/include\
