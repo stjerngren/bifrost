@@ -317,7 +317,7 @@ Bifrost includes a test suite to ensure the correctness of the supported operati
 cd bifrost
 python setup.py
 ```
-Tested on macOS Big Sur (11.1) and Manjaro 20.2.1 
+Tested on macOS Big Sur (11.1) and Manjaro 20.2.1, the NCHW conv2d and dense tests pass. The NHWC tests do not.
 
 # Benchmarks
 
