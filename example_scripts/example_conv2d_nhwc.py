@@ -28,8 +28,7 @@ architecture.create_config_file()
 
 
 # Let’s create a very simple network for demonstration.
-# It consists of convolution, batch normalization, and ReLU activation.
-logging.basicConfig(level=logging.DEBUG)  # to dump TVM IR after fusion
+#It consists of one nchw convoltiion
 out_channels = 2
 batch_size = 1
 

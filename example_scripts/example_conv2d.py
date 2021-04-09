@@ -45,14 +45,12 @@ architecture.controller_type = "TPU_OS_DENSE"
 architecture.create_config_file()
 """
 
-# Let’s create a very simple network for demonstration.
-# It consists of convolution, batch normalization, and ReLU activation.
-logging.basicConfig(level=logging.DEBUG)  # to dump TVM IR after fusion
+
 out_channels = 2
 batch_size = 1
 
 # Let's create a very simple network for demonstration.
-# It consists of convolution, batch normalization, and ReLU activation.
+# It consists of convolution
 
 data = relay.var("data", relay.TensorType((batch_size, 2, 50, 50), "float32"))
 weight = relay.var("weight")
