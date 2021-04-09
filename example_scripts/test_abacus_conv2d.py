@@ -15,7 +15,7 @@ import random
 
 # Import this add stonne as an x86 co-processor
 import bifrost
-from bifrost.stonne.simulator import config_simulator, architecture
+from bifrost.stonne.simulator import architecture
 
 import os
 

@@ -3,16 +3,14 @@ from bifrost.stonne.simulator import config_simulator, architecture
 architecture.ms_size = 128
 architecture.dn_bw=64
 architecture.rn_bw=64
-architecture.controller_type = "SIGMA_SPARSE_GEMM"
-architecture.sparsity_ratio = 50
 architecture.tune = True
 architecture.tuner.tune_sparsity_ratio = True
-architecture.tuner.sparsity_ratio_range = [0,50]
-#architecture.tuner.tune_psums = True
-#architecture.tuner.conv_num = 20
-#architecture.tuner.fc_num = 20
-#architecture.tuner.tune_convolutions_tile = True
-#architecture.tuner.tune_fc_tile = False
+
+architecture.tuner.tune_psums = True
+architecture.tuner.conv_num = 20
+architecture.tuner.fc_num = 20
+architecture.tuner.tune_convolutions_tile = True
+architecture.tuner.tune_fc_tile = False
 architecture.create_config_file()
 
 

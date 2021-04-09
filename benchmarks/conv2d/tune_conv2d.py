@@ -11,6 +11,11 @@ config_simulator(
 
 )
 
+architecture.tune = True
+architecture.tuner.tune_convolutions_tile = True
+architecture.tuner.conv_num = 30
+architecture.tuner.tune_ms_size = True
+
 if __name__ == "__main__":
 
     import tvm
@@ -20,6 +25,8 @@ if __name__ == "__main__":
     from tvm.relay import testing
     import logging
     import random
+
+    np.random.seed(seed=1)
 
 
     # Import this add stonne as an x86 co-processor
@@ -50,13 +57,6 @@ if __name__ == "__main__":
     data=data, weight=weight, kernel_size=(5,5), channels=out_channels, padding=(1, 1)
     )
 
-    simple_net = relay.nn.relu(simple_net)
-    simple_net = relay.nn.conv2d(simple_net, weight=weight, kernel_size=(5, 5), channels=out_channels, padding=(1, 1)
-    )
-    simple_net = relay.Function(relay.analysis.free_vars(simple_net), simple_net)
-
-
-
     data_shape = (batch_size, 2, 10, 10)
     net, params = testing.create_workload(simple_net)
 
@@ -73,7 +73,8 @@ if __name__ == "__main__":
     target = "llvm --libs=stonne"
 
     mod, params = testing.create_workload(simple_net)
-    log_file = "test.log"
+
+    log_file = "evaluation/conv2d.log"
 
     tuning_options = {
         "log_filename": log_file,
@@ -124,7 +125,7 @@ if __name__ == "__main__":
             print(task.config_space)
             print(n_trial, "test")
             tuner_obj.tune(
-                n_trial=100,
+                n_trial=n_trial,
                 early_stopping=early_stopping,
                 measure_option=measure_option,
                 callbacks=[
@@ -146,19 +147,3 @@ if __name__ == "__main__":
     )
     print(tasks)
     tune_kernels(tasks, tuning_options["measure_option"])
-
-    with autotvm.apply_history_best(log_file):
-        
-
-        # Generate the data to suse with both llvm and llvm stonne
-        target = "llvm -libs=stonne"
-        lib = relay.build_module.build(net, target, params=params)
-
-        ctx = tvm.context(target, 0)
-        module = runtime.GraphModule(lib["default"](ctx))
-        module.set_input("data", data)
-        module.run()
-        out_shape = (batch_size, out_channels, 6, 6)
-        out = module.get_output(0, tvm.nd.empty(out_shape))
-        out_stonne = out.asnumpy()
-        print(out_stonne)
