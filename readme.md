@@ -11,7 +11,7 @@ Bifrost is a Python tool. You can install it using pip:
 ```
 pip install git+https://github.com/axelstjerngren/level-4-project#"egg=bifrost&subdirectory=bifrost"
 ```
-This will enable to you to use the latest version of Bifrost.
+This will enable to you to use the latest version of Bifrost. If you want to install from source, please see the advanced instructions.
 
 **N.B You need to have Apache TVM installed. You can find installation instructions [here](https://tvm.apache.org/docs/install/index.html).**
 
@@ -320,17 +320,41 @@ python setup.py
 Tested on macOS Big Sur (11.1) and Manjaro 20.2.1, the NCHW conv2d and dense tests pass. The NHWC tests do not.
 
 # Benchmarks
+Bifrost includes a number of tests and benchmarks. These are the benchmarks which are used in the evaluation section of the dissertation. These benchmarks can be found in the ```benchmarks``` directory. Please make sure TVM and Bifrost have been insatleld before running any of these.
 
+## AlexNet
+The AlexNet benchmarks is divided up into several files. The tune_alexnet.py file will tune the mapping space for the conv and fc layer for the MAERI architecture. Please cd into the ```benchmarks/alexnet``` folder tu run this. The tuning log will be placed in the ```benchmarks/alexnet/evaluation``` folder. The log be parsed using the parse_log_benchmark.py file to find the efficient mappings produced by Bifrost's AutoTVM module. 
+
+The run_alexnet.py is used to execute both the MAERI and SIGMA evaluations from the dissertation, instructions on how to use can be found at mthe top of the file.
+
+In the ```benchmarks/alexnet/evaluation``` directory all the AlexNet figures from the dissertation can be found. These can be prdouced by running the figures.py file.
+
+The ```benchmarks/alexnet/tiles``` contains mapping files for AlexNet. The basic mapping sets all tiles to 1, the opt mappings are the mapping produced by Bifrost, the performance mappings are the mappings produced by mRNA, and the stonne_paper mappings are the mapping from the STONNE paper to execute AlexNet.
+
+## Conv2d MAPPING example.
+This benchmark is used to demonstrate the importance of proper dataflow orchestration for reconfigurable architectures. The tune_conv2d.py explores the whole mapping space [1-20]for a small convolution using ms_size in the range [8,16,32,64,128]. The output log is placed in the ```benchmarks/conv2d/evaluation``` directory, This log can be parsed using parse_log_and_create_fig.py which will also produce the figures used in the dissertation.
+
+## Other benchmrks
+The resnet and vgg evaluations should work, but they have not been documented properly and are very slow. 
+
+# Example scripts
+Bifrost ships with a number of example scripts which show typical use cases for Bifrost and are used to orient users on how to perfrom some basic actions. These assume TVM knowledge. The following table explains these files in detail:
+|File Name|Description|
+|--|--|
+|example_conv2d|Demonstrates how to execute a NCHW convolution and compares output to LLVM. |
+|example_dense |Demonstrates how to execute a dense operator (fully connected) and compares output to LLVM.|
+|example_conv2d_nhwc |Demonstrates how to execute a NHWC convolution and compares output to LLVM. It also shows how NHWC convolutions currently do not work properly. |
+|example_tensorflow|Demonstrates how to a deep learning framework like TensorFlow.|
+|example_conv2d_opt |Demonstrates how to tune a small network. This examples tunes the ms_size range on cycles.|
 
 # Advanced Instructions 
 ## Build from source
 
 Install Apache TVM using the installation instructions [here](https://tvm.apache.org/docs/install/index.html).
 
-Clone the project and cd into bifrost
+Cd into bifrost
 ```
-git clone https://github.com/axelstjerngren/level-4-project
-cd level-4-project/bifrost
+cd bifrost
 ```
 You can now install it by running setup.py:
 ```
