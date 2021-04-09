@@ -307,7 +307,7 @@ if __name__ == "__main__":
 
 Python >=3.8
 * Apache TVM |A deep learning compiler stack | https://tvm.apache.org
-* STONNE |A cycle-accurate simulator for reconfigurable DNN accelerators written in C++, a forked version is required for Bifrost| https://github.com/francisco-munoz/stonne
+* STONNE |A cycle-accurate simulator for reconfigurable DNN accelerators written in C++, however a forked version is required for Bifrost| https://github.com/francisco-munoz/stonne
 * MRNA | A mapping exploration for MAERI by theGA Tech Synergy lab | https://github.com/georgia-tech-synergy-lab/mRNA
 * JSONCPP |A library to read/write JSON files for C++| https://github.com/open-source-parsers/jsoncpp
 
