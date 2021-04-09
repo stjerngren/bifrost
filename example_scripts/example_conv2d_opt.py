@@ -1,9 +1,33 @@
 from bifrost.stonne.simulator import config_simulator, architecture
 
+""" Example of using MAERI """
+architecture.rn_bw = 64
+architecture.dn_bw = 64
+architecture.controller_type = "MAERI_DENSE_WORKLOAD"
+architecture.create_config_file()
+
+"""    Example of using TPU
+architecture.rn_bw = 64
+architecture.dn_bw = 64
+architecture.controller_type = "SIGMA_SPARSE_GEMM"
+architecture.sparsity_ratio = 0
+architecture.create_config_file()
+"""
+
+"""    Example of using TPU
+architecture.ms_cols = 128
+architecture.ms_rows = 128
+architecture.reduce_network_type = "TEMPORALRN"
+architecture.ms_network_type = "OS_MESH"
+architecture.accumulation_buffer_enabled = True
+architecture.controller_type = "TPU_OS_DENSE"
+architecture.create_config_file()
+"""
+
+# Tune ms_size
 architecture.tune = True
-architecture.tuner.tune_maeri_all()
-
-
+architecture.tuner.tune_ms_size = True
+architecture.tuner.ms_size_range = [8,16,32]
 if __name__ == "__main__":
 
     import tvm
@@ -60,7 +84,7 @@ if __name__ == "__main__":
     target = "llvm --libs=stonne"
 
     mod, params = testing.create_workload(simple_net)
-    log_file = "bifrost_temp/test.log"
+    log_file = "example.log"
 
     tuning_options = {
         "log_filename": log_file,

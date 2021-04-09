@@ -28,6 +28,36 @@ Please refer to https://www.tensorflow.org/install
 import tvm
 from tvm import te
 from tvm import relay
+import bifrost
+from bifrost.stonne.simulator import architecture
+
+
+""" Example of using MAERI """
+architecture.ms_size = 128
+architecture.rn_bw = 64
+architecture.dn_bw = 64
+architecture.controller_type = "MAERI_DENSE_WORKLOAD"
+architecture.create_config_file()
+
+"""    Example of using TPU
+architecture.ms_size = 128
+architecture.rn_bw = 64
+architecture.dn_bw = 64
+architecture.controller_type = "SIGMA_SPARSE_GEMM"
+architecture.sparsity_ratio = 0
+architecture.create_config_file()
+"""
+
+"""    Example of using TPU
+architecture.ms_cols = 128
+architecture.ms_rows = 128
+architecture.reduce_network_type = "TEMPORALRN"
+architecture.ms_network_type = "OS_MESH"
+architecture.accumulation_buffer_enabled = True
+architecture.controller_type = "TPU_OS_DENSE"
+architecture.create_config_file()
+"""
+
 
 # os and numpy
 import numpy as np
