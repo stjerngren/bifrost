@@ -308,7 +308,6 @@ if __name__ == "__main__":
 Python >=3.8
 * Apache TVM |A deep learning compiler stack | https://tvm.apache.org
 * STONNE |A cycle-accurate simulator for reconfigurable DNN accelerators written in C++, however a forked version is required for Bifrost| https://github.com/francisco-munoz/stonne
-* MRNA | A mapping exploration for MAERI by theGA Tech Synergy lab | https://github.com/georgia-tech-synergy-lab/mRNA
 * JSONCPP |A library to read/write JSON files for C++| https://github.com/open-source-parsers/jsoncpp
 
 ## Tests
@@ -485,7 +484,7 @@ level-4-project
 |    |__Makefile
 ```
 
-Any new .cpp files will be automatically found by the Makefile as long as they are created within the /src folder. Before you compile the code you need STONNE, mRNA and TVM as enviroment variables (see next section) You can the compile your new code with the following commands:
+Any new .cpp files will be automatically found by the Makefile as long as they are created within the /src folder. Before you compile the code you need STONNE and TVM as enviroment variables (see next section) You can the compile your new code with the following commands:
 ```
 cd bifrost
 make -j
@@ -503,7 +502,6 @@ Before you can run **make** you need to export two environment variables:
 ```
 export TVM_ROOT    = path_to_tvm/tvm
 export STONNE_ROOT = path_to_stonne/stonne
-export MRNA_ROOT   = path_to_stonne/stonne
 ```
 The C++ should now compile correctly when you run **make** inside of the /bifrost directory.
 
