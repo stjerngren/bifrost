@@ -1,5 +1,5 @@
 // STONNE
-#include "stonne_linker.h"
+#include "include/stonne_linker.h"
 #include "Config.h"
 #include "STONNEModel.h"
 
