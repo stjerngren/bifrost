@@ -9,7 +9,7 @@ The name is taken from Norse mythology, where Bifrost is the bridge between Midg
 ## Installation
 Bifrost is a Python tool. You can install it using pip:
 ```
-pip install git+https://github.com/axelstjerngren/level-4-project#"egg=bifrost&subdirectory=bifrost"
+pip install git+https://github.com/axelstjerngren/bifrost#"egg=bifrost&subdirectory=bifrost"
 ```
 This will enable to you to use the latest version of Bifrost. If you want to install from source, please see the advanced instructions.
 
