@@ -25,12 +25,6 @@
 // -Y: Number of input columns
 // -X_: Number of output columns
 // -Y_: Number of output columns
-
-
-
-
-
-
 namespace tvm
 {
     namespace contrib
@@ -64,9 +58,10 @@ namespace tvm
                 bool tune_psums = args[21];
                 std::string costs_path = args[22];
                 bool stats = args[23];
-                DLTensor *input = args[24];
-                DLTensor *weight = args[25];
-                DLTensor *output = args[26];
+                bool use_mrna = args[24];
+                DLTensor *input = args[25];
+                DLTensor *weight = args[26];
+                DLTensor *output = args[27];
 
                 //Creating config  to find out if we are going to
                 // run a dense or sparse simulation
@@ -125,17 +120,18 @@ namespace tvm
                     int gemm_K = R * S * C;
                     int gemm_N = h0 * w0;
 
+                    std::cout << "Sparse conv" << std::endl;
+                    for (int i = 0; i < h0 * w0 * R * S * C; i++)
+                    {
+                        std::cout << input_im2col[i] << " ";
+                    }
+                    std::cout << std::endl;
 
-                    std::cout << "Sparse conv"<< std::endl;
-                        for (int i=0;i < h0 * w0 * R * S * C;i++) {
-                           std::cout << input_im2col[i] << " ";
-                        }
-                        std::cout << std::endl;
-
-                        for (int i=0;i < R*S*C;i++) {
-                           std::cout << weight_raw[i] << " ";
-                        }
-                        std::cout << std::endl;
+                    for (int i = 0; i < R * S * C; i++)
+                    {
+                        std::cout << weight_raw[i] << " ";
+                    }
+                    std::cout << std::endl;
 
                     if (tune_psums)
                     {
@@ -243,56 +239,53 @@ namespace tvm
                     }
                     else
                     {
-                          cost = simulateDenseConvForward(
-                        layer_name,
-                        input_raw,
-                        weight_raw,
-                        output_raw,
-                        R,
-                        S,
-                        C,
-                        K,
-                        G,
-                        N,
-                        X,
-                        Y,
-                        H_out,
-                        W_out,
-                        strides_x,
-                        pad_x,
-                        pad_y,
-                        path_to_tile,
+                        if (use_mrna)
+                        {
+                            std::cout << "Use mRNA" << std::endl;
+                            cost = simulateDenseConvForwardmRNA(
+                                layer_name,
+                                input_raw,
+                                weight_raw,
+                                output_raw,
+                                R,
+                                S,
+                                C,
+                                K,
+                                G,
+                                N,
+                                X,
+                                Y,
+                                H_out,
+                                W_out,
+                                strides_x,
+                                pad_x,
+                                pad_y,
                                 stonne_config);
-                        // std::cout << "Execute mrna" << std::endl;
-                        //int X_ = H_out;
-                        //int Y_ = W_out;
-                        //const int ifmap_size = C * ((X + 2 * pad_x) * (Y + 2 * pad_y));
-                        //const int ofmap_size = K * X_ * Y_; //X_ and Y_ include padding
-                        //std::cout << "Executing layer " << layer_name << std::endl;
-     //
-//
-//
-                        //float *ifmap_to_send = Transform_Ifmap_Memory_a(input_raw, C, X, Y, pad_x, pad_y);
-                        //float *filters_to_send = Transform_Filters_Memory_a(weight_raw, K, G, C, R, S);
-                        //float *ofmap_raw = new float[ofmap_size];
-//
-//
-//
-                        ////Executing the accelerator 
-                        //Stonne *stonne_instance = new Stonne(stonne_config);
-//
-                        //stonne_instance->loadDNNLayer(CONV, layer_name, R, S, C, K, G, N, X + 2 * pad_x, Y + 2 * pad_y, strides_x, (address_t)ifmap_to_send, (address_t)filters_to_send, (address_t)ofmap_raw, CNN_DATAFLOW);
-                        //mRNA_tiles(stonne_instance, 128,64,64,X,Y,C,R,S,H_out,W_out,K,N, strides_x);
-                      //
-//
-                        //stonne_instance->run(); //Running the accelerator and generates the output in ofmap_raw
-                        //int cost = stonne_instance->n_cycles;
-                        //Transform_Ofmap_Memory_a(ofmap_raw, output_raw, K, X_, Y_); // Transform simulator memory format to caffe format.
-//
-                        ////Deleting objects
-                        //delete[] ofmap_raw;
-                        //delete[] ifmap_to_send;
-                        //delete[] filters_to_send;
+                        }
+                        else
+                        {
+                            std::cout << "Don't use mRNA" << std::endl;
+                            cost = simulateDenseConvForward(
+                                layer_name,
+                                input_raw,
+                                weight_raw,
+                                output_raw,
+                                R,
+                                S,
+                                C,
+                                K,
+                                G,
+                                N,
+                                X,
+                                Y,
+                                H_out,
+                                W_out,
+                                strides_x,
+                                pad_x,
+                                pad_y,
+                                path_to_tile,
+                                stonne_config);
+                        }
                     }
                 }
                 if (tune)
@@ -313,6 +306,5 @@ namespace tvm
                         cost);
                 }
             });
-
     } // namespace contrib
 } // namespace tvm

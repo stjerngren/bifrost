@@ -9,7 +9,7 @@
 int simulateDenseConvForwardNHWC(std::string layer_name, float* input, float* weight, float* output, int R, int S, int C, int K, int G, int N, int X, int Y, int X_, int Y_, int strides, int pad_x, int pad_y, std::string path_to_tile, Config stonne_cfg);
 int simulateDenseConvForward(std::string layer_name, float* input, float* weight, float* output, int R, int S, int C, int K, int G, int N, int X, int Y, int X_, int Y_, int strides, int pad_x, int pad_y, std::string path_to_tile, Config stonne_cfg);
 int simulateDenseConvForwardPsums(std::string layer_name, float* input, float* weight, float* output, int R, int S, int C, int K, int G, int N, int X, int Y, int X_, int Y_, int strides, int pad_x, int pad_y, std::string path_to_tile, Config stonne_cfg);
-
+int simulateDenseConvForwardmRNA(std::string layer_name, float* input, float* weight, float* output, int R, int S, int C, int K, int G, int N, int X, int Y, int X_, int Y_, int strides, int pad_x, int pad_y, Config stonne_cfg);
 
 //This function performs the prunning on its own and gets the bitmaps and sparse representation according to that prunning configuration. The prunning is done by prunning the sparsity_level% lowest amount of data in the STA matrix. 
 int simulateSparseGemmForward(std::string layer_name, float* KN_matrix_raw, float* MK_matrix_raw, float* output_raw, int N, int G, int gemm_M, int gemm_K, int gemm_N, float sparsity_level, Config stonne_cfg, Dataflow dataflow);

@@ -8,7 +8,7 @@
 #include "testbench.h"
 #include "utility.h"
 #include <string>
-
+#include "include/mrna.h"
 // This file has been copied from the original STONNE project and later modified.
 
 
@@ -237,8 +237,32 @@ int simulateDenseConvForwardNHWC(std::string layer_name, float *input, float *we
     return cycles;
 }
 
+int simulateDenseConvForwardmRNA(std::string layer_name, float *input, float *weight, float *output, int R, int S, int C, int K, int G, int N, int X, int Y, int X_, int Y_, int strides, int pad_x, int pad_y, Config stonne_cfg)
+{
+    const int ifmap_size = C * ((X + 2 * pad_x) * (Y + 2 * pad_y));
+    const int ofmap_size = K * X_ * Y_; //X_ and Y_ include padding
+
+    float *ifmap_to_send = Transform_Ifmap_Memory(input, C, X, Y, pad_x, pad_y);
+    float *filters_to_send = Transform_Filters_Memory(weight, K, G, C, R, S);
+    float *ofmap_raw = new float[ofmap_size];
 
 
+    std::cout << "Executing layer " << layer_name << std::endl;
+
+      //Executing the accelerator
+    Stonne *stonne_instance = new Stonne(stonne_cfg);
+    stonne_instance->loadDNNLayer(CONV, layer_name, R, S, C, K, G, N, X + 2 * pad_x, Y + 2 * pad_y, strides, (address_t)ifmap_to_send, (address_t)filters_to_send, (address_t)ofmap_raw, CNN_DATAFLOW);
+    mRNA_tiles(stonne_instance, stonne_cfg, X,Y,C,R,S,X_,Y_,K,N, strides);
+    stonne_instance->run(); //Running the accelerator and generates the output in ofmap_raw
+    int cycles = stonne_instance->n_cycles;
+    Transform_Ofmap_Memory(ofmap_raw, output, K, X_, Y_); // Transform simulator memory format to caffe format.
+
+    //Deleting objects
+    delete[] ofmap_raw;
+    delete[] ifmap_to_send;
+    delete[] filters_to_send;
+    return cycles;
+}
 
 int simulateDenseConvForwardPsums(std::string layer_name, float *input, float *weight, float *output, int R, int S, int C, int K, int G, int N, int X, int Y, int X_, int Y_, int strides, int pad_x, int pad_y, std::string path_to_tile, Config stonne_cfg)
 {

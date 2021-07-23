@@ -119,9 +119,10 @@ def conv2d_stonne_nchw(
             architecture.tuner.tune_psums, # [21]
             costs_path,        # [22]
             architecture.print_stats, # [23]
-            ins[0],            # [24]
-            ins[1],            # [25]
-            outs[0],           # [26]
+            architecture.use_mrna, # [24] mRNA               
+            ins[0],            # [25]
+            ins[1],            # [26]
+            outs[0],           # [27]
 
             ),
             name = "s",

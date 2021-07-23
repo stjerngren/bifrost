@@ -28,7 +28,7 @@ class Simulator(object):
         self.print_stats:bool = False # Create output stats for stonne
         self.knobs:tuple = () # An empty tuple for now
         self._accumulation_buffer_enabled = 1
-       
+        self.use_mrna = False       
         self.tuner = tune_parameters
 
         # Tiles

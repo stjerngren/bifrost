@@ -23,6 +23,7 @@ import os
 architecture.ms_size = 128
 architecture.rn_bw = 64
 architecture.dn_bw = 64
+architecture.use_mrna = True
 architecture.controller_type = "MAERI_DENSE_WORKLOAD"
 architecture.create_config_file()
 
