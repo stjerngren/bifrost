@@ -259,7 +259,7 @@ int simulateDenseConvForwardmRNA(std::string layer_name, float *input,
       CONV, layer_name, R, S, C, K, G, N, X + 2 * pad_x, Y + 2 * pad_y, strides,
       (address_t)ifmap_to_send, (address_t)filters_to_send,
       (address_t)ofmap_raw, CNN_DATAFLOW);
-  mRNA_conv(stonne_instance, stonne_cfg, X, Y, C, R, S, X_, Y_, K, N, strides);
+  mRNA(stonne_instance, stonne_cfg, CONV, X, Y, C, R, S, X_, Y_, K, N, strides);
   stonne_instance
       ->run(); // Running the accelerator and generates the output in ofmap_raw
   int cycles = stonne_instance->n_cycles;

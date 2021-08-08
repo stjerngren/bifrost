@@ -4,8 +4,9 @@
 #include "include/DNNModel.h"
 #include "include/MAERIModel.h"
 
-void mRNA_conv(Stonne *stonne_instance, Config stonne_cfg, int X, int Y, int C,
-               int R, int S, int X_, int Y_, int K, int N, int stride) {
+void mRNA(Stonne *stonne_instance, Config stonne_cfg, Layer_t type, int X,
+          int Y, int C, int R, int S, int X_, int Y_, int K, int N,
+          int stride) {
   std::cout << "Create MAERI" << std::endl;
   mrna::Maeri *maeri = new mrna::Maeri(stonne_cfg.m_MSNetworkCfg.ms_size,
                                        stonne_cfg.m_SDMemoryCfg.n_read_ports,
@@ -34,7 +35,14 @@ void mRNA_conv(Stonne *stonne_instance, Config stonne_cfg, int X, int Y, int C,
   dnn->dnn_hidden->hidden_channel = 0;
 
   dnn->model_name = "";
-  dnn->layer_type = "CONV";
+  switch (type) {
+  case CONV:
+    dnn->layer_type = "CONV";
+  case FC:
+    dnn->layer_type = "FC";
+  case GEMM:;
+  case POOL:;
+  }
   dnn->layer_num = "0";
 
   std::cout << "Create analyzer" << std::endl;
@@ -50,20 +58,20 @@ void mRNA_conv(Stonne *stonne_instance, Config stonne_cfg, int X, int Y, int C,
 
   mrna::MappingStrategy *bestmap;
   std::cout << "Analyse" << std::endl;
-  if (analyzer->dnn_model->layer_type == "CONV") {
+  if (type == CONV) {
     analyzer->AnalyzeCNN(Profile_result, opt_goal);
+
+    unsigned int T_R = analyzer->bestmap->kernel_x;
+    unsigned int T_S = analyzer->bestmap->kernel_y;
+    unsigned int T_C = analyzer->bestmap->kernel_c;
+    unsigned int T_K = analyzer->bestmap->kernel_n;
+    unsigned int T_G = 1;
+    unsigned int T_N = analyzer->bestmap->kernel_in;
+    unsigned int T_X_ = analyzer->bestmap->kernel_ox;
+    unsigned int T_Y_ = analyzer->bestmap->kernel_oy;
+    std::cout << "Load tile" << std::endl;
+    stonne_instance->loadTile(T_R, T_S, T_C, T_K, T_G, T_N, T_X_, T_Y_);
+  } else if (type == FC) {
+    analyzer->AnalyzeFC(Profile_result, opt_goal);
   }
-
-  unsigned int T_R = analyzer->bestmap->kernel_x;
-  unsigned int T_S = analyzer->bestmap->kernel_y;
-  unsigned int T_C = analyzer->bestmap->kernel_c;
-  unsigned int T_K = analyzer->bestmap->kernel_n;
-  unsigned int T_G = 1;
-  unsigned int T_N = analyzer->bestmap->kernel_in;
-  unsigned int T_X_ = analyzer->bestmap->kernel_ox;
-  unsigned int T_Y_ = analyzer->bestmap->kernel_oy;
-  std::cout << "Load tile" << std::endl;
-  stonne_instance->loadTile(T_R, T_S, T_C, T_K, T_G, T_N, T_X_, T_Y_);
 }
-
-void mRNA_fc() {}
