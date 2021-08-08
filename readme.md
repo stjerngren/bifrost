@@ -168,6 +168,14 @@ architecture.load_mapping(
   fc = fc_mappings,
 )
 ```
+#### mRNA
+
+[mRNA](https://github.com/georgia-tech-synergy-lab/mRNA) is a mapping space exploration tool for MAERI. Bifrot has integrated support for mRNA in the convolutional and fully connected layesr when using MAERI. By enabling the following flag mappings will be provided by mRNA:
+
+``` python
+from bifrost.stonne.simulator import architecture
+architecture.use_mrna = True
+```
 
 ### Tuning 
 When tuning the mapping or the hardware for a DNN, we first need to set 
@@ -491,7 +499,7 @@ make -j
 ```
 
 #### C++ depdencies 
-To change the C code you need to clone the STONNE, mRNA and TVM repositories:
+To change the C code you need to clone the STONNE, and TVM repositories:
 ```
 git clone https://github.com/axelstjerngren/stonne
 git clone https://github.com/axelstjerngren/mrna
@@ -502,6 +510,7 @@ Before you can run **make** you need to export two environment variables:
 ```
 export TVM_ROOT    = path_to_tvm/tvm
 export STONNE_ROOT = path_to_stonne/stonne
+export MRNA_ROOT = path_to_mrna/mRNA
 ```
 The C++ should now compile correctly when you run **make** inside of the /bifrost directory.
 
