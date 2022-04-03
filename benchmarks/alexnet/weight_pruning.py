@@ -1,3 +1,4 @@
+import os
 import torch
 import torch.nn as nn
 import torch.nn.utils.prune as prune
@@ -8,7 +9,7 @@ from tqdm import tqdm
 def remove_weight_prune_masks(model, exclude_list=[]):
     for name, m in model.named_modules():
         m.auto_name = name
-        if type(m) == nn.modules.conv.Conv2d:
+        if type(m) in [nn.modules.conv.Conv2d, nn.modules.Linear]:
             if name not in exclude_list:
                 prune.remove(m, "weight")
 
@@ -21,7 +22,7 @@ def weight_prune(model, prune_rate=0.5):
 
     for name, m in model.named_modules():
         m.auto_name = name
-        if type(m) == nn.modules.conv.Conv2d:
+        if type(m) in [nn.modules.conv.Conv2d, nn.modules.Linear]:
             if name not in exclude_list:
                 prune_names.append(name)
 
@@ -45,10 +46,39 @@ def verify_pruning(model):
     zero_params = 0.0
     all_params = 0.0
     for name, m in model.named_modules():
-        if type(m) == nn.modules.conv.Conv2d:
+        if type(m) in [nn.modules.conv.Conv2d, nn.modules.Linear]:
             zero_params += torch.sum(m.weight == 0)
             all_params += m.weight.nelement()
     return 100 * float(zero_params) / float(all_params)
+
+
+def main(args):
+    if not os.path.exists(args.save_directory):
+        os.makedirs(args.save_directory)
+
+    model = torch.hub.load("pytorch/vision:v0.6.0", "alexnet", pretrained=True)
+    model.eval()
+
+    prune_rates = [
+        50,
+    ]
+    for prune_rate in tqdm(prune_rates):
+        # add masks to remove smallest weights
+        model = weight_prune(model, prune_rate / 100)
+
+        # remove masked weights
+        remove_weight_prune_masks(model)
+
+        ## save model
+        # fname = f"{args.save_directory}/{args.save_file}_{prune_rate}.pt"
+        # torch.save(model, fname)
+
+        measured_sparsity = verify_pruning(model)
+        print(f"Actual sparsity of {prune_rate} model is {measured_sparsity}")
+        # model.load_state_dict(torch.load(fname)) <-- be sure to load the sparse weights in TVM,
+        # you may have an error I couldn't solve:
+        # torch.nn.modules.module.ModuleAttributeError: 'AlexNet' object has no attribute 'copy'
+        # in which case, copy the code from this script and use it with your own code directly
 
 
 if __name__ == "__main__":
@@ -66,31 +96,4 @@ if __name__ == "__main__":
 
     args = parser.parse_args()
 
-    import os
-
-    if not os.path.exists(args.save_directory):
-        os.makedirs(args.save_directory)
-
-model = torch.hub.load("pytorch/vision:v0.6.0", "alexnet", pretrained=True)
-model.eval()
-
-prune_rates = [
-    50,
-]
-for prune_rate in tqdm(prune_rates):
-    # add masks to remove smallest weights
-    model = weight_prune(model, prune_rate / 100)
-
-    # remove masked weights
-    remove_weight_prune_masks(model)
-
-    ## save model
-    #fname = f"{args.save_directory}/{args.save_file}_{prune_rate}.pt"
-    #torch.save(model, fname)
-
-    measured_sparsity = verify_pruning(model)
-    print(f"Actual sparsity of {prune_rate} model is {measured_sparsity}")
-        # model.load_state_dict(torch.load(fname)) <-- be sure to load the sparse weights in TVM,
-        # you may have an error I couldn't solve:
-        # torch.nn.modules.module.ModuleAttributeError: 'AlexNet' object has no attribute 'copy'
-        # in which case, copy the code from this script and use it with your own code directly
+    main(args)
