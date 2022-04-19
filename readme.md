@@ -6,14 +6,48 @@ The name is taken from Norse mythology, where Bifrost is the bridge between Midg
 
 # Quickstart Guide
 
-## Installation
-Bifrost is a Python tool. You can install it using pip:
-```
-pip install git+https://github.com/axelstjerngren/bifrost#"egg=bifrost&subdirectory=bifrost"
-```
-This will enable to you to use the latest version of Bifrost. If you want to install from source, please see the advanced instructions.
+## Build from source
 
-**N.B You need to have Apache TVM installed. You can find installation instructions [here](https://tvm.apache.org/docs/install/index.html).**
+Clone the STONNE, and TVM repositories:
+```
+git clone https://github.com/axelstjerngren/stonne
+git clone https://github.com/axelstjerngren/mrna
+git clone https://github.com/apache/tvm
+```
+Keeping these three in the same folder will be useful.
+Before you can run **make** you need to export three environment variables:
+```
+export TVM_ROOT    = path_to_tvm/tvm
+export STONNE_ROOT = path_to_stonne/stonne
+export MRNA_ROOT = path_to_mrna/mRNA
+```
+
+Cd into bifrost/api
+```
+cd bifrost/api
+```
+
+Compile the Bifrost C++ API:
+```
+make
+```
+
+Navigate back to python setup:
+```
+cd .../bifrost/bifrost
+```
+
+You can now install it by running setup.py:
+```
+python setup.py install 
+```
+You can now use Bifrost.
+
+Alternatively, if you are going to make modifications to Bifrost then export it to PYTHONPATH to tell python where to find the library. This way your changes will immeditaly be reflected and there is no need to call setup.py again.
+```
+export BIFROST=/path/to/level-4-project/bifrost/
+export PYTHONPATH=$BIFROST/python:${PYTHONPATH}
+```
 
 ## How to use
 
@@ -355,26 +389,6 @@ Bifrost ships with a number of example scripts which show typical use cases for 
 |example_conv2d_opt |Demonstrates how to tune a small network. This examples tunes the ms_size range on cycles.|
 
 # Advanced Instructions 
-## Build from source
-
-Install Apache TVM using the installation instructions [here](https://tvm.apache.org/docs/install/index.html).
-
-Cd into bifrost
-```
-cd bifrost
-```
-You can now install it by running setup.py:
-```
-python setup.py install 
-```
-You can now use Bifrost.
-
-Alternatively, if you are going to make modifications to Bifrost then export it to PYTHONPATH to tell python where to find the library. This way your changes will immeditaly be reflected and there is no need to call setup.py again.
-```
-export BIFROST=/path/to/level-4-project/bifrost/
-export PYTHONPATH=$BIFROST/python:${PYTHONPATH}
-```
-
 
 ## Bifrost Deep Dive
 The following diagram shows an overview of Bifrost.
@@ -497,22 +511,6 @@ Any new .cpp files will be automatically found by the Makefile as long as they a
 cd bifrost
 make -j
 ```
-
-#### C++ depdencies 
-To change the C code you need to clone the STONNE, and TVM repositories:
-```
-git clone https://github.com/axelstjerngren/stonne
-git clone https://github.com/axelstjerngren/mrna
-git clone https://github.com/apache/tvm
-```
-Keeping these three in the same folder will be useful.
-Before you can run **make** you need to export two environment variables:
-```
-export TVM_ROOT    = path_to_tvm/tvm
-export STONNE_ROOT = path_to_stonne/stonne
-export MRNA_ROOT = path_to_mrna/mRNA
-```
-The C++ should now compile correctly when you run **make** inside of the /bifrost directory.
 
 ### Simulator configurator
 This module can be found in ```bifrost/bifrost/stonne/simulator.py```. The simulated architecture is contained in a class called ```Simulator```:
