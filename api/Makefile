@@ -14,7 +14,7 @@ UNAME_S := $(shell uname -s)
 ifeq ($(UNAME_S), Darwin)
 	PKG_LDFLAGS += -undefined dynamic_lookup -DCMAKE_FIND_FRAMEWORK=LAST
 endif
-CC=g++
+CC=clang
 ../bifrost/bifrost/stonne/stonne_lib/stonne_lib.so: $(wildcard src/*cpp) $(wildcard ${STONNE_ROOT}/src/*cpp)  $(wildcard ${MRNA_ROOT}/src/*cpp)
 	@mkdir -p $(@D)
 	$(CC) $(PKG_CFLAGS) -shared -o $@ $^ $(PKG_LDFLAGS)
