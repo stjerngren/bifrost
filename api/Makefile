@@ -11,9 +11,8 @@ PKG_LDFLAGS =-L${TVM_ROOT}/build
 
 UNAME_S := $(shell uname -s)
 
-ifeq ($(UNAME_S), Darwin)
-	PKG_LDFLAGS += -undefined dynamic_lookup -DCMAKE_FIND_FRAMEWORK=LAST
-endif
+PKG_LDFLAGS += -undefined dynamic_lookup -DCMAKE_FIND_FRAMEWORK=LAST
+
 CC=clang++
 ../bifrost/bifrost/stonne/stonne_lib/stonne_lib.so: $(wildcard src/*cpp) $(wildcard ${STONNE_ROOT}/src/*cpp)  $(wildcard ${MRNA_ROOT}/src/*cpp)
 	@mkdir -p $(@D)
