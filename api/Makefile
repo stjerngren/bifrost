@@ -1,5 +1,5 @@
 # Makefie for Bifrost-STONNE API
-PKG_CFLAGS = -std=c++17 -stdlib=libc++ -O2 -fPIC -Iinclude/ -Iexternal/\
+PKG_CFLAGS = -std=c++17 -O2 -fPIC -Iinclude/ -Iexternal/\
 	-I${TVM_ROOT}/include\
 	-I${TVM_ROOT}/3rdparty/dmlc-core/include\
 	-I${TVM_ROOT}/3rdparty/dlpack/include\
@@ -13,7 +13,7 @@ UNAME_S := $(shell uname -s)
 
 PKG_LDFLAGS += -undefined dynamic_lookup -DCMAKE_FIND_FRAMEWORK=LAST
 
-CC=clang++
+CC=g++
 ../bifrost/bifrost/stonne/stonne_lib/stonne_lib.so: $(wildcard src/*cpp) $(wildcard ${STONNE_ROOT}/src/*cpp)  $(wildcard ${MRNA_ROOT}/src/*cpp)
 	@mkdir -p $(@D)
 	$(CC) $(PKG_CFLAGS) -shared -o $@ $^ $(PKG_LDFLAGS)
