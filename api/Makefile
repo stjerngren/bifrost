@@ -1,4 +1,4 @@
-# Makefie for Bifrost-STONNE API
+# Makefile for Bifrost-STONNE API
 PKG_CFLAGS = -std=c++17 -O2 -fPIC -Iinclude/ -Iexternal/\
 	-I${TVM_ROOT}/include\
 	-I${TVM_ROOT}/3rdparty/dmlc-core/include\
@@ -11,7 +11,9 @@ PKG_LDFLAGS =-L${TVM_ROOT}/build
 
 UNAME_S := $(shell uname -s)
 
-PKG_LDFLAGS += -undefined dynamic_lookup -DCMAKE_FIND_FRAMEWORK=LAST
+ifeq ($(UNAME_S), Darwin)
+	PKG_LDFLAGS += -undefined dynamic_lookup -DCMAKE_FIND_FRAMEWORK=LAST
+endif
 
 CC=g++
 ../bifrost/bifrost/stonne/stonne_lib/stonne_lib.so: $(wildcard src/*cpp) $(wildcard ${STONNE_ROOT}/src/*cpp)  $(wildcard ${MRNA_ROOT}/src/*cpp)
