@@ -77,6 +77,26 @@ class TestDense(TestCase):
         # Check if output is equivalent to running the convolution on CPU 
         self.assertTrue(np.all(np.round(out_stonne, 4) == np.round(self.out_llvm, 4)))
 
+    def test_tpu(self):
+        config_simulator(
+            ms_size=16,
+            reduce_network_type="TEMPORALRN",
+            ms_network_type= "OS_MESH",
+            accumulation_buffer_enabled = True,             
+            dn_bw=8,
+            rn_bw=8,
+            controller_type="TPU_OS_DENSE",
+            sparsity_ratio = 20,
+        )
+        self.module.run()
+        out_stonne = self.module.get_output(
+            0,
+            tvm.nd.empty(self.out_shape)
+            ).asnumpy()
+
+        # Check if output is equivalent to running the convolution on CPU 
+        self.assertTrue(np.all(np.round(out_stonne, 4) == np.round(self.out_llvm, 4)))
+        
     def test_sigma_sparse(self):
         config_simulator(
             ms_size=16,
